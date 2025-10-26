@@ -18,7 +18,7 @@ class Config:
     # SQLAlchemy Database Configuration
     SQLALCHEMY_DATABASE_URI = os.getenv(
         'DATABASE_URL',
-        'mysql+pymysql://root:@localhost:3306/intellevalpro_db'
+        'mysql+pymysql://admin:12345678@intellevalpro.cx4waogceerc.ap-southeast-2.rds.amazonaws.com/intellevalpro_db'
     )
     SQLALCHEMY_TRACK_MODIFICATIONS = False
     SQLALCHEMY_ECHO = os.getenv('DEBUG', 'True').lower() == 'true'  # Log SQL queries in debug mode
