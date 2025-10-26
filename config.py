@@ -1,12 +1,29 @@
 """
 Configuration module for IntellEvalPro
-Loads environment variables and provides configuration classes
+Loads environment variables from .env file OR system environment OR AWS Parameter Store
 """
 import os
 from dotenv import load_dotenv
 
-# Load environment variables from .env file
-load_dotenv()
+# Try to load .env file (works locally and as backup on server)
+dotenv_path = os.path.join(os.path.dirname(__file__), '.env')
+if os.path.exists(dotenv_path):
+    load_dotenv(dotenv_path)
+    print(f"✅ Loaded environment from .env file")
+else:
+    print(f"ℹ️ No .env file found, using system environment variables")
+
+# Try to load AWS secrets if available (optional - install boto3 first)
+try:
+    from aws_config import load_aws_secrets
+    loaded_secrets = load_aws_secrets()
+    if any(loaded_secrets.values()):
+        print("✅ Loaded secrets from AWS Parameter Store")
+except ImportError:
+    # boto3 not installed - skip AWS Parameter Store
+    pass
+except Exception as e:
+    print(f"⚠️ Could not load AWS secrets: {e}")
 
 class Config:
     """Base configuration class"""
