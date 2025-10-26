@@ -1,0 +1,838 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+  <title>Activity Logs | IntellEvalPro</title>
+  
+  <!-- Favicon -->
+  <link rel="icon" type="image/png" href="{{ url_for('static', filename='images/nclogo.png') }}">
+  <link rel="shortcut icon" type="image/png" href="{{ url_for('static', filename='images/nclogo.png') }}">
+  <link rel="apple-touch-icon" href="{{ url_for('static', filename='images/nclogo.png') }}">
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  
+  <!-- Font Awesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"/>
+  
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  
+  <!-- jQuery -->
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  
+  <!-- SweetAlert2 -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11.7.12/dist/sweetalert2.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.7.12/dist/sweetalert2.all.min.js"></script>
+  
+  <script>
+    tailwind.config = {
+      theme: {
+        fontFamily: {
+          'sans': ['Inter', 'system-ui', 'sans-serif'],
+        },
+        extend: {
+          colors: {
+            primary: {
+              50: '#e6f0ff',
+              100: '#b3d1ff',
+              200: '#80b3ff',
+              300: '#4d94ff', 
+              400: '#1a75ff',
+              500: '#0059cc',
+              600: '#004db3',
+              700: '#004099',
+              800: '#003380',
+              900: '#002666'
+            }
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    /* Active nav link */
+    .nav-link.active {
+      position: relative;
+    }
+    
+    .nav-link.active::after {
+      content: '';
+      position: absolute;
+      left: 0;
+      width: 4px;
+      height: 100%;
+      background-color: #0059cc;
+    }
+    
+    /* Custom scrollbar */
+    .custom-scrollbar::-webkit-scrollbar {
+      width: 8px;
+      height: 8px;
+    }
+    
+    .custom-scrollbar::-webkit-scrollbar-track {
+      background: #f1f1f1;
+      border-radius: 4px;
+    }
+    
+    .custom-scrollbar::-webkit-scrollbar-thumb {
+      background: #888;
+      border-radius: 4px;
+    }
+    
+    .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+      background: #555;
+    }
+  </style>
+</head>
+
+<body class="bg-gray-50">
+  <div class="flex h-screen">
+    <!-- Sidebar (will be loaded dynamically) -->
+    <div id="admin-sidebar"></div>
+    
+    <!-- Main content -->
+    <div class="flex-1 flex flex-col overflow-hidden lg:ml-64">
+      <!-- Top Navigation (will be loaded dynamically) -->
+      <div id="admin-header"></div>
+      
+      <!-- Main content area -->
+      <main class="flex-1 overflow-x-hidden overflow-y-auto bg-gray-50 p-4 md:p-6">
+        <!-- Page Header -->
+        <div class="mb-6">
+          <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
+            <div>
+              <h1 class="text-xl md:text-2xl font-bold text-gray-900 mb-1 md:mb-2">Activity Logs</h1>
+              <p class="text-sm text-gray-600">Monitor all system activities and user actions</p>
+            </div>
+            <div>
+              <button onclick="refreshLogs()" class="w-full md:w-auto px-4 py-2 bg-primary-600 text-white rounded-md hover:bg-primary-700 transition-colors text-sm min-h-[44px]">
+                <i class="fas fa-sync-alt mr-2"></i><span class="hidden sm:inline">Refresh</span><span class="sm:hidden">Refresh</span>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Stats Cards -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+          <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
+            <div class="flex items-center justify-between">
+              <div>
+                <p class="text-xs md:text-sm text-gray-600 mb-1">Total Logs</p>
+                <p id="total-logs" class="text-xl md:text-2xl font-bold text-gray-900">0</p>
+              </div>
+              <div class="h-10 w-10 md:h-12 md:w-12 bg-blue-100 rounded-lg flex items-center justify-center">
+                <i class="fas fa-clipboard-list text-blue-600 text-lg md:text-xl"></i>
+              </div>
+            </div>
+          </div>
+
+          <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
+            <div class="flex items-center justify-between">
+              <div>
+                <p class="text-xs md:text-sm text-gray-600 mb-1">Login Activities</p>
+                <p id="login-count" class="text-xl md:text-2xl font-bold text-gray-900">0</p>
+              </div>
+              <div class="h-10 w-10 md:h-12 md:w-12 bg-green-100 rounded-lg flex items-center justify-center">
+                <i class="fas fa-sign-in-alt text-green-600 text-lg md:text-xl"></i>
+              </div>
+            </div>
+          </div>
+
+          <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
+            <div class="flex items-center justify-between">
+              <div>
+                <p class="text-xs md:text-sm text-gray-600 mb-1">Retake Requests</p>
+                <p id="retake-count" class="text-xl md:text-2xl font-bold text-gray-900">0</p>
+              </div>
+              <div class="h-10 w-10 md:h-12 md:w-12 bg-orange-100 rounded-lg flex items-center justify-center">
+                <i class="fas fa-redo text-orange-600 text-lg md:text-xl"></i>
+              </div>
+            </div>
+          </div>
+
+          <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
+            <div class="flex items-center justify-between">
+              <div>
+                <p class="text-xs md:text-sm text-gray-600 mb-1">Today's Activities</p>
+                <p id="today-count" class="text-xl md:text-2xl font-bold text-gray-900">0</p>
+              </div>
+              <div class="h-10 w-10 md:h-12 md:w-12 bg-purple-100 rounded-lg flex items-center justify-center">
+                <i class="fas fa-calendar-day text-purple-600 text-lg md:text-xl"></i>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Filters -->
+        <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-4 mb-6">
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            <!-- Search -->
+            <div class="sm:col-span-2">
+              <label class="block text-sm font-medium text-gray-700 mb-2">Search</label>
+              <div class="relative">
+                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                  <i class="fas fa-search text-gray-400"></i>
+                </div>
+                <input type="text" id="search-input" placeholder="Search logs..." 
+                       class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary-500 focus:border-transparent text-sm">
+              </div>
+            </div>
+
+            <!-- Activity Type Filter -->
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-2">Activity Type</label>
+              <select id="activity-filter" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary-500 focus:border-transparent text-sm">
+                <option value="">All Activities</option>
+                <option value="login">Login</option>
+                <option value="logout">Logout</option>
+                <option value="retake">Retake Request</option>
+                <option value="evaluation">Evaluation</option>
+                <option value="create">Create</option>
+                <option value="update">Update</option>
+                <option value="delete">Delete</option>
+              </select>
+            </div>
+
+            <!-- User Role Filter -->
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-2">User Role</label>
+              <select id="role-filter" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary-500 focus:border-transparent text-sm">
+                <option value="">All Roles</option>
+                <option value="admin">Admin</option>
+                <option value="guidance">Guidance</option>
+                <option value="student">Student</option>
+                <option value="faculty">Faculty</option>
+              </select>
+            </div>
+
+            <!-- Date Range -->
+            <div class="sm:col-span-2 lg:col-span-1">
+              <label class="block text-sm font-medium text-gray-700 mb-2">Date Range</label>
+              <select id="date-filter" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary-500 focus:border-transparent text-sm">
+                <option value="all">All Time</option>
+                <option value="today">Today</option>
+                <option value="week">This Week</option>
+                <option value="month">This Month</option>
+                <option value="custom">Custom Range</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Custom Date Range (hidden by default) -->
+          <div id="custom-date-range" class="hidden mt-4 grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-2">From Date</label>
+              <input type="date" id="from-date" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary-500 focus:border-transparent text-sm">
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-2">To Date</label>
+              <input type="date" id="to-date" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary-500 focus:border-transparent text-sm">
+            </div>
+          </div>
+        </div>
+
+        <!-- Activity Logs Table - Desktop View -->
+        <div class="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden hidden md:block">
+          <div class="px-4 py-3 border-b border-gray-200 bg-gray-50">
+            <h3 class="text-base md:text-lg font-medium text-gray-900">Activity Timeline</h3>
+          </div>
+          
+          <div class="overflow-x-auto custom-scrollbar">
+            <table class="min-w-full divide-y divide-gray-200">
+              <thead class="bg-gray-50">
+                <tr>
+                  <th class="px-4 lg:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Timestamp</th>
+                  <th class="px-4 lg:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">User</th>
+                  <th class="px-4 lg:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Activity</th>
+                  <th class="px-4 lg:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider hidden lg:table-cell">Details</th>
+                  <th class="px-4 lg:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider hidden xl:table-cell">IP Address</th>
+                  <th class="px-4 lg:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                </tr>
+              </thead>
+              <tbody id="logs-table-body" class="bg-white divide-y divide-gray-200">
+                <!-- Logs will be loaded dynamically -->
+              </tbody>
+            </table>
+          </div>
+          
+          <!-- Loading State -->
+          <div id="loading-state" class="flex items-center justify-center py-12">
+            <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-500"></div>
+            <span class="ml-2 text-gray-600 text-sm">Loading activity logs...</span>
+          </div>
+          
+          <!-- Empty State -->
+          <div id="empty-state" class="hidden text-center py-12">
+            <i class="fas fa-clipboard-list text-gray-300 text-5xl mb-4"></i>
+            <h3 class="text-lg font-medium text-gray-900 mb-2">No Activity Logs Found</h3>
+            <p class="text-gray-500 text-sm">No activities match your current filter criteria.</p>
+          </div>
+
+          <!-- Pagination -->
+          <div id="pagination" class="px-4 lg:px-6 py-4 border-t border-gray-200 flex flex-col sm:flex-row items-center justify-between gap-3">
+            <div class="text-sm text-gray-700">
+              Showing <span id="showing-from">0</span> to <span id="showing-to">0</span> of <span id="total-records">0</span> entries
+            </div>
+            <div class="flex gap-2">
+              <button id="prev-page" onclick="changePage(-1)" class="px-3 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed min-h-[44px] md:min-h-0">
+                <i class="fas fa-chevron-left"></i> <span class="hidden sm:inline">Previous</span>
+              </button>
+              <button id="next-page" onclick="changePage(1)" class="px-3 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed min-h-[44px] md:min-h-0">
+                <span class="hidden sm:inline">Next</span> <i class="fas fa-chevron-right"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Activity Logs Cards - Mobile View -->
+        <div class="md:hidden">
+          <div class="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden mb-4">
+            <div class="px-4 py-3 border-b border-gray-200 bg-gray-50">
+              <h3 class="text-base font-medium text-gray-900">Activity Timeline</h3>
+            </div>
+            
+            <!-- Loading State Mobile -->
+            <div id="loading-state-mobile" class="flex items-center justify-center py-12">
+              <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-500"></div>
+              <span class="ml-2 text-gray-600 text-sm">Loading...</span>
+            </div>
+            
+            <!-- Empty State Mobile -->
+            <div id="empty-state-mobile" class="hidden text-center py-12 px-4">
+              <i class="fas fa-clipboard-list text-gray-300 text-4xl mb-3"></i>
+              <h3 class="text-base font-medium text-gray-900 mb-1">No Logs Found</h3>
+              <p class="text-gray-500 text-sm">No activities match your filters.</p>
+            </div>
+            
+            <!-- Cards Container -->
+            <div id="logs-cards-body" class="divide-y divide-gray-200">
+              <!-- Cards will be loaded dynamically -->
+            </div>
+          </div>
+
+          <!-- Mobile Pagination -->
+          <div id="pagination-mobile" class="bg-white rounded-lg shadow-sm border border-gray-200 p-4">
+            <div class="flex flex-col items-center gap-3">
+              <div class="text-sm text-gray-700 text-center">
+                Showing <span id="showing-from-mobile">0</span> to <span id="showing-to-mobile">0</span> of <span id="total-records-mobile">0</span> entries
+              </div>
+              <div class="flex gap-2 w-full">
+                <button id="prev-page-mobile" onclick="changePage(-1)" class="flex-1 px-3 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed min-h-[44px]">
+                  <i class="fas fa-chevron-left"></i> Previous
+                </button>
+                <button id="next-page-mobile" onclick="changePage(1)" class="flex-1 px-3 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed min-h-[44px]">
+                  Next <i class="fas fa-chevron-right"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <!-- Overlay for mobile sidebar -->
+  <div id="sidebar-overlay" class="fixed inset-0 bg-black bg-opacity-50 z-30 lg:hidden hidden"></div>
+
+  <!-- Log Details Modal -->
+  <div id="log-details-modal" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50 hidden">
+    <div class="relative top-4 md:top-20 mx-auto p-4 md:p-5 border w-full md:w-11/12 lg:w-3/4 xl:w-1/2 max-w-4xl shadow-lg rounded-md bg-white mb-4">
+      <div class="mt-3">
+        <!-- Modal Header -->
+        <div class="flex items-center justify-between mb-4">
+          <h3 class="text-base md:text-lg font-medium text-gray-900">Activity Log Details</h3>
+          <button type="button" onclick="closeLogDetailsModal()" class="text-gray-400 hover:text-gray-600 min-w-[44px] min-h-[44px] flex items-center justify-center">
+            <i class="fas fa-times"></i>
+          </button>
+        </div>
+        
+        <!-- Modal Content -->
+        <div id="log-details-content" class="space-y-4">
+          <!-- Details will be populated here -->
+        </div>
+        
+        <!-- Modal Footer -->
+        <div class="flex justify-end mt-6">
+          <button type="button" onclick="closeLogDetailsModal()" class="w-full md:w-auto px-4 py-2 text-sm font-medium text-white bg-primary-600 border border-transparent rounded-md hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 min-h-[44px]">
+            Close
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Include navigation and loading scripts -->
+    
+  <!-- Include loading animation script -->
+  <script src="{{ url_for('static', filename='js/loading-animation.js') }}"></script>
+  
+  <!-- Prevent logout on browser back button -->
+  <script src="{{ url_for('static', filename='js/prevent-back-logout.js') }}"></script>
+
+  <!-- Session Timeout Monitor (Auto-logout after 1 hour) -->
+  <script src="{{ url_for('static', filename='js/session-timeout.js') }}"></script>
+</body>
+</html>
+  <script src="{{ url_for('static', filename='js/admin-navigation.js') }}"></script>
+
+  <script>
+    // Initialize page
+    document.addEventListener('DOMContentLoaded', function() {
+      loadActivityLogs();
+      setupEventListeners();
+    });
+
+    let logsData = [];
+    let filteredLogs = [];
+    let currentPage = 1;
+    let logsPerPage = 20;
+    let searchTimeout = null;
+
+    /**
+     * Setup event listeners
+     */
+    function setupEventListeners() {
+      // Search with debouncing
+      document.getElementById('search-input').addEventListener('input', function() {
+        clearTimeout(searchTimeout);
+        searchTimeout = setTimeout(filterLogs, 300);
+      });
+
+      // Filter changes
+      document.getElementById('activity-filter').addEventListener('change', filterLogs);
+      document.getElementById('role-filter').addEventListener('change', filterLogs);
+      document.getElementById('date-filter').addEventListener('change', function() {
+        const customRange = document.getElementById('custom-date-range');
+        if (this.value === 'custom') {
+          customRange.classList.remove('hidden');
+        } else {
+          customRange.classList.add('hidden');
+          filterLogs();
+        }
+      });
+
+      // Custom date range
+      document.getElementById('from-date').addEventListener('change', filterLogs);
+      document.getElementById('to-date').addEventListener('change', filterLogs);
+    }
+
+    /**
+     * Load activity logs from API
+     */
+    function loadActivityLogs() {
+      document.getElementById('loading-state').style.display = 'flex';
+      document.getElementById('empty-state').classList.add('hidden');
+      
+      fetch('/api/admin/activity-logs')
+        .then(response => {
+          if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+          }
+          return response.json();
+        })
+        .then(data => {
+          if (data.success) {
+            logsData = data.logs || [];
+            filteredLogs = logsData;
+            displayLogs();
+            updateStats();
+            console.log('Activity logs loaded:', logsData.length);
+          } else {
+            showError('Failed to load activity logs: ' + (data.message || 'Unknown error'));
+          }
+        })
+        .catch(error => {
+          console.error('Error loading activity logs:', error);
+          showError('Error loading activity logs: ' + error.message);
+        })
+        .finally(() => {
+          document.getElementById('loading-state').style.display = 'none';
+        });
+    }
+
+    /**
+     * Update statistics
+     */
+    function updateStats() {
+      const today = new Date().toDateString();
+      
+      document.getElementById('total-logs').textContent = logsData.length;
+      document.getElementById('login-count').textContent = logsData.filter(l => l.activity_type === 'login').length;
+      document.getElementById('retake-count').textContent = logsData.filter(l => l.activity_type === 'retake').length;
+      document.getElementById('today-count').textContent = logsData.filter(l => 
+        new Date(l.timestamp).toDateString() === today
+      ).length;
+    }
+
+    /**
+     * Get activity icon and color
+     */
+    function getActivityIcon(type) {
+      const icons = {
+        'login': { icon: 'fa-sign-in-alt', color: 'text-green-600', bg: 'bg-green-100' },
+        'logout': { icon: 'fa-sign-out-alt', color: 'text-gray-600', bg: 'bg-gray-100' },
+        'retake': { icon: 'fa-redo', color: 'text-orange-600', bg: 'bg-orange-100' },
+        'evaluation': { icon: 'fa-clipboard-check', color: 'text-blue-600', bg: 'bg-blue-100' },
+        'create': { icon: 'fa-plus-circle', color: 'text-green-600', bg: 'bg-green-100' },
+        'update': { icon: 'fa-edit', color: 'text-yellow-600', bg: 'bg-yellow-100' },
+        'delete': { icon: 'fa-trash', color: 'text-red-600', bg: 'bg-red-100' }
+      };
+      return icons[type] || { icon: 'fa-info-circle', color: 'text-gray-600', bg: 'bg-gray-100' };
+    }
+
+    /**
+     * Display logs in table and cards
+     */
+    function displayLogs() {
+      const tbody = document.getElementById('logs-table-body');
+      const cardsBody = document.getElementById('logs-cards-body');
+      const loadingState = document.getElementById('loading-state');
+      const loadingStateMobile = document.getElementById('loading-state-mobile');
+      const emptyState = document.getElementById('empty-state');
+      const emptyStateMobile = document.getElementById('empty-state-mobile');
+      
+      loadingState.style.display = 'none';
+      loadingStateMobile.style.display = 'none';
+      
+      if (filteredLogs.length === 0) {
+        tbody.innerHTML = '';
+        cardsBody.innerHTML = '';
+        emptyState.classList.remove('hidden');
+        emptyStateMobile.classList.remove('hidden');
+        document.getElementById('pagination').style.display = 'none';
+        document.getElementById('pagination-mobile').style.display = 'none';
+        return;
+      }
+      
+      emptyState.classList.add('hidden');
+      emptyStateMobile.classList.add('hidden');
+      document.getElementById('pagination').style.display = 'flex';
+      document.getElementById('pagination-mobile').style.display = 'block';
+      
+      // Calculate pagination
+      const totalPages = Math.ceil(filteredLogs.length / logsPerPage);
+      const startIndex = (currentPage - 1) * logsPerPage;
+      const endIndex = Math.min(startIndex + logsPerPage, filteredLogs.length);
+      const paginatedLogs = filteredLogs.slice(startIndex, endIndex);
+      
+      // Update pagination info (desktop)
+      document.getElementById('showing-from').textContent = startIndex + 1;
+      document.getElementById('showing-to').textContent = endIndex;
+      document.getElementById('total-records').textContent = filteredLogs.length;
+      document.getElementById('prev-page').disabled = currentPage === 1;
+      document.getElementById('next-page').disabled = currentPage === totalPages;
+      
+      // Update pagination info (mobile)
+      document.getElementById('showing-from-mobile').textContent = startIndex + 1;
+      document.getElementById('showing-to-mobile').textContent = endIndex;
+      document.getElementById('total-records-mobile').textContent = filteredLogs.length;
+      document.getElementById('prev-page-mobile').disabled = currentPage === 1;
+      document.getElementById('next-page-mobile').disabled = currentPage === totalPages;
+      
+      // Render desktop table rows
+      tbody.innerHTML = paginatedLogs.map(log => {
+        const activityStyle = getActivityIcon(log.activity_type);
+        const timestamp = new Date(log.timestamp);
+        
+        return `
+          <tr class="hover:bg-gray-50">
+            <td class="px-4 lg:px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+              <div>${timestamp.toLocaleDateString()}</div>
+              <div class="text-xs text-gray-500">${timestamp.toLocaleTimeString()}</div>
+            </td>
+            <td class="px-4 lg:px-6 py-4 whitespace-nowrap">
+              <div class="flex items-center">
+                <div class="h-8 w-8 rounded-full bg-primary-100 flex items-center justify-center mr-2 lg:mr-3">
+                  <span class="text-xs font-medium text-primary-600">${log.user_name ? log.user_name.charAt(0) : 'U'}</span>
+                </div>
+                <div>
+                  <div class="text-sm font-medium text-gray-900">${log.user_name || 'Unknown'}</div>
+                  <div class="text-xs text-gray-500">${log.user_role || 'N/A'}</div>
+                </div>
+              </div>
+            </td>
+            <td class="px-4 lg:px-6 py-4 whitespace-nowrap">
+              <div class="flex items-center">
+                <div class="h-8 w-8 ${activityStyle.bg} rounded-lg flex items-center justify-center mr-2">
+                  <i class="fas ${activityStyle.icon} ${activityStyle.color}"></i>
+                </div>
+                <span class="text-sm font-medium text-gray-900 capitalize">${log.activity_type}</span>
+              </div>
+            </td>
+            <td class="px-4 lg:px-6 py-4 text-sm text-gray-900 hidden lg:table-cell">
+              <div class="max-w-xs truncate">${log.description || 'N/A'}</div>
+              ${log.reason ? `<div class="text-xs text-gray-500 mt-1"><strong>Reason:</strong> ${log.reason}</div>` : ''}
+            </td>
+            <td class="px-4 lg:px-6 py-4 whitespace-nowrap text-sm text-gray-500 hidden xl:table-cell">
+              ${log.ip_address || 'N/A'}
+            </td>
+            <td class="px-4 lg:px-6 py-4 whitespace-nowrap text-sm font-medium">
+              <button onclick="viewLogDetails(${log.log_id})" class="text-primary-600 hover:text-primary-900">
+                <i class="fas fa-eye"></i> <span class="hidden lg:inline">View</span>
+              </button>
+            </td>
+          </tr>
+        `;
+      }).join('');
+      
+      // Render mobile cards
+      cardsBody.innerHTML = paginatedLogs.map(log => {
+        const activityStyle = getActivityIcon(log.activity_type);
+        const timestamp = new Date(log.timestamp);
+        
+        return `
+          <div class="p-4 hover:bg-gray-50">
+            <div class="flex items-start justify-between mb-3">
+              <div class="flex items-center">
+                <div class="h-10 w-10 ${activityStyle.bg} rounded-lg flex items-center justify-center mr-3">
+                  <i class="fas ${activityStyle.icon} ${activityStyle.color}"></i>
+                </div>
+                <div>
+                  <div class="text-sm font-semibold text-gray-900 capitalize">${log.activity_type}</div>
+                  <div class="text-xs text-gray-500">${timestamp.toLocaleString()}</div>
+                </div>
+              </div>
+            </div>
+            
+            <div class="space-y-2 mb-3">
+              <div class="flex items-center">
+                <div class="h-6 w-6 rounded-full bg-primary-100 flex items-center justify-center mr-2">
+                  <span class="text-xs font-medium text-primary-600">${log.user_name ? log.user_name.charAt(0) : 'U'}</span>
+                </div>
+                <span class="text-sm text-gray-900">${log.user_name || 'Unknown'}</span>
+                <span class="text-xs text-gray-500 ml-2">(${log.user_role || 'N/A'})</span>
+              </div>
+              
+              ${log.description ? `
+                <div class="text-sm text-gray-700">
+                  <span class="font-medium">Details:</span> ${log.description}
+                </div>
+              ` : ''}
+              
+              ${log.reason ? `
+                <div class="text-sm text-gray-700">
+                  <span class="font-medium">Reason:</span> ${log.reason}
+                </div>
+              ` : ''}
+              
+              ${log.ip_address ? `
+                <div class="text-xs text-gray-500">
+                  <span class="font-medium">IP:</span> ${log.ip_address}
+                </div>
+              ` : ''}
+            </div>
+            
+            <button onclick="viewLogDetails(${log.log_id})" class="w-full px-4 py-2 text-sm font-medium text-primary-600 bg-primary-50 rounded-md hover:bg-primary-100 min-h-[44px]">
+              <i class="fas fa-eye mr-2"></i>View Full Details
+            </button>
+          </div>
+        `;
+      }).join('');
+    }
+
+    /**
+     * Filter logs
+     */
+    function filterLogs() {
+      const searchTerm = document.getElementById('search-input').value.toLowerCase();
+      const activityFilter = document.getElementById('activity-filter').value;
+      const roleFilter = document.getElementById('role-filter').value;
+      const dateFilter = document.getElementById('date-filter').value;
+      
+      filteredLogs = logsData.filter(log => {
+        // Search filter
+        const matchesSearch = !searchTerm || 
+          (log.user_name && log.user_name.toLowerCase().includes(searchTerm)) ||
+          (log.description && log.description.toLowerCase().includes(searchTerm)) ||
+          (log.activity_type && log.activity_type.toLowerCase().includes(searchTerm));
+        
+        // Activity type filter
+        const matchesActivity = !activityFilter || log.activity_type === activityFilter;
+        
+        // Role filter
+        const matchesRole = !roleFilter || log.user_role === roleFilter;
+        
+        // Date filter
+        let matchesDate = true;
+        if (dateFilter !== 'all') {
+          const logDate = new Date(log.timestamp);
+          const today = new Date();
+          today.setHours(0, 0, 0, 0);
+          
+          if (dateFilter === 'today') {
+            matchesDate = logDate >= today;
+          } else if (dateFilter === 'week') {
+            const weekAgo = new Date(today);
+            weekAgo.setDate(weekAgo.getDate() - 7);
+            matchesDate = logDate >= weekAgo;
+          } else if (dateFilter === 'month') {
+            const monthAgo = new Date(today);
+            monthAgo.setMonth(monthAgo.getMonth() - 1);
+            matchesDate = logDate >= monthAgo;
+          } else if (dateFilter === 'custom') {
+            const fromDate = document.getElementById('from-date').value;
+            const toDate = document.getElementById('to-date').value;
+            if (fromDate && toDate) {
+              matchesDate = logDate >= new Date(fromDate) && logDate <= new Date(toDate + 'T23:59:59');
+            }
+          }
+        }
+        
+        return matchesSearch && matchesActivity && matchesRole && matchesDate;
+      });
+      
+      currentPage = 1;
+      displayLogs();
+    }
+
+    /**
+     * Change page
+     */
+    function changePage(direction) {
+      const totalPages = Math.ceil(filteredLogs.length / logsPerPage);
+      currentPage = Math.max(1, Math.min(totalPages, currentPage + direction));
+      displayLogs();
+    }
+
+    /**
+     * View log details
+     */
+    function viewLogDetails(logId) {
+      const log = logsData.find(l => l.log_id === logId);
+      if (!log) return;
+      
+      const activityStyle = getActivityIcon(log.activity_type);
+      const timestamp = new Date(log.timestamp);
+      
+      const detailsHtml = `
+        <div class="space-y-4">
+          <div class="flex items-center justify-center mb-4">
+            <div class="h-12 w-12 md:h-16 md:w-16 ${activityStyle.bg} rounded-full flex items-center justify-center">
+              <i class="fas ${activityStyle.icon} ${activityStyle.color} text-xl md:text-2xl"></i>
+            </div>
+          </div>
+          
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+              <label class="text-xs md:text-sm font-medium text-gray-500">Activity Type</label>
+              <p class="text-sm md:text-base text-gray-900 capitalize">${log.activity_type}</p>
+            </div>
+            <div>
+              <label class="text-xs md:text-sm font-medium text-gray-500">Timestamp</label>
+              <p class="text-sm md:text-base text-gray-900">${timestamp.toLocaleString()}</p>
+            </div>
+          </div>
+          
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+              <label class="text-xs md:text-sm font-medium text-gray-500">User</label>
+              <p class="text-sm md:text-base text-gray-900">${log.user_name || 'Unknown'}</p>
+            </div>
+            <div>
+              <label class="text-xs md:text-sm font-medium text-gray-500">Role</label>
+              <p class="text-sm md:text-base text-gray-900 capitalize">${log.user_role || 'N/A'}</p>
+            </div>
+          </div>
+          
+          ${log.ip_address ? `
+            <div>
+              <label class="text-xs md:text-sm font-medium text-gray-500">IP Address</label>
+              <p class="text-sm md:text-base text-gray-900">${log.ip_address}</p>
+            </div>
+          ` : ''}
+          
+          ${log.description ? `
+            <div>
+              <label class="text-xs md:text-sm font-medium text-gray-500">Description</label>
+              <p class="text-sm md:text-base text-gray-900">${log.description}</p>
+            </div>
+          ` : ''}
+          
+          ${log.reason ? `
+            <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-3">
+              <label class="text-xs md:text-sm font-medium text-yellow-800">Reason</label>
+              <p class="text-sm md:text-base text-yellow-900 mt-1">${log.reason}</p>
+            </div>
+          ` : ''}
+          
+          ${log.target_user ? `
+            <div>
+              <label class="text-xs md:text-sm font-medium text-gray-500">Target User</label>
+              <p class="text-sm md:text-base text-gray-900">${log.target_user}</p>
+            </div>
+          ` : ''}
+          
+          ${log.additional_data ? `
+            <div>
+              <label class="text-xs md:text-sm font-medium text-gray-500">Additional Information</label>
+              <pre class="text-xs text-gray-900 bg-gray-50 p-3 rounded-md overflow-x-auto mt-1">${JSON.stringify(JSON.parse(log.additional_data), null, 2)}</pre>
+            </div>
+          ` : ''}
+        </div>
+      `;
+      
+      document.getElementById('log-details-content').innerHTML = detailsHtml;
+      document.getElementById('log-details-modal').classList.remove('hidden');
+    }
+
+    /**
+     * Close log details modal
+     */
+    function closeLogDetailsModal() {
+      document.getElementById('log-details-modal').classList.add('hidden');
+    }
+
+    /**
+     * Refresh logs
+     */
+    function refreshLogs() {
+      Swal.fire({
+        title: 'Refreshing...',
+        text: 'Loading latest activity logs',
+        allowOutsideClick: false,
+        showConfirmButton: false,
+        willOpen: () => {
+          Swal.showLoading();
+        }
+      });
+      
+      loadActivityLogs();
+      
+      setTimeout(() => {
+        Swal.close();
+        showSuccess('Activity logs refreshed successfully');
+      }, 500);
+    }
+
+    /**
+     * Show error message
+     */
+    function showError(message) {
+      Swal.fire({
+        icon: 'error',
+        title: 'Error',
+        text: message,
+        confirmButtonColor: '#0059cc'
+      });
+    }
+
+    /**
+     * Show success message
+     */
+    function showSuccess(message) {
+      Swal.fire({
+        icon: 'success',
+        title: 'Success',
+        text: message,
+        timer: 2000,
+        showConfirmButton: false
+      });
+    }
+  </script>
+</body>
+</html>

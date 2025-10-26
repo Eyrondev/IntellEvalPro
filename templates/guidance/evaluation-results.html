@@ -1,0 +1,3931 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+  <title>Evaluation Results | IntellEvalPro</title>
+  
+  <!-- Favicon -->
+  <link rel="icon" type="image/png" href="{{ url_for('static', filename='images/nclogo.png') }}">
+  
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+  
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  
+  <!-- jQuery -->
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  
+  <!-- jQuery UI for Draggable -->
+  <link rel="stylesheet" href="https://code.jquery.com/ui/1.13.2/themes/base/jquery-ui.css">
+  <script src="https://code.jquery.com/ui/1.13.2/jquery-ui.min.js"></script>
+  
+  <!-- SweetAlert2 -->
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.7.12/dist/sweetalert2.all.min.js"></script>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11.7.12/dist/sweetalert2.min.css">
+  
+  <!-- Tailwind Config -->
+  <script>
+    tailwind.config = {
+      theme: {
+        fontFamily: {
+          'sans': ['Inter', 'system-ui', 'sans-serif']
+        },
+        extend: {
+          colors: {
+            primary: {
+              50: '#e6f0ff',
+              100: '#b3d1ff',
+              200: '#80b3ff',
+              300: '#4d94ff', 
+              400: '#1a75ff',
+              500: '#0059cc',
+              600: '#004799',
+              700: '#003566',
+              800: '#002233',
+              900: '#001019'
+            },
+            secondary: {
+              50: '#f8f9fa',
+              100: '#e9ecef',
+              200: '#dee2e6',
+              300: '#ced4da',
+              400: '#adb5bd',
+              500: '#6c757d',
+              600: '#495057',
+              700: '#343a40',
+              800: '#212529',
+              900: '#0d1117'
+            }
+          }
+        }
+      }
+    }
+  </script>
+  
+  <style>
+    /* Modern UI Design (Same as other guidance pages) */
+    body {
+      font-family: 'Inter', system-ui, sans-serif;
+    }
+    /* Custom scrollbar */
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    
+    ::-webkit-scrollbar-track {
+      background: #f1f1f1;
+      border-radius: 10px;
+    }
+    
+    ::-webkit-scrollbar-thumb {
+      background: #c1c1c1;
+      border-radius: 10px;
+    }
+    
+    ::-webkit-scrollbar-thumb:hover {
+      background: #a8a8a8;
+    }
+    
+    /* Active nav link - Orange guidance theme */
+        /* Active nav link - Orange guidance theme */
+        .active-nav {
+            background-color: #e6f0ff !important;
+            color: #0059cc !important;
+            border-left: 4px solid #0059cc !important;
+        }
+    
+    /* Modern Tab Navigation */
+    .results-tab {
+      position: relative;
+      outline: none;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      border-radius: 16px 16px 0 0;
+      background: linear-gradient(135deg, #ffffff 0%, #f8fafc 50%, #f1f5f9 100%);
+      border: 1px solid #e2e8f0;
+      border-bottom: none;
+      margin-right: 6px;
+      overflow: hidden;
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+    }
+    
+    .results-tab:last-child {
+      margin-right: 0;
+    }
+    
+    .results-tab::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 3px;
+      background: linear-gradient(90deg, #0059cc, #3b82f6);
+      transform: scaleX(0);
+      transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    
+    .results-tab.active::before {
+      transform: scaleX(1);
+    }
+    
+    .results-tab.active {
+      color: #0059cc !important;
+      background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+      border-color: #0059cc;
+      box-shadow: 
+        0 -6px 20px rgba(0, 89, 204, 0.25),
+        0 4px 12px rgba(0, 0, 0, 0.08),
+        inset 0 1px 0 rgba(255, 255, 255, 0.9);
+      transform: translateY(-3px);
+      z-index: 10;
+    }
+    
+    .results-tab.active i {
+      color: #0059cc;
+      transform: scale(1.1);
+    }
+    
+    .results-tab:not(.active):hover {
+      background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+      border-color: #94a3b8;
+      transform: translateY(-1px);
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    }
+    
+    .results-tab:not(.active):hover i {
+      transform: scale(1.05);
+    }
+    
+    .results-tab i {
+      transition: all 0.2s ease;
+      margin-right: 8px;
+      font-size: 16px;
+    }
+    
+    /* Tab container modern styling */
+    .modern-tab-container {
+      background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+      border-radius: 16px;
+      padding: 8px 8px 0 8px;
+      box-shadow: 
+        0 4px 6px -1px rgba(0, 0, 0, 0.1),
+        0 2px 4px -1px rgba(0, 0, 0, 0.06);
+      border: 1px solid #e2e8f0;
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .modern-tab-container::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 100%;
+      background: linear-gradient(45deg, rgba(255,255,255,0.1) 0%, transparent 50%);
+      pointer-events: none;
+    }
+    
+    /* Enhanced tab typography */
+    .results-tab span {
+      opacity: 0.8;
+      transition: opacity 0.2s ease;
+    }
+    
+    .results-tab.active span,
+    .results-tab:hover span {
+      opacity: 1;
+    }
+    
+    /* Responsive tab design */
+    @media (max-width: 768px) {
+      .results-tab {
+        padding: 12px 16px !important;
+        font-size: 12px;
+        margin-right: 2px;
+      }
+      
+      .results-tab i {
+        font-size: 14px;
+        margin-right: 4px;
+      }
+      
+      .results-tab span {
+        font-size: 10px;
+        margin-top: 2px;
+      }
+      
+      .modern-tab-container {
+        padding: 6px 6px 0 6px;
+        border-radius: 12px;
+      }
+    }
+    
+    @media (max-width: 480px) {
+      .results-tab {
+        padding: 10px 8px !important;
+        font-size: 11px;
+      }
+      
+      .results-tab span {
+        display: none; /* Hide subtitle on very small screens */
+      }
+    }
+    
+    /* Modern focus states for accessibility */
+    .results-tab:focus-visible {
+      outline: 2px solid #0059cc;
+      outline-offset: -2px;
+      border-color: #0059cc;
+    }
+    
+    /* Loading state animation for tabs */
+    @keyframes tabPulse {
+      0%, 100% { 
+        box-shadow: 0 0 0 0 rgba(0, 89, 204, 0.4);
+      }
+      50% { 
+        box-shadow: 0 0 0 8px rgba(0, 89, 204, 0);
+      }
+    }
+    
+    .results-tab.loading {
+      animation: tabPulse 2s infinite;
+    }
+    
+    /* Modern tab content panels */
+    .tab-panel {
+      animation: fadeInUp 0.4s ease-out;
+      transform-origin: top;
+    }
+    
+    @keyframes fadeInUp {
+      0% {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+      100% {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+    
+    /* Enhanced visual depth */
+    .modern-tab-container {
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+    }
+    
+    /* Tab Content Panels */
+    .tab-panel {
+      display: none;
+    }
+    
+    .tab-panel.active {
+      display: block;
+    }
+    
+    /* Loading animation */
+    .loading-spinner {
+      border: 3px solid #f3f4f6;
+      border-top: 3px solid #f97316;
+      border-radius: 50%;
+      width: 40px;
+      height: 40px;
+      animation: spin 1s linear infinite;
+    }
+    
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+    
+    /* ISO 25010 Format - Only for Results Tables */
+    
+    /* Standard Academic Table */
+    .results-table {
+      width: 100%;
+      border-collapse: collapse;
+      background: white;
+      font-size: 0.875rem;
+      font-family: 'Times New Roman', Times, serif;
+      margin-bottom: 1.5rem;
+    }
+    
+    .results-table th {
+      background: #e5e7eb;
+      border: 2px solid #000;
+      padding: 0.75rem;
+      font-weight: 700;
+      text-align: center;
+      color: #000;
+      font-size: 0.875rem;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      vertical-align: middle;
+    }
+    
+    .results-table td {
+      border: 1px solid #000;
+      padding: 0.75rem;
+      vertical-align: middle;
+      color: #000;
+      text-align: center;
+    }
+    
+    .results-table td.text-left {
+      text-align: left;
+    }
+    
+    .results-table .criteria-number {
+      text-align: center;
+      font-weight: 600;
+      color: #000;
+      width: 50px;
+    }
+    
+    .results-table .criteria-text {
+      color: #000;
+      line-height: 1.6;
+      text-align: left;
+      padding: 0.75rem;
+    }
+    
+    .results-table .vote-cell {
+      text-align: center;
+      font-weight: 600;
+      color: #000;
+      width: 60px;
+    }
+    
+    .results-table .mean-cell {
+      text-align: center;
+      font-weight: 700;
+      color: #000;
+      font-size: 1rem;
+      width: 80px;
+    }
+    
+    .results-table .remarks-cell {
+      text-align: center;
+      font-weight: 700;
+      color: #000;
+      text-transform: uppercase;
+      width: 150px;
+    }
+    
+    /* Category Header - Standard Format */
+    .category-header-standard {
+      background: #e5e7eb;
+      border: 2px solid #000;
+      padding: 1rem;
+      font-family: 'Times New Roman', Times, serif;
+      font-size: 1.125rem;
+      font-weight: 700;
+      color: #000;
+      text-transform: uppercase;
+      letter-spacing: 0.75px;
+      margin-top: 1.5rem;
+      margin-bottom: 0;
+    }
+    
+    /* Print optimization */
+    @media print {
+      * {
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+      }
+      
+      body {
+        background: white;
+        margin: 0;
+        padding: 0;
+        font-family: 'Times New Roman', Times, serif;
+      }
+      
+      /* Hide screen-only elements */
+      .no-print,
+      nav,
+      header,
+      .sidebar,
+      button,
+      .mb-6:has(h1),
+      .bg-white:has(.fas.fa-filter) {
+        display: none !important;
+      }
+      
+      /* Show print header */
+      #print-header,
+      #print-dept-header,
+      #print-rankings-header {
+        display: block !important;
+        page-break-after: avoid;
+        margin-bottom: 16pt !important;
+      }
+      
+      /* Remove shadows and borders for print */
+      .rounded-lg,
+      .shadow-sm,
+      .border-gray-200 {
+        border-radius: 0 !important;
+        box-shadow: none !important;
+        border: none !important;
+      }
+      
+      /* Table styling to match PDF */
+      .results-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-bottom: 10pt;
+        font-size: 8pt;
+      }
+      
+      .results-table th {
+        background: #e5e7eb !important;
+        border: 1px solid #000 !important;
+        padding: 4pt !important;
+        font-weight: 700 !important;
+        text-align: center !important;
+        font-size: 8pt !important;
+        text-transform: uppercase;
+      }
+      
+      .results-table td {
+        border: 1px solid #000 !important;
+        padding: 3pt !important;
+        font-size: 7pt !important;
+        vertical-align: middle !important;
+        text-align: center !important;
+      }
+      
+      .results-table .criteria-text {
+        text-align: left !important;
+        padding: 3pt !important;
+        line-height: 1.3;
+      }
+      
+      .results-table .remarks-cell {
+        font-size: 7pt !important;
+        font-weight: 700 !important;
+        text-transform: uppercase;
+        word-wrap: break-word;
+        max-width: 80pt;
+      }
+      
+      .category-header-standard {
+        border: 2px solid #000 !important;
+        background: #e5e7eb !important;
+        padding: 6pt !important;
+        font-size: 11pt !important;
+        font-weight: 700 !important;
+        text-transform: uppercase;
+        page-break-after: avoid;
+        page-break-inside: avoid;
+        margin-top: 10pt;
+        margin-bottom: 0;
+      }
+      
+      /* Adjust margins for print */
+      main {
+        padding: 0 !important;
+        margin: 0 !important;
+      }
+      
+      #results-container,
+      #dept-results-container {
+        padding: 0.4in !important;
+      }
+      
+      /* Page breaks */
+      .category-header-standard {
+        page-break-after: avoid;
+      }
+      
+      .results-table {
+        page-break-inside: avoid;
+      }
+      
+      /* Results header section */
+      #results-container > div:first-of-type {
+        margin-bottom: 12pt !important;
+      }
+      
+      /* Comments section */
+      #comments-container {
+        margin-top: 12pt;
+        page-break-before: avoid;
+      }
+      
+      #comments-container h3 {
+        font-size: 10pt;
+        font-weight: 700;
+        border-bottom: 2px solid #000;
+        padding-bottom: 4pt;
+        margin-bottom: 8pt;
+      }
+      
+      /* Rating scale table */
+      #results-container table:last-of-type {
+        margin-top: 15pt;
+        font-size: 9pt;
+      }
+      
+      #results-container table:last-of-type td {
+        padding: 6pt !important;
+        border: 1px solid #000 !important;
+      }
+      
+      /* Better page utilization */
+      @page {
+        size: letter portrait;
+        margin: 0.5in;
+      }
+      
+      /* Prevent orphaned headers */
+      h3, .category-header-standard {
+        orphans: 3;
+        widows: 3;
+      }
+      
+      /* Keep related content together */
+      .results-table tbody tr {
+        page-break-inside: avoid;
+      }
+      
+      /* Signature section spacing */
+      .bg-white.rounded-lg:has(table) {
+        page-break-before: avoid;
+      }
+    }
+    
+    /* Mobile responsive adjustments */
+    @media (max-width: 768px) {
+      .results-table {
+        font-size: 0.75rem;
+      }
+      
+      .results-table th,
+      .results-table td {
+        padding: 0.5rem 0.25rem;
+      }
+      
+      .category-header-standard {
+        font-size: 1rem;
+        padding: 0.75rem;
+      }
+      
+      .results-table .vote-cell,
+      .results-table .mean-cell {
+        font-size: 0.75rem;
+      }
+    }
+    
+    @media (max-width: 480px) {
+      .results-table {
+        font-size: 0.625rem;
+      }
+      
+      .results-table th,
+      .results-table td {
+        padding: 0.375rem 0.25rem;
+      }
+      
+      .results-table .criteria-text {
+        font-size: 0.625rem;
+      }
+    }
+    
+    /* Signature Preview Modal Styles */
+    .signature-preview-modal {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.8);
+      z-index: 9999;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+    
+    .signature-preview-container {
+      background: white;
+      border-radius: 8px;
+      max-width: 900px;
+      width: 100%;
+      max-height: 90vh;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    }
+    
+    .signature-preview-header {
+      background: #0059cc;
+      color: white;
+      padding: 20px 24px;
+      border-radius: 8px 8px 0 0;
+    }
+    
+    .signature-preview-body {
+      padding: 24px;
+      overflow-y: auto;
+      flex: 1;
+    }
+    
+    .signature-preview-footer {
+      padding: 16px 24px;
+      border-top: 1px solid #e5e7eb;
+      display: flex;
+      justify-content: flex-end;
+      gap: 12px;
+    }
+    
+    .signature-canvas {
+      position: relative;
+      background: #f9fafb;
+      border: 2px dashed #d1d5db;
+      border-radius: 8px;
+      min-height: 600px;
+      padding: 40px;
+      background-image: 
+        linear-gradient(0deg, transparent 24%, rgba(0, 0, 0, .03) 25%, rgba(0, 0, 0, .03) 26%, transparent 27%, transparent 74%, rgba(0, 0, 0, .03) 75%, rgba(0, 0, 0, .03) 76%, transparent 77%, transparent),
+        linear-gradient(90deg, transparent 24%, rgba(0, 0, 0, .03) 25%, rgba(0, 0, 0, .03) 26%, transparent 27%, transparent 74%, rgba(0, 0, 0, .03) 75%, rgba(0, 0, 0, .03) 76%, transparent 77%, transparent);
+      background-size: 50px 50px;
+    }
+    
+    .draggable-signature {
+      position: absolute;
+      background: white;
+      border: 2px solid #0059cc;
+      border-radius: 6px;
+      padding: 16px 20px;
+      cursor: move;
+      box-shadow: 0 4px 12px rgba(0, 89, 204, 0.2);
+      min-width: 300px;
+      transition: box-shadow 0.2s;
+    }
+    
+    .draggable-signature:hover {
+      box-shadow: 0 8px 24px rgba(0, 89, 204, 0.3);
+      border-color: #004799;
+    }
+    
+    .draggable-signature.ui-draggable-dragging {
+      box-shadow: 0 12px 32px rgba(0, 89, 204, 0.4);
+      transform: rotate(2deg);
+    }
+    
+    .draggable-signature .signature-label {
+      font-weight: 600;
+      color: #0059cc;
+      font-size: 14px;
+      margin-bottom: 8px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    
+    .draggable-signature .signature-line {
+      border-bottom: 2px solid #000;
+      height: 50px;
+      margin-bottom: 8px;
+      background: #f9fafb;
+    }
+    
+    .draggable-signature .signature-text {
+      font-weight: 700;
+      text-transform: uppercase;
+      font-size: 12px;
+      color: #374151;
+    }
+    
+    .position-indicator {
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      background: #0059cc;
+      color: white;
+      padding: 4px 8px;
+      border-radius: 4px;
+      font-size: 11px;
+      font-weight: 600;
+    }
+  </style>
+</head>
+<body class="bg-gray-50">
+  
+  <!-- Main Container -->
+  <div class="flex min-h-screen">
+    
+    <!-- Navigation Component -->
+    {% include 'guidance/components/navigation.html' %}
+    
+    <!-- Main Content Area -->
+    <div class="flex-1 lg:ml-64">
+      
+      <!-- Header Component -->
+      {% include 'guidance/components/header.html' %}
+      
+      <!-- Main Content -->
+      <main class="p-4 sm:p-6 lg:p-8">
+        
+        <!-- Page Title -->
+        <div class="mb-6">
+          <h1 class="text-2xl font-bold text-gray-900">Evaluation Results</h1>
+          <p class="text-sm text-gray-600 mt-1">View detailed evaluation results with vote distribution</p>
+        </div>
+        
+        <!-- Modern Sub-Navigation Tabs -->
+        <div class="modern-tab-container mb-8">
+          <div class="flex">
+            <button id="tab-faculty" class="results-tab active flex-1 px-8 py-5 text-sm font-semibold text-center text-primary-600">
+              <i class="fas fa-user-tie"></i>
+              <span class="block text-xs mt-1 font-medium">Individual Analysis</span>
+              Faculty Results
+            </button>
+            <button id="tab-department" class="results-tab flex-1 px-8 py-5 text-sm font-semibold text-center text-gray-600">
+              <i class="fas fa-building"></i>
+              <span class="block text-xs mt-1 font-medium">Group Overview</span>
+              Department Analysis
+            </button>
+            <button id="tab-ranking" class="results-tab flex-1 px-8 py-5 text-sm font-semibold text-center text-gray-600">
+              <i class="fas fa-trophy"></i>
+              <span class="block text-xs mt-1 font-medium">Performance Ranking</span>
+              Rankings
+            </button>
+          </div>
+          <!-- Modern tab indicator line -->
+          <div class="h-1 bg-gray-200 rounded-full mt-2"></div>
+        </div>
+        
+        <!-- Tab Panel: Faculty Results -->
+        <div id="panel-faculty" class="tab-panel active">
+          
+        <!-- Filters Section - Modern Style -->
+        <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-6">
+          <h2 class="text-lg font-semibold text-gray-900 mb-4">
+            <i class="fas fa-filter mr-2 text-primary-600"></i>
+            Filters
+          </h2>
+          
+          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            <!-- Faculty Selection -->
+            <div>
+              <label for="faculty-select" class="block text-sm font-medium text-gray-700 mb-2">
+                1. Select Faculty <span class="text-red-500">*</span>
+              </label>
+              <select id="faculty-select" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary-500 focus:outline-none">
+                <option value="">-- Select Faculty --</option>
+              </select>
+            </div>
+            
+            <!-- Subject Selection -->
+            <div>
+              <label for="subject-select" class="block text-sm font-medium text-gray-700 mb-2">
+                2. Select Subject <span class="text-red-500">*</span>
+              </label>
+              <select id="subject-select" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary-500 focus:outline-none" disabled>
+                <option value="">-- Select Subject --</option>
+              </select>
+            </div>
+            
+            <!-- Section Selection (Optional) -->
+            <div>
+              <label for="section-select" class="block text-sm font-medium text-gray-700 mb-2">
+                3. Section <span class="text-gray-500 text-xs">(Optional)</span>
+              </label>
+              <select id="section-select" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary-500 focus:outline-none" disabled>
+                <option value="">-- All Sections --</option>
+              </select>
+            </div>
+            
+            <!-- Academic Year Selection -->
+            <div>
+              <label for="academic-year-select" class="block text-sm font-medium text-gray-700 mb-2">
+                4. Academic Year <span class="text-red-500">*</span>
+              </label>
+              <select id="academic-year-select" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary-500 focus:outline-none" disabled>
+                <option value="">-- Select Year --</option>
+              </select>
+            </div>
+            
+            <!-- Period Selection -->
+            <div>
+              <label for="period-select" class="block text-sm font-medium text-gray-700 mb-2">
+                5. Evaluation Period <span class="text-red-500">*</span>
+              </label>
+              <select id="period-select" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary-500 focus:outline-none" disabled>
+                <option value="">-- Select Period --</option>
+              </select>
+            </div>
+          </div>
+          
+          <!-- Load Button -->
+          <div class="mt-4 flex flex-wrap gap-2">
+            <button id="load-results-btn" class="px-6 py-2 bg-primary-600 text-white rounded-md hover:bg-primary-700 focus:ring-2 focus:ring-primary-500 focus:outline-none transition-colors" disabled>
+              <i class="fas fa-search mr-2"></i>
+              Load Results
+            </button>
+            <button id="reset-filters-btn" class="px-6 py-2 bg-gray-600 text-white rounded-md hover:bg-gray-700 focus:ring-2 focus:ring-gray-500 focus:outline-none transition-colors">
+              <i class="fas fa-undo mr-2"></i>
+              Reset Filters
+            </button>
+            <button id="preview-signatures-btn" class="px-6 py-2 bg-purple-600 text-white rounded-md hover:bg-purple-700 focus:ring-2 focus:ring-purple-500 focus:outline-none transition-colors hidden">
+              <i class="fas fa-pen-fancy mr-2"></i>
+              Position Signatures & Export
+            </button>
+            <button id="export-pdf-btn" class="px-6 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 focus:ring-2 focus:ring-red-500 focus:outline-none transition-colors hidden">
+              <i class="fas fa-file-pdf mr-2"></i>
+              Quick Export PDF
+            </button>
+            <button id="export-excel-btn" class="px-6 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 focus:ring-2 focus:ring-green-500 focus:outline-none transition-colors hidden">
+              <i class="fas fa-file-excel mr-2"></i>
+              Export Excel
+            </button>
+          </div>
+        </div>
+        
+        <!-- Loading State -->
+        <div id="loading-container" class="hidden text-center py-12 bg-white rounded-lg shadow-sm border border-gray-200">
+          <div class="loading-spinner mx-auto mb-4"></div>
+          <p class="text-gray-600">Loading evaluation results...</p>
+        </div>
+        
+        <!-- No Results State - Initial/Default -->
+        <div id="no-results-container" class="bg-white rounded-lg shadow-sm border border-gray-200 p-12 text-center">
+          <i class="fas fa-chart-bar text-gray-300 text-6xl mb-4"></i>
+          <h3 class="text-xl font-semibold text-gray-900 mb-2">No Evaluation Data</h3>
+          <p class="text-gray-600 mb-1">Select all required filters and click "Load Results" to view ISO 25010 evaluation results.</p>
+          <p class="text-sm text-gray-500">Filter sequence: Faculty → Subject → Section (Optional) → Academic Year → Period</p>
+        </div>
+        
+        <!-- Results Container -->
+        <div id="results-container" class="hidden">
+          
+          <!-- Print Header (Hidden on screen, visible on print) -->
+          <div id="print-header" class="hidden print:block bg-white text-center" style="font-family: 'Times New Roman', Times, serif; margin-bottom: 20pt;">
+            <div class="flex flex-col items-center justify-center">
+              <img src="{{ url_for('static', filename='images/nclogo.png') }}" alt="Norzagaray College Logo" style="width: 60px; height: 60px; margin: 0 auto 8pt auto;">
+              <div>
+                <h1 style="font-size: 12pt; font-weight: bold; text-transform: uppercase; margin: 0; padding: 0;">NORZAGARAY COLLEGE</h1>
+                <p style="font-size: 10pt; margin: 4pt 0;">Municipal Compound, Norzagaray, Bulacan</p>
+                <h2 style="font-size: 10pt; font-weight: bold; text-transform: uppercase; margin: 4pt 0;">GUIDANCE AND COUNSELING CENTER</h2>
+                <p style="font-size: 9pt; margin: 4pt 0;">FACULTY TEACHING PERFORMANCE EVALUATION SUMMARY REPORT</p>
+                <p style="font-size: 9pt; margin: 4pt 0;" id="print-semester">1st Semester, A.Y. 2025 - 2026</p>
+                <p style="font-size: 9pt; margin: 4pt 0;" id="print-section-info" class="hidden"></p>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Results Header - ISO 25010 Format -->
+          <div class="bg-white p-4 mb-4 print:p-0 print:mb-3 print:border-0 print:shadow-none" style="font-family: 'Times New Roman', Times, serif;">
+            <div class="text-left">
+              <p style="font-size: 10pt; margin-bottom: 6pt;">
+                <span style="font-weight: bold;">Faculty Name:</span> <span style="font-weight: normal; text-transform: uppercase;" id="header-faculty-name">Faculty Name</span>
+              </p>
+              <p style="font-size: 10pt; margin-bottom: 6pt;">
+                <span style="font-weight: bold;">Subject:</span> <span style="font-weight: normal;" id="header-subject">N/A</span>
+              </p>
+              <p style="font-size: 10pt; margin-bottom: 0;" id="header-section-container" class="hidden">
+                <span style="font-weight: bold;">Section:</span> <span style="font-weight: normal;" id="header-section">N/A</span>
+              </p>
+            </div>
+          </div>
+          
+          <!-- Categories and Criteria - ISO 25010 Format -->
+          <div id="categories-container"></div>
+          
+          <!-- Comments Section - ISO 25010 Format -->
+          <div id="comments-container" class="hidden bg-white rounded-lg shadow-sm border border-gray-200 p-6 mt-6" style="font-family: 'Times New Roman', Times, serif;">
+            <h3 class="text-lg font-bold text-gray-900 mb-4 uppercase" style="border-bottom: 2px solid #000; padding-bottom: 0.5rem;">Comments:</h3>
+            <ol id="comments-list" class="list-decimal list-inside space-y-2">
+              <!-- Comments will be dynamically inserted here -->
+            </ol>
+          </div>
+          
+          <!-- Rating Scale Reference - ISO 25010 Format -->
+          <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mt-6" style="font-family: 'Times New Roman', Times, serif;">
+            <table class="w-full border-collapse">
+              <tbody>
+                <tr>
+                  <td class="border-2 border-black p-3 font-bold uppercase" style="width: 25%;">RATING</td>
+                  <td class="border-2 border-black p-3 font-bold uppercase" style="width: 35%;">EQUIVALENT</td>
+                  <td class="border-2 border-black p-3 font-bold uppercase" style="width: 20%;">TOTAL:</td>
+                  <td class="border-2 border-black p-3" style="width: 20%;" id="total-rating"></td>
+                </tr>
+                <tr>
+                  <td class="border border-black p-3 font-semibold">4.50 - 5.00</td>
+                  <td class="border border-black p-3">OUTSTANDING</td>
+                  <td class="border border-black p-3 font-bold uppercase">RATING:</td>
+                  <td class="border border-black p-3 font-semibold" id="overall-mean"></td>
+                </tr>
+                <tr>
+                  <td class="border border-black p-3 font-semibold">3.50 - 4.49</td>
+                  <td class="border border-black p-3">HIGHLY SATISFACTORY</td>
+                  <td class="border border-black p-3 font-bold uppercase">REMARKS:</td>
+                  <td class="border border-black p-3 font-bold uppercase" id="overall-remarks"></td>
+                </tr>
+                <tr>
+                  <td class="border border-black p-3 font-semibold">2.50 - 3.49</td>
+                  <td class="border border-black p-3">SATISFACTORY</td>
+                  <td class="border border-black p-3" colspan="2" rowspan="3"></td>
+                </tr>
+                <tr>
+                  <td class="border border-black p-3 font-semibold">1.50 - 2.49</td>
+                  <td class="border border-black p-3">NEEDS IMPROVEMENT</td>
+                </tr>
+                <tr>
+                  <td class="border border-black p-3 font-semibold">1.00 - 1.49</td>
+                  <td class="border border-black p-3">POOR</td>
+                </tr>
+              </tbody>
+            </table>
+            
+            <!-- Signature Section -->
+            <div class="mt-8 space-y-6">
+              <div>
+                <div class="border-b-2 border-black w-64 mb-1"></div>
+                <p class="font-bold uppercase text-sm">SIGNATURE OF FACULTY</p>
+              </div>
+              
+              <div>
+                <div class="border-b-2 border-black w-64 mb-1"></div>
+                <p class="font-bold uppercase text-sm">SIGNATURE OF COLLEGE DEAN</p>
+              </div>
+              
+              <div>
+                <p class="font-bold uppercase mb-2">NOTED BY:</p>
+                <p class="font-bold mt-4">MA. LIBERTY DG. PASCUAL, Ph.D.</p>
+                <p class="text-sm">College President</p>
+              </div>
+            </div>
+          </div>
+          
+        </div>
+        
+        </div>
+        <!-- End Tab Panel: Faculty Results -->
+        
+        <!-- Tab Panel: Department Analysis -->
+        <div id="panel-department" class="tab-panel">
+          
+          <!-- Department Filters Section -->
+          <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-6">
+            <h2 class="text-lg font-semibold text-gray-900 mb-4">
+              <i class="fas fa-filter mr-2 text-primary-600"></i>
+              Department Filters
+            </h2>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              <!-- Department Selection -->
+              <div>
+                <label for="dept-select" class="block text-sm font-medium text-gray-700 mb-2">
+                  1. Select Department <span class="text-red-500">*</span>
+                </label>
+                <select id="dept-select" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary-500 focus:outline-none">
+                  <option value="">-- Select Department --</option>
+                </select>
+              </div>
+              
+              <!-- Academic Year Selection -->
+              <div>
+                <label for="dept-academic-year-select" class="block text-sm font-medium text-gray-700 mb-2">
+                  2. Academic Year <span class="text-red-500">*</span>
+                </label>
+                <select id="dept-academic-year-select" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary-500 focus:outline-none" disabled>
+                  <option value="">-- Select Year --</option>
+                </select>
+              </div>
+              
+              <!-- Period Selection -->
+              <div>
+                <label for="dept-period-select" class="block text-sm font-medium text-gray-700 mb-2">
+                  3. Evaluation Period <span class="text-red-500">*</span>
+                </label>
+                <select id="dept-period-select" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary-500 focus:outline-none" disabled>
+                  <option value="">-- Select Period --</option>
+                </select>
+              </div>
+            </div>
+            
+            <!-- Load Button -->
+            <div class="mt-4 flex flex-wrap gap-2">
+              <button id="load-dept-results-btn" class="px-6 py-2 bg-primary-600 text-white rounded-md hover:bg-primary-700 focus:ring-2 focus:ring-primary-500 focus:outline-none transition-colors" disabled>
+                <i class="fas fa-search mr-2"></i>
+                Load Department Results
+              </button>
+              <button id="reset-dept-filters-btn" class="px-6 py-2 bg-gray-600 text-white rounded-md hover:bg-gray-700 focus:ring-2 focus:ring-gray-500 focus:outline-none transition-colors">
+                <i class="fas fa-undo mr-2"></i>
+                Reset Filters
+              </button>
+              <button id="preview-dept-signatures-btn" class="px-6 py-2 bg-purple-600 text-white rounded-md hover:bg-purple-700 focus:ring-2 focus:ring-purple-500 focus:outline-none transition-colors hidden">
+                <i class="fas fa-pen-fancy mr-2"></i>
+                Preview Signatures
+              </button>
+              <button id="export-dept-pdf-btn" class="px-6 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 focus:ring-2 focus:ring-red-500 focus:outline-none transition-colors hidden">
+                <i class="fas fa-file-pdf mr-2"></i>
+                Export PDF
+              </button>
+              <button id="export-dept-excel-btn" class="px-6 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 focus:ring-2 focus:ring-green-500 focus:outline-none transition-colors hidden">
+                <i class="fas fa-file-excel mr-2"></i>
+                Export Excel
+              </button>
+            </div>
+          </div>
+          
+          <!-- Loading State -->
+          <div id="dept-loading-container" class="hidden text-center py-12 bg-white rounded-lg shadow-sm border border-gray-200">
+            <div class="loading-spinner mx-auto mb-4"></div>
+            <p class="text-gray-600">Loading department analysis...</p>
+          </div>
+          
+          <!-- No Results State -->
+          <div id="dept-no-results-container" class="bg-white rounded-lg shadow-sm border border-gray-200 p-12 text-center">
+            <i class="fas fa-building text-gray-300 text-6xl mb-4"></i>
+            <h3 class="text-xl font-semibold text-gray-900 mb-2">No Department Data</h3>
+            <p class="text-gray-600 mb-1">Select all required filters and click "Load Department Results" to view comprehensive department analysis.</p>
+            <p class="text-sm text-gray-500">Filter sequence: Department → Academic Year → Period</p>
+          </div>
+          
+          <!-- Department Results Container -->
+          <div id="dept-results-container" class="hidden">
+            
+            <!-- Print Header for Department (Hidden on screen, visible on print) -->
+            <div id="print-dept-header" class="hidden print:block bg-white text-center" style="font-family: 'Times New Roman', Times, serif; margin-bottom: 20pt;">
+              <div class="flex flex-col items-center justify-center">
+                <img src="{{ url_for('static', filename='images/nclogo.png') }}" alt="Norzagaray College Logo" style="width: 60px; height: 60px; margin: 0 auto 8pt auto;">
+                <div>
+                  <h1 style="font-size: 12pt; font-weight: bold; text-transform: uppercase; margin: 0; padding: 0;">NORZAGARAY COLLEGE</h1>
+                  <p style="font-size: 10pt; margin: 4pt 0;">Municipal Compound, Norzagaray, Bulacan</p>
+                  <h2 style="font-size: 10pt; font-weight: bold; text-transform: uppercase; margin: 4pt 0;">GUIDANCE AND COUNSELING CENTER</h2>
+                  <p style="font-size: 9pt; margin: 4pt 0;">DEPARTMENT EVALUATION SUMMARY REPORT</p>
+                  <p style="font-size: 9pt; margin: 4pt 0;" id="print-dept-period">1st Semester, A.Y. 2025 - 2026</p>
+                </div>
+              </div>
+            </div>
+            
+            <!-- Department Header - ISO 25010 Format -->
+            <div class="bg-white p-4 mb-4 no-print print:p-0 print:mb-3 print:border-0 print:shadow-none" style="font-family: 'Times New Roman', Times, serif;">
+              <div class="text-left">
+                <p style="font-size: 10pt; margin-bottom: 6pt;">
+                  <span style="font-weight: bold;">Department:</span> <span style="font-weight: normal; text-transform: uppercase;" id="dept-header-name">Department Name</span>
+                </p>
+                <p style="font-size: 10pt; margin-bottom: 6pt;">
+                  <span style="font-weight: bold;">Academic Year:</span> <span style="font-weight: normal;" id="dept-header-year">N/A</span>
+                </p>
+                <p style="font-size: 10pt; margin-bottom: 0;">
+                  <span style="font-weight: bold;">Period:</span> <span style="font-weight: normal;" id="dept-header-period">N/A</span>
+                </p>
+              </div>
+            </div>
+            
+            <!-- Categories and Criteria - ISO 25010 Format -->
+            <div id="dept-categories-container"></div>
+            
+            <!-- Rating Scale Reference - ISO 25010 Format -->
+            <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mt-6 print:border-0 print:shadow-none" style="font-family: 'Times New Roman', Times, serif;">
+              <table class="w-full border-collapse">
+                <tbody>
+                  <tr>
+                    <td class="border-2 border-black p-3 font-bold uppercase" style="width: 25%;">RATING</td>
+                    <td class="border-2 border-black p-3 font-bold uppercase" style="width: 35%;">EQUIVALENT</td>
+                    <td class="border-2 border-black p-3 font-bold uppercase" style="width: 20%;">TOTAL:</td>
+                    <td class="border-2 border-black p-3" style="width: 20%;" id="dept-total-rating"></td>
+                  </tr>
+                  <tr>
+                    <td class="border border-black p-3 font-semibold">4.50 - 5.00</td>
+                    <td class="border border-black p-3">OUTSTANDING</td>
+                    <td class="border border-black p-3 font-bold uppercase">RATING:</td>
+                    <td class="border border-black p-3 font-semibold" id="dept-overall-mean"></td>
+                  </tr>
+                  <tr>
+                    <td class="border border-black p-3 font-semibold">3.50 - 4.49</td>
+                    <td class="border border-black p-3">HIGHLY SATISFACTORY</td>
+                    <td class="border border-black p-3 font-bold uppercase">REMARKS:</td>
+                    <td class="border border-black p-3 font-bold uppercase" id="dept-overall-remarks"></td>
+                  </tr>
+                  <tr>
+                    <td class="border border-black p-3 font-semibold">2.50 - 3.49</td>
+                    <td class="border border-black p-3">SATISFACTORY</td>
+                    <td class="border border-black p-3" colspan="2" rowspan="3"></td>
+                  </tr>
+                  <tr>
+                    <td class="border border-black p-3 font-semibold">1.50 - 2.49</td>
+                    <td class="border border-black p-3">NEEDS IMPROVEMENT</td>
+                  </tr>
+                  <tr>
+                    <td class="border border-black p-3 font-semibold">1.00 - 1.49</td>
+                    <td class="border border-black p-3">POOR</td>
+                  </tr>
+                </tbody>
+              </table>
+              
+              <!-- Signature Section -->
+              <div class="mt-8 space-y-6 no-print print:block">
+                <div>
+                  <div class="border-b-2 border-black w-64 mb-1"></div>
+                  <p class="font-bold uppercase text-sm">SIGNATURE OF DEPARTMENT HEAD</p>
+                </div>
+                
+                <div>
+                  <div class="border-b-2 border-black w-64 mb-1"></div>
+                  <p class="font-bold uppercase text-sm">SIGNATURE OF COLLEGE DEAN</p>
+                </div>
+                
+                <div>
+                  <p class="font-bold uppercase mb-2">NOTED BY:</p>
+                  <p class="font-bold mt-4">MA. LIBERTY DG. PASCUAL, Ph.D.</p>
+                  <p class="text-sm">College President</p>
+                </div>
+              </div>
+            </div>
+            
+          </div>
+          
+        </div>
+        <!-- End Tab Panel: Department Analysis -->
+        
+        <!-- Tab Panel: Rankings -->
+        <div id="panel-ranking" class="tab-panel">
+          
+          <!-- Filters Section -->
+          <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-6">
+            <div class="flex items-center justify-between mb-4">
+              <h2 class="text-lg font-semibold text-gray-900">
+                <i class="fas fa-filter text-primary-600 mr-2"></i>
+                Ranking Filters
+              </h2>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+              <!-- Department Filter -->
+              <div>
+                <label for="ranking-dept-select" class="block text-sm font-medium text-gray-700 mb-2">
+                  Department <span class="text-red-500">*</span>
+                </label>
+                <select id="ranking-dept-select" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary-500 focus:border-primary-500">
+                  <option value="">-- All Departments --</option>
+                </select>
+              </div>
+              
+              <!-- Academic Year Filter -->
+              <div>
+                <label for="ranking-year-select" class="block text-sm font-medium text-gray-700 mb-2">
+                  Academic Year <span class="text-red-500">*</span>
+                </label>
+                <select id="ranking-year-select" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary-500 focus:border-primary-500" disabled>
+                  <option value="">-- Select Year --</option>
+                </select>
+              </div>
+              
+              <!-- Period Filter -->
+              <div>
+                <label for="ranking-period-select" class="block text-sm font-medium text-gray-700 mb-2">
+                  Evaluation Period <span class="text-red-500">*</span>
+                </label>
+                <select id="ranking-period-select" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-primary-500 focus:border-primary-500" disabled>
+                  <option value="">-- Select Period --</option>
+                </select>
+              </div>
+            </div>
+            
+            <div class="flex flex-wrap gap-3">
+              <button id="load-rankings-btn" class="px-6 py-2 bg-primary-600 text-white rounded-md hover:bg-primary-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed" disabled>
+                <i class="fas fa-chart-bar mr-2"></i>
+                Load Rankings
+              </button>
+              <button id="reset-ranking-filters-btn" class="px-6 py-2 bg-gray-600 text-white rounded-md hover:bg-gray-700 transition-colors">
+                <i class="fas fa-redo mr-2"></i>
+                Reset Filters
+              </button>
+              <button id="preview-ranking-signatures-btn" class="hidden px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 transition-colors">
+                <i class="fas fa-pen-fancy mr-2"></i>
+                Preview Signatures
+              </button>
+              <button id="export-ranking-pdf-btn" class="hidden px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 transition-colors">
+                <i class="fas fa-file-pdf mr-2"></i>
+                Export PDF
+              </button>
+              <button id="export-ranking-excel-btn" class="hidden px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 transition-colors">
+                <i class="fas fa-file-excel mr-2"></i>
+                Export Excel
+              </button>
+            </div>
+          </div>
+          
+          <!-- Loading State -->
+          <div id="ranking-loading-container" class="hidden text-center py-12 bg-white rounded-lg shadow-sm border border-gray-200">
+            <div class="loading-spinner mx-auto mb-4"></div>
+            <p class="text-gray-600">Loading rankings data...</p>
+          </div>
+          
+          <!-- No Results State -->
+          <div id="ranking-no-results-container" class="bg-white rounded-lg shadow-sm border border-gray-200 p-12 text-center">
+            <i class="fas fa-trophy text-gray-300 text-6xl mb-4"></i>
+            <h3 class="text-xl font-semibold text-gray-900 mb-2">No Rankings Data</h3>
+            <p class="text-gray-600">Select filters and click "Load Rankings" to view faculty performance rankings.</p>
+          </div>
+          
+          <!-- Rankings Results Container -->
+          <div id="ranking-results-container" class="hidden">
+            
+            <!-- Print Header for Rankings (Hidden on screen, visible on print) -->
+            <div id="print-rankings-header" class="hidden print:block bg-white text-center" style="font-family: 'Times New Roman', Times, serif; margin-bottom: 20pt;">
+              <div class="flex flex-col items-center justify-center">
+                <img src="{{ url_for('static', filename='images/nclogo.png') }}" alt="Norzagaray College Logo" style="width: 60px; height: 60px; margin: 0 auto 8pt auto;">
+                <div>
+                  <h1 style="font-size: 12pt; font-weight: bold; text-transform: uppercase; margin: 0; padding: 0;">NORZAGARAY COLLEGE</h1>
+                  <p style="font-size: 10pt; margin: 4pt 0;">Municipal Compound, Norzagaray, Bulacan</p>
+                  <h2 style="font-size: 10pt; font-weight: bold; text-transform: uppercase; margin: 4pt 0;">GUIDANCE AND COUNSELING CENTER</h2>
+                  <p style="font-size: 9pt; margin: 4pt 0;">FACULTY PERFORMANCE RANKINGS REPORT</p>
+                  <p style="font-size: 9pt; margin: 4pt 0;" id="print-ranking-semester">1st Semester, A.Y. 2025 - 2026</p>
+                  <p style="font-size: 9pt; margin: 4pt 0;" id="print-ranking-dept-info" class="hidden"></p>
+                </div>
+              </div>
+            </div>
+            
+            <!-- Rankings Header - ISO 25010 Format -->
+            <div class="bg-white p-4 mb-4 print:p-0 print:mb-3 print:border-0 print:shadow-none" style="font-family: 'Times New Roman', Times, serif;">
+              <div class="text-left">
+                <p style="font-size: 10pt; margin-bottom: 6pt;">
+                  <span style="font-weight: bold;">Report Type:</span> <span style="font-weight: normal; text-transform: uppercase;" id="ranking-report-type">Faculty Performance Rankings</span>
+                </p>
+                <p style="font-size: 10pt; margin-bottom: 6pt;">
+                  <span style="font-weight: bold;">Period:</span> <span style="font-weight: normal;" id="ranking-header-period">N/A</span>
+                </p>
+                <p style="font-size: 10pt; margin-bottom: 0;" id="ranking-header-dept-container" class="hidden">
+                  <span style="font-weight: bold;">Department:</span> <span style="font-weight: normal;" id="ranking-header-dept">N/A</span>
+                </p>
+              </div>
+            </div>
+            
+            <!-- Rankings Table - ISO 25010 Format -->
+            <div class="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
+              <div class="overflow-x-auto">
+                <table class="results-table">
+                  <thead>
+                    <tr>
+                      <th class="text-center" style="width: 60px;">Rank</th>
+                      <th class="text-left" style="width: 200px;">Professor</th>
+                      <th class="text-center" style="width: 150px;">Department</th>
+                      <th class="text-center" style="width: 100px;">Average Score</th>
+                      <th class="text-center" style="width: 120px;">Learning Delivery</th>
+                      <th class="text-center" style="width: 120px;">Assessment of Student Learning</th>
+                      <th class="text-center" style="width: 120px;">Student-Teacher Engagement</th>
+                      <th class="text-center" id="total-evaluations-header" style="width: 100px;">Total Evaluations</th>
+                    </tr>
+                  </thead>
+                  <tbody id="ranking-table-body">
+                    <!-- Rankings will be populated here -->
+                  </tbody>
+                </table>
+              </div>
+            </div>
+            
+          </div>
+          
+        </div>
+        <!-- End Tab Panel: Rankings -->
+        
+      </main>
+    </div>
+  </div>
+  
+  <!-- Signature Positioning Preview Modal -->
+  <div id="signature-preview-modal" class="signature-preview-modal hidden">
+    <div class="signature-preview-container">
+      <!-- Modal Header -->
+      <div class="signature-preview-header">
+        <h2 class="text-xl font-bold mb-2">
+          <i class="fas fa-pen-fancy mr-2"></i>
+          Position Signatures for PDF Export
+        </h2>
+        <p class="text-sm text-blue-100">
+          Drag the signature blocks to your desired positions on the page. Changes will be applied to the PDF export.
+        </p>
+      </div>
+      
+      <!-- Modal Body -->
+      <div class="signature-preview-body">
+        <div class="mb-4 bg-blue-50 border border-blue-200 rounded-lg p-4">
+          <div class="flex items-start gap-3">
+            <i class="fas fa-info-circle text-blue-600 text-xl mt-1"></i>
+            <div class="flex-1">
+              <p class="font-semibold text-blue-900 mb-1">How to Use:</p>
+              <ul class="text-sm text-blue-800 space-y-1">
+                <li>• <strong>Drag freely</strong> - Move signature blocks anywhere on the canvas (both horizontally and vertically)</li>
+                <li>• <strong>Horizontal Position:</strong> Left side = Left-aligned | Middle = Center-aligned | Right side = Right-aligned</li>
+                <li>• <strong>Vertical Position:</strong> Controls spacing between signatures</li>
+                <li>• Blocks snap to a 10px grid for precise alignment</li>
+                <li>• The blue badge shows X (horizontal) and Y (vertical) positions</li>
+                <li>• Click <strong>"Generate PDF with Positions"</strong> when ready</li>
+                <li>• Positions are saved for this session only</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Draggable Canvas -->
+        <div id="signature-canvas" class="signature-canvas">
+          <div class="text-center text-gray-400 mb-4">
+            <i class="fas fa-arrows-alt text-3xl mb-2"></i>
+            <p class="font-medium">Drag signature blocks to position them</p>
+          </div>
+          
+          <!-- Draggable Signature Blocks -->
+          <div id="signature-faculty" class="draggable-signature" style="top: 50px; left: 50px;" data-signature-id="faculty">
+            <span class="position-indicator">Position: <span class="pos-value">X:50px Y:50px</span></span>
+            <div class="signature-label">
+              <i class="fas fa-user"></i>
+              Faculty Signature
+            </div>
+            <div class="signature-line"></div>
+            <div class="signature-text">SIGNATURE OF FACULTY</div>
+          </div>
+          
+          <div id="signature-dean" class="draggable-signature" style="top: 200px; left: 50px;" data-signature-id="dean">
+            <span class="position-indicator">Position: <span class="pos-value">X:50px Y:200px</span></span>
+            <div class="signature-label">
+              <i class="fas fa-user-tie"></i>
+              Dean Signature
+            </div>
+            <div class="signature-line"></div>
+            <div class="signature-text">SIGNATURE OF COLLEGE DEAN</div>
+          </div>
+          
+          <div id="signature-president" class="draggable-signature" style="top: 350px; left: 50px;" data-signature-id="president">
+            <span class="position-indicator">Position: <span class="pos-value">X:50px Y:350px</span></span>
+            <div class="signature-label">
+              <i class="fas fa-crown"></i>
+              President
+            </div>
+            <div class="signature-text" style="margin-top: 8px;">
+              <p style="font-weight: bold; margin-bottom: 4px;">NOTED BY:</p>
+              <p style="font-weight: bold; margin-top: 12px;">MA. LIBERTY DG. PASCUAL, Ph.D.</p>
+              <p style="font-size: 11px; font-weight: normal;">College President</p>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Modal Footer -->
+      <div class="signature-preview-footer">
+        <button id="reset-positions-btn" class="px-4 py-2 bg-gray-500 text-white rounded-md hover:bg-gray-600 transition-colors">
+          <i class="fas fa-undo mr-2"></i>
+          Reset Positions
+        </button>
+        <button id="cancel-preview-btn" class="px-4 py-2 bg-gray-600 text-white rounded-md hover:bg-gray-700 transition-colors">
+          <i class="fas fa-times mr-2"></i>
+          Cancel
+        </button>
+        <button id="generate-pdf-btn" class="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 transition-colors">
+          <i class="fas fa-file-pdf mr-2"></i>
+          Generate PDF with Positions
+        </button>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Department Signature Positioning Preview Modal -->
+  <div id="dept-signature-preview-modal" class="signature-preview-modal hidden">
+    <div class="signature-preview-container">
+      <!-- Modal Header -->
+      <div class="signature-preview-header">
+        <h2 class="text-xl font-bold mb-2">
+          <i class="fas fa-pen-fancy mr-2"></i>
+          Position Signatures for Department PDF Export
+        </h2>
+        <p class="text-sm text-blue-100">
+          Drag the signature blocks to your desired positions on the page. Changes will be applied to the department PDF export.
+        </p>
+      </div>
+      
+      <!-- Modal Body -->
+      <div class="signature-preview-body">
+        <div class="mb-4 bg-blue-50 border border-blue-200 rounded-lg p-4">
+          <div class="flex items-start gap-3">
+            <i class="fas fa-info-circle text-blue-600 text-xl mt-1"></i>
+            <div class="flex-1">
+              <p class="font-semibold text-blue-900 mb-1">How to Use:</p>
+              <ul class="text-sm text-blue-800 space-y-1">
+                <li>• <strong>Drag freely</strong> - Move signature blocks anywhere on the canvas</li>
+                <li>• Blocks snap to a 10px grid for precise alignment</li>
+                <li>• The blue badge shows X (horizontal) and Y (vertical) positions</li>
+                <li>• Click <strong>"Generate PDF with Positions"</strong> when ready</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Draggable Canvas -->
+        <div id="dept-signature-canvas" class="signature-canvas">
+          <div class="text-center text-gray-400 mb-4">
+            <i class="fas fa-arrows-alt text-3xl mb-2"></i>
+            <p class="text-sm">Drag signatures to position them on the report</p>
+          </div>
+          
+          <!-- Draggable Signature Blocks -->
+          <div id="dept-signature-head" class="draggable-signature" style="top: 50px; left: 50px;" data-signature-id="head">
+            <div class="signature-label">
+              <i class="fas fa-user-tie"></i>
+              Department Head
+            </div>
+            <div class="signature-line"></div>
+            <div class="signature-text">Signature of Department Head</div>
+            <div class="position-indicator">
+              <span class="pos-value">X:50px Y:50px</span>
+            </div>
+          </div>
+          
+          <div id="dept-signature-dean" class="draggable-signature" style="top: 200px; left: 50px;" data-signature-id="dean">
+            <div class="signature-label">
+              <i class="fas fa-user-graduate"></i>
+              College Dean
+            </div>
+            <div class="signature-line"></div>
+            <div class="signature-text">Signature of College Dean</div>
+            <div class="position-indicator">
+              <span class="pos-value">X:50px Y:200px</span>
+            </div>
+          </div>
+          
+          <div id="dept-signature-president" class="draggable-signature" style="top: 350px; left: 50px;" data-signature-id="president">
+            <div class="signature-label">
+              <i class="fas fa-crown"></i>
+              College President
+            </div>
+            <div style="font-weight: 600; font-size: 11px; color: #374151; margin-bottom: 8px;">NOTED BY:</div>
+            <div class="signature-text">MA. LIBERTY DG. PASCUAL, Ph.D.</div>
+            <p class="text-xs text-gray-600 mt-1">College President</p>
+            <div class="position-indicator">
+              <span class="pos-value">X:50px Y:350px</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Modal Footer -->
+      <div class="signature-preview-footer">
+        <button id="dept-reset-positions-btn" class="px-4 py-2 bg-gray-500 text-white rounded-md hover:bg-gray-600 transition-colors">
+          <i class="fas fa-undo mr-2"></i>
+          Reset Positions
+        </button>
+        <button id="dept-cancel-preview-btn" class="px-4 py-2 bg-gray-600 text-white rounded-md hover:bg-gray-700 transition-colors">
+          <i class="fas fa-times mr-2"></i>
+          Cancel
+        </button>
+        <button id="dept-generate-pdf-btn" class="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 transition-colors">
+          <i class="fas fa-file-pdf mr-2"></i>
+          Generate PDF with Positions
+        </button>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Rankings Signature Positioning Preview Modal -->
+  <div id="ranking-signature-preview-modal" class="signature-preview-modal hidden">
+    <div class="signature-preview-container">
+      <!-- Modal Header -->
+      <div class="signature-preview-header">
+        <h2 class="text-xl font-bold mb-2">
+          <i class="fas fa-pen-fancy mr-2"></i>
+          Position Signatures for Rankings PDF Export
+        </h2>
+        <p class="text-sm text-blue-100">
+          Drag the signature blocks to your desired positions on the rankings report. Changes will be applied to the PDF export.
+        </p>
+      </div>
+      
+      <!-- Modal Body -->
+      <div class="signature-preview-body">
+        <div class="mb-4 bg-blue-50 border border-blue-200 rounded-lg p-4">
+          <div class="flex items-start gap-3">
+            <i class="fas fa-info-circle text-blue-600 text-xl mt-1"></i>
+            <div class="flex-1">
+              <p class="font-semibold text-blue-900 mb-1">How to Use:</p>
+              <ul class="text-sm text-blue-800 space-y-1">
+                <li>• <strong>Drag freely</strong> - Move signature blocks anywhere on the canvas</li>
+                <li>• Blocks snap to a 10px grid for precise alignment</li>
+                <li>• The blue badge shows X (horizontal) and Y (vertical) positions</li>
+                <li>• Click <strong>"Generate PDF with Positions"</strong> when ready</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Draggable Canvas -->
+        <div id="ranking-signature-canvas" class="signature-canvas">
+          <div class="text-center text-gray-400 mb-4">
+            <i class="fas fa-arrows-alt text-3xl mb-2"></i>
+            <p class="text-sm">Drag signatures to position them on the report</p>
+          </div>
+          
+          <!-- Draggable Signature Blocks -->
+          <div id="ranking-signature-guidance" class="draggable-signature" style="top: 50px; left: 50px;" data-signature-id="guidance">
+            <div class="signature-label">
+              <i class="fas fa-user-tie"></i>
+              Guidance Counselor
+            </div>
+            <div class="signature-line"></div>
+            <div class="signature-text">Signature of Guidance Counselor</div>
+            <div class="position-indicator">
+              <span class="pos-value">X:50px Y:50px</span>
+            </div>
+          </div>
+          
+          <div id="ranking-signature-dean" class="draggable-signature" style="top: 200px; left: 50px;" data-signature-id="dean">
+            <div class="signature-label">
+              <i class="fas fa-user-graduate"></i>
+              College Dean
+            </div>
+            <div class="signature-line"></div>
+            <div class="signature-text">Signature of College Dean</div>
+            <div class="position-indicator">
+              <span class="pos-value">X:50px Y:200px</span>
+            </div>
+          </div>
+          
+          <div id="ranking-signature-president" class="draggable-signature" style="top: 350px; left: 50px;" data-signature-id="president">
+            <div class="signature-label">
+              <i class="fas fa-crown"></i>
+              College President
+            </div>
+            <div style="height: 20px; margin-bottom: 8px;">
+              <div style="font-weight: 700; text-transform: uppercase; font-size: 12px; color: #374151;">NOTED BY:</div>
+            </div>
+            <div class="signature-text">MA. LIBERTY DG. PASCUAL, PH.D.</div>
+            <div style="font-size: 10px; color: #6b7280; margin-top: 4px;">College President</div>
+            <div class="position-indicator">
+              <span class="pos-value">X:50px Y:350px</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Modal Footer -->
+      <div class="signature-preview-footer">
+        <button id="ranking-reset-positions-btn" class="px-4 py-2 bg-gray-500 text-white rounded-md hover:bg-gray-600 transition-colors">
+          <i class="fas fa-redo mr-2"></i>
+          Reset Positions
+        </button>
+        <button id="ranking-cancel-preview-btn" class="px-4 py-2 bg-gray-600 text-white rounded-md hover:bg-gray-700 transition-colors">
+          <i class="fas fa-times mr-2"></i>
+          Cancel
+        </button>
+        <button id="ranking-generate-pdf-btn" class="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 transition-colors">
+          <i class="fas fa-file-pdf mr-2"></i>
+          Generate PDF with Positions
+        </button>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Scripts -->
+  <script src="{{ url_for('static', filename='js/loading-animation.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/guidance-navigation.js') }}"></script>
+  <script>
+    // Global variables
+    let allFaculty = [];
+    let allSubjects = [];
+    let allSections = [];
+    let allAcademicYears = [];
+    let allPeriods = [];
+    
+    $(document).ready(function() {
+      // Check if we should default to rankings tab (based on URL hash or other params)
+      const urlHash = window.location.hash;
+      let initialTab = 'evaluation-results'; // Always use evaluation-results for navigation
+      
+      if (urlHash === '#rankings' || window.location.search.includes('tab=ranking')) {
+        // Switch to rankings tab but keep navigation on evaluation-results
+        $('.results-tab').removeClass('active');
+        $('#tab-ranking').addClass('active');
+        $('.tab-panel').removeClass('active');
+        $('#panel-ranking').addClass('active');
+      }
+      
+      // Initialize navigation with proper active state
+      loadGuidanceNavigation(initialTab);
+      
+      // Additional check to ensure active state is applied after navigation loads
+      setTimeout(function() {
+        // Set the correct active navigation based on initial tab
+        setActiveGuidancePage(initialTab);
+        
+        console.log('✅ Active navigation set for:', initialTab);
+      }, 500);
+      
+      // Enhanced Tab switching functionality with modern animations
+      $('.results-tab').on('click', function() {
+        const $this = $(this);
+        const tabId = $this.attr('id').replace('tab-', '');
+        
+        // Prevent multiple clicks during transition
+        if ($this.hasClass('loading')) return;
+        
+        // Add loading state
+        $this.addClass('loading');
+        
+        // Smooth fade out current panel
+        const $currentPanel = $('.tab-panel.active');
+        $currentPanel.addClass('opacity-0 transform translate-y-4 transition-all duration-300');
+        
+        setTimeout(() => {
+          // Update tab buttons with smooth transition
+          $('.results-tab').removeClass('active');
+          $this.addClass('active').removeClass('loading');
+          
+          // Update tab panels
+          $('.tab-panel').removeClass('active opacity-0 transform translate-y-4 transition-all duration-300');
+          $('#panel-' + tabId).addClass('active');
+          
+        // Keep navigation active state on evaluation-results for all tabs
+        // Since rankings is a tab within evaluation-results, not a separate page
+        setActiveGuidancePage('evaluation-results');          // Trigger a subtle bounce animation on the active tab
+          $this.addClass('animate-pulse');
+          setTimeout(() => {
+            $this.removeClass('animate-pulse');
+          }, 600);
+          
+          console.log('✨ Switched to tab:', tabId);
+        }, 150);
+      });
+      
+      // Load faculty list
+      loadFacultyList();
+      
+      // Cascading filter events
+      $('#faculty-select').on('change', function() {
+        const facultyId = $(this).val();
+        
+        // Reset dependent dropdowns
+        resetSubjectDropdown();
+        resetSectionDropdown();
+        resetAcademicYearDropdown();
+        resetPeriodDropdown();
+        $('#load-results-btn').prop('disabled', true);
+        
+        if (facultyId) {
+          loadSubjects(facultyId);
+        }
+      });
+      
+      $('#subject-select').on('change', function() {
+        const subjectId = $(this).val();
+        const facultyId = $('#faculty-select').val();
+        
+        // Reset dependent dropdowns
+        resetSectionDropdown();
+        resetAcademicYearDropdown();
+        resetPeriodDropdown();
+        $('#load-results-btn').prop('disabled', true);
+        
+        if (subjectId && facultyId) {
+          loadSections(facultyId, subjectId);
+          loadAcademicYears();
+        }
+      });
+      
+      $('#section-select').on('change', function() {
+        // Section is optional, so just check if we can enable the load button
+        checkLoadButtonState();
+      });
+      
+      $('#academic-year-select').on('change', function() {
+        const academicYearId = $(this).val();
+        console.log('📅 Academic year selected:', academicYearId);
+        
+        // Reset dependent dropdowns
+        resetPeriodDropdown();
+        $('#load-results-btn').prop('disabled', true);
+        
+        if (academicYearId) {
+          console.log('🔄 Loading periods for academic year:', academicYearId);
+          loadPeriods(academicYearId);
+        } else {
+          console.log('⚠️ No academic year selected, period dropdown disabled');
+        }
+      });
+      
+      $('#period-select').on('change', function() {
+        checkLoadButtonState();
+      });
+      
+      // Load results button click
+      $('#load-results-btn').on('click', function() {
+        loadEvaluationResults();
+      });
+      
+      // Reset filters button click
+      $('#reset-filters-btn').on('click', function() {
+        resetAllFilters();
+      });
+      
+      // Export PDF button click
+      $('#export-pdf-btn').on('click', function() {
+        exportToPDF();
+      });
+      
+      // Export Excel button click
+      $('#export-excel-btn').on('click', function() {
+        exportToExcel();
+      });
+      
+      // Preview signatures button click
+      $('#preview-signatures-btn').on('click', function() {
+        openSignaturePreview();
+      });
+      
+      // Cancel preview button
+      $('#cancel-preview-btn').on('click', function() {
+        closeSignaturePreview();
+      });
+      
+      // Reset positions button
+      $('#reset-positions-btn').on('click', function() {
+        resetSignaturePositions();
+      });
+      
+      // Generate PDF with positions button
+      $('#generate-pdf-btn').on('click', function() {
+        exportToPDFWithPositions();
+      });
+    });
+    
+    // Load faculty list
+    function loadFacultyList() {
+      $.ajax({
+        url: '/api/guidance/faculty-list',
+        method: 'GET',
+        success: function(response) {
+          if (response.success && response.faculty) {
+            allFaculty = response.faculty;
+            
+            const $select = $('#faculty-select');
+            $select.empty().append('<option value="">-- Select Faculty --</option>');
+            
+            response.faculty.forEach(function(faculty) {
+              const fullName = faculty.first_name + ' ' + faculty.last_name;
+              $select.append(
+                $('<option></option>')
+                  .val(faculty.faculty_id)
+                  .text(fullName + ' (' + faculty.faculty_number + ')')
+              );
+            });
+          }
+        },
+        error: function(xhr, status, error) {
+          console.error('Error loading faculty list:', error);
+          Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: 'Failed to load faculty list'
+          });
+        }
+      });
+    }
+    
+    // Load subjects for selected faculty
+    function loadSubjects(facultyId) {
+      $.ajax({
+        url: '/api/guidance/faculty-subjects/' + facultyId,
+        method: 'GET',
+        success: function(response) {
+          if (response.success && response.subjects) {
+            allSubjects = response.subjects;
+            
+            const $select = $('#subject-select');
+            $select.empty().append('<option value="">-- Select Subject --</option>');
+            
+            if (response.subjects.length > 0) {
+              response.subjects.forEach(function(subject) {
+                $select.append(
+                  $('<option></option>')
+                    .val(subject.subject_id)
+                    .text(subject.subject_code + ' - ' + subject.subject_name)
+                );
+              });
+              $select.prop('disabled', false);
+            } else {
+              $select.append('<option value="" disabled>No subjects available</option>');
+            }
+          }
+        },
+        error: function(xhr, status, error) {
+          console.error('Error loading subjects:', error);
+          Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: 'Failed to load subjects for this faculty'
+          });
+        }
+      });
+    }
+    
+    // Load sections for selected faculty and subject (Optional)
+    function loadSections(facultyId, subjectId) {
+      $.ajax({
+        url: '/api/guidance/faculty-sections',
+        method: 'GET',
+        data: {
+          faculty_id: facultyId,
+          subject_id: subjectId
+        },
+        success: function(response) {
+          if (response.success && response.sections) {
+            allSections = response.sections;
+            
+            const $select = $('#section-select');
+            $select.empty().append('<option value="">-- All Sections --</option>');
+            
+            if (response.sections.length > 0) {
+              response.sections.forEach(function(section) {
+                $select.append(
+                  $('<option></option>')
+                    .val(section.section_id)
+                    .text(section.section_name)
+                );
+              });
+              $select.prop('disabled', false);
+            } else {
+              $select.append('<option value="" disabled>No sections available</option>');
+              $select.prop('disabled', true);
+            }
+          }
+        },
+        error: function(xhr, status, error) {
+          console.error('Error loading sections:', error);
+          // Don't show error alert since section is optional
+          resetSectionDropdown();
+        }
+      });
+    }
+    
+    // Load academic years
+    function loadAcademicYears() {
+      console.log('🔄 Loading academic years...');
+      
+      $.ajax({
+        url: '/api/guidance/academic-years',
+        method: 'GET',
+        success: function(response) {
+          console.log('✅ Academic years loaded:', response);
+          
+          if (response.success && response.academic_years) {
+            allAcademicYears = response.academic_years;
+            
+            const $select = $('#academic-year-select');
+            $select.empty().append('<option value="">-- Select Year --</option>');
+            
+            response.academic_years.forEach(function(year) {
+              const yearLabel = year.year_name || (year.start_year + ' - ' + year.end_year);
+              $select.append(
+                $('<option></option>')
+                  .val(year.academic_year_id)
+                  .text(yearLabel)
+              );
+            });
+            $select.prop('disabled', false);
+            console.log('✅ Academic year dropdown enabled with', response.academic_years.length, 'options');
+          } else {
+            console.error('❌ Invalid response format:', response);
+          }
+        },
+        error: function(xhr, status, error) {
+          console.error('❌ Error loading academic years:', error);
+          console.error('Response:', xhr.responseText);
+        }
+      });
+    }
+    
+    // Load periods for selected academic year
+    function loadPeriods(academicYearId) {
+      console.log('🔄 Loading periods for academic year:', academicYearId);
+      
+      if (!academicYearId) {
+        console.warn('⚠️ No academic year ID provided');
+        resetPeriodDropdown();
+        return;
+      }
+      
+      const url = '/api/guidance/evaluation-periods?academic_year_id=' + academicYearId;
+      console.log('📡 Making AJAX request to:', url);
+      
+      $.ajax({
+        url: url,
+        method: 'GET',
+        beforeSend: function() {
+          console.log('⏳ Request started...');
+          $('#period-select').empty().append('<option value="">Loading periods...</option>').prop('disabled', true);
+        },
+        success: function(response) {
+          console.log('✅ Periods response received:', response);
+          console.log('Response type:', typeof response);
+          console.log('Response.success:', response.success);
+          console.log('Response.data:', response.data);
+          
+          // The API returns 'data' not 'periods'
+          const periodsArray = response.data || response.periods || [];
+          
+          if (response.success && periodsArray.length >= 0) {
+            allPeriods = periodsArray;
+            
+            const $select = $('#period-select');
+            $select.empty().append('<option value="">-- Select Period --</option>');
+            
+            if (periodsArray.length > 0) {
+              console.log('📋 Found', periodsArray.length, 'periods for this academic year:');
+              
+              periodsArray.forEach(function(period, index) {
+                console.log(`  Period ${index + 1}:`, {
+                  id: period.period_id,
+                  title: period.title,
+                  status: period.status,
+                  computed_status: period.computed_status,
+                  acad_year_id: period.acad_year_id
+                });
+                
+                const periodTitle = period.title || period.period_name || 'Unnamed Period';
+                const periodStatus = period.computed_status || period.status || 'Unknown';
+                
+                $select.append(
+                  $('<option></option>')
+                    .val(period.period_id)
+                    .text(periodTitle + ' (' + periodStatus + ')')
+                );
+              });
+              
+              $select.prop('disabled', false);
+              console.log('✅ Period dropdown enabled with', periodsArray.length, 'options');
+            } else {
+              $select.append('<option value="" disabled>No periods available for this academic year</option>');
+              $select.prop('disabled', true);
+              console.warn('⚠️ No periods found for academic year:', academicYearId);
+            }
+          } else {
+            console.error('❌ Invalid response format:', response);
+            const $select = $('#period-select');
+            $select.empty().append('<option value="">-- Invalid response format --</option>');
+            $select.prop('disabled', true);
+          }
+        },
+        error: function(xhr, status, error) {
+          console.error('❌ AJAX Error loading periods:');
+          console.error('  Status:', status);
+          console.error('  Error:', error);
+          console.error('  Response status:', xhr.status);
+          console.error('  Response text:', xhr.responseText);
+          
+          const $select = $('#period-select');
+          $select.empty().append('<option value="">-- Error loading periods --</option>');
+          $select.prop('disabled', true);
+          
+          // Show user-friendly error
+          Swal.fire({
+            icon: 'error',
+            title: 'Error Loading Periods',
+            text: 'Failed to load evaluation periods. Please try again or contact support.',
+            confirmButtonColor: '#0059cc'
+          });
+        }
+      });
+    }
+    
+    // Reset subject dropdown
+    function resetSubjectDropdown() {
+      $('#subject-select').empty().append('<option value="">-- Select Subject --</option>').prop('disabled', true);
+      allSubjects = [];
+    }
+    
+    // Reset section dropdown
+    function resetSectionDropdown() {
+      $('#section-select').empty().append('<option value="">-- All Sections --</option>').prop('disabled', true);
+      allSections = [];
+    }
+    
+    // Reset academic year dropdown
+    function resetAcademicYearDropdown() {
+      $('#academic-year-select').empty().append('<option value="">-- Select Year --</option>').prop('disabled', true);
+      allAcademicYears = [];
+    }
+    
+    // Reset period dropdown
+    function resetPeriodDropdown() {
+      $('#period-select').empty().append('<option value="">-- Select Period --</option>').prop('disabled', true);
+      allPeriods = [];
+    }
+    
+    // Check if load button should be enabled
+    function checkLoadButtonState() {
+      const facultyId = $('#faculty-select').val();
+      const subjectId = $('#subject-select').val();
+      const academicYearId = $('#academic-year-select').val();
+      const periodId = $('#period-select').val();
+      
+      // Section is optional, so don't check it
+      $('#load-results-btn').prop('disabled', !(facultyId && subjectId && academicYearId && periodId));
+    }
+    
+    // Reset all filters
+    function resetAllFilters() {
+      $('#faculty-select').val('');
+      resetSubjectDropdown();
+      resetSectionDropdown();
+      resetAcademicYearDropdown();
+      resetPeriodDropdown();
+      $('#load-results-btn').prop('disabled', true);
+      
+      // Show no results state, hide everything else
+      $('#results-container').addClass('hidden');
+      $('#loading-container').addClass('hidden');
+      $('#no-results-container').removeClass('hidden');
+      $('#preview-signatures-btn').addClass('hidden');
+      $('#export-pdf-btn').addClass('hidden');
+      $('#export-excel-btn').addClass('hidden');
+    }
+    
+    // Load evaluation results
+    function loadEvaluationResults() {
+      const facultyId = $('#faculty-select').val();
+      const subjectId = $('#subject-select').val();
+      const sectionId = $('#section-select').val(); // Optional
+      const academicYearId = $('#academic-year-select').val();
+      const periodId = $('#period-select').val();
+      
+      if (!facultyId || !subjectId || !academicYearId || !periodId) {
+        Swal.fire({
+          icon: 'warning',
+          title: 'Selection Required',
+          text: 'Please select all required filters (Faculty, Subject, Academic Year, and Period)'
+        });
+        return;
+      }
+      
+      // Show loading state
+      $('#loading-container').removeClass('hidden');
+      $('#no-results-container').addClass('hidden');
+      $('#results-container').addClass('hidden');
+      
+      // Build URL with all parameters
+      let url = '/api/guidance/evaluation-criteria-results/' + facultyId;
+      url += '?subject_id=' + subjectId;
+      url += '&academic_year_id=' + academicYearId;
+      url += '&period_id=' + periodId;
+      
+      // Add section filter if selected (optional)
+      if (sectionId) {
+        url += '&section_id=' + sectionId;
+      }
+      
+      // Fetch results
+      $.ajax({
+        url: url,
+        method: 'GET',
+        success: function(response) {
+          $('#loading-container').addClass('hidden');
+          
+          if (response.success && response.categories) {
+            displayResults(response);
+          } else {
+            $('#no-results-container').removeClass('hidden');
+          }
+        },
+        error: function(xhr, status, error) {
+          console.error('Error loading evaluation results:', error);
+          $('#loading-container').addClass('hidden');
+          
+          Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: 'Failed to load evaluation results'
+          });
+        }
+      });
+    }
+    
+    // Display results
+    function displayResults(data) {
+      const faculty = data.faculty;
+      const categories = data.categories;
+      const comments = data.comments || [];
+      const periodStatus = data.period_status || 'Active'; // Get period status from response
+      
+      // Get selected filter values for display
+      const selectedSubject = $('#subject-select option:selected').text();
+      const selectedSection = $('#section-select').val();
+      const selectedSectionText = $('#section-select option:selected').text();
+      
+      // Update header section (ISO 25010 style)
+      $('#header-faculty-name').text(faculty.first_name + ' ' + faculty.last_name);
+      $('#header-subject').text(selectedSubject);
+      
+      // Show/hide section field based on selection
+      if (selectedSection && selectedSection !== '') {
+        $('#header-section').text(selectedSectionText);
+        $('#header-section-container').removeClass('hidden');
+      } else {
+        $('#header-section-container').addClass('hidden');
+      }
+      
+      // Build categories HTML
+      const $categoriesContainer = $('#categories-container');
+      $categoriesContainer.empty();
+      
+      if (categories.length === 0) {
+        $('#no-results-container').removeClass('hidden');
+        return;
+      }
+      
+      // Calculate overall mean from all criteria
+      let totalMean = 0;
+      let totalCriteria = 0;
+      
+      categories.forEach(function(category) {
+        const categoryHtml = buildCategoryHtml(category);
+        $categoriesContainer.append(categoryHtml);
+        
+        // Sum up means for overall calculation
+        if (category.criteria && category.criteria.length > 0) {
+          category.criteria.forEach(function(criterion) {
+            if (criterion.total_responses > 0) {
+              totalMean += criterion.mean;
+              totalCriteria++;
+            }
+          });
+        }
+      });
+      
+      // Calculate and display overall rating
+      const overallMean = totalCriteria > 0 ? (totalMean / totalCriteria) : 0;
+      const overallRemarks = getRemarks(overallMean);
+      
+      $('#total-rating').text(totalCriteria > 0 ? totalMean.toFixed(2) : 'N/A');
+      $('#overall-mean').text(overallMean.toFixed(2));
+      $('#overall-remarks').text(overallRemarks);
+      
+      // Display comments if available
+      displayComments(comments);
+      
+      // Update print header with current period info
+      let selectedPeriod = $('#period-select option:selected').text();
+      // Remove status text like (Active), (Closed), etc. from period name
+      selectedPeriod = selectedPeriod.replace(/\s*\([^)]*\)\s*$/, '').trim();
+      const selectedYear = $('#academic-year-select option:selected').text();
+      $('#print-semester').text(selectedPeriod + ', A.Y. ' + selectedYear);
+      
+      // Update print header section info
+      if (selectedSection && selectedSection !== '') {
+        $('#print-section-info').text('Section: ' + selectedSectionText).removeClass('hidden');
+      } else {
+        $('#print-section-info').addClass('hidden');
+      }
+      
+      // Show results container
+      $('#results-container').removeClass('hidden');
+      
+      // Only show export buttons if period is closed (Status: 'Closed')
+      // Valid period status values: 'Pending', 'Active', 'Closed', 'Canceled'
+      if (periodStatus === 'Closed') {
+        $('#preview-signatures-btn').removeClass('hidden');
+        $('#export-pdf-btn').removeClass('hidden');
+        $('#export-excel-btn').removeClass('hidden');
+      } else {
+        // Hide export buttons if period is not closed
+        $('#preview-signatures-btn').addClass('hidden');
+        $('#export-pdf-btn').addClass('hidden');
+        $('#export-excel-btn').addClass('hidden');
+      }
+    }
+    
+    // Get remarks based on mean value
+    function getRemarks(mean) {
+      if (mean >= 4.50) return 'OUTSTANDING';
+      if (mean >= 3.50) return 'HIGHLY SATISFACTORY';
+      if (mean >= 2.50) return 'SATISFACTORY';
+      if (mean >= 1.50) return 'NEEDS IMPROVEMENT';
+      if (mean >= 1.00) return 'POOR';
+      return 'NO DATA';
+    }
+    
+    // Display comments section
+    function displayComments(comments) {
+      const $commentsContainer = $('#comments-container');
+      const $commentsList = $('#comments-list');
+      
+      // Clear previous comments
+      $commentsList.empty();
+      
+      // Only show if there are comments
+      if (comments && comments.length > 0) {
+        comments.forEach(function(comment, index) {
+          const commentHtml = `
+            <li class="text-sm text-gray-900" style="line-height: 1.6; margin-bottom: 0.5rem;">
+              ${comment}
+            </li>
+          `;
+          $commentsList.append(commentHtml);
+        });
+        
+        $commentsContainer.removeClass('hidden');
+      } else {
+        $commentsContainer.addClass('hidden');
+      }
+    }
+    
+    // Build category HTML - ISO 25010 Format
+    function buildCategoryHtml(category) {
+      let html = `
+        <!-- Category Header - Standard Academic Format -->
+        <div class="category-header-standard">
+          <i class="fas fa-clipboard-list mr-2"></i>
+          ${category.category_name}
+        </div>
+        
+        <!-- Results Table -->
+        <table class="results-table">
+          <thead>
+            <tr>
+              <th style="width: 50px;">No.</th>
+              <th style="width: auto;">PERFORMANCE INDICATORS</th>
+              <th style="width: 60px;">5</th>
+              <th style="width: 60px;">4</th>
+              <th style="width: 60px;">3</th>
+              <th style="width: 60px;">2</th>
+              <th style="width: 60px;">1</th>
+              <th style="width: 80px;">MEAN</th>
+              <th style="width: 150px;">REMARKS</th>
+            </tr>
+          </thead>
+          <tbody>
+      `;
+      
+      if (category.criteria && category.criteria.length > 0) {
+        category.criteria.forEach(function(criterion, index) {
+          html += buildCriterionRowHtml(criterion, index + 1);
+        });
+      } else {
+        html += `
+          <tr>
+            <td colspan="9" style="padding: 2rem; text-align: center;">
+              <i class="fas fa-info-circle text-gray-400 text-2xl mb-2" style="display: block;"></i>
+              <span style="color: #6b7280; font-style: italic;">No evaluation data available for this category</span>
+            </td>
+          </tr>
+        `;
+      }
+      
+      html += `
+          </tbody>
+        </table>
+      `;
+      
+      return html;
+    }
+    
+    // Build criterion row HTML - ISO 25010 Table Format
+    function buildCriterionRowHtml(criterion, number) {
+      const totalResponses = criterion.total_responses;
+      const mean = criterion.mean;
+      const remarks = criterion.remarks;
+      
+      // Get vote counts for each rating
+      const votes5 = criterion.votes['5'] || 0;
+      const votes4 = criterion.votes['4'] || 0;
+      const votes3 = criterion.votes['3'] || 0;
+      const votes2 = criterion.votes['2'] || 0;
+      const votes1 = criterion.votes['1'] || 0;
+      
+      // Skip if no responses
+      if (totalResponses === 0) {
+        return `
+          <tr>
+            <td class="criteria-number">${number}</td>
+            <td class="criteria-text text-left">${criterion.description}</td>
+            <td class="vote-cell">0</td>
+            <td class="vote-cell">0</td>
+            <td class="vote-cell">0</td>
+            <td class="vote-cell">0</td>
+            <td class="vote-cell">0</td>
+            <td class="mean-cell">N/A</td>
+            <td class="remarks-cell">No Data</td>
+          </tr>
+        `;
+      }
+      
+      let html = `
+        <tr>
+          <td class="criteria-number">${number}</td>
+          <td class="criteria-text text-left">${criterion.description}</td>
+          <td class="vote-cell">${votes5}</td>
+          <td class="vote-cell">${votes4}</td>
+          <td class="vote-cell">${votes3}</td>
+          <td class="vote-cell">${votes2}</td>
+          <td class="vote-cell">${votes1}</td>
+          <td class="mean-cell">${mean.toFixed(2)}</td>
+          <td class="remarks-cell">${remarks}</td>
+        </tr>
+      `;
+      
+      return html;
+    }
+    
+    // Export to PDF function
+    function exportToPDF() {
+      const facultyId = $('#faculty-select').val();
+      const subjectId = $('#subject-select').val();
+      const sectionId = $('#section-select').val();
+      const academicYearId = $('#academic-year-select').val();
+      const periodId = $('#period-select').val();
+      
+      if (!facultyId || !subjectId || !academicYearId || !periodId) {
+        Swal.fire({
+          icon: 'warning',
+          title: 'Cannot Export',
+          text: 'Please load results first before exporting'
+        });
+        return;
+      }
+      
+      // Show loading
+      Swal.fire({
+        title: 'Generating PDF...',
+        text: 'Please wait while we prepare your report',
+        allowOutsideClick: false,
+        showConfirmButton: false,
+        willOpen: () => {
+          Swal.showLoading();
+        }
+      });
+      
+      // Build URL with all parameters
+      let url = '/api/guidance/export-evaluation-pdf/' + facultyId;
+      url += '?subject_id=' + subjectId;
+      url += '&academic_year_id=' + academicYearId;
+      url += '&period_id=' + periodId;
+      
+      if (sectionId) {
+        url += '&section_id=' + sectionId;
+      }
+      
+      // Download PDF
+      window.location.href = url;
+      
+      // Close loading after a delay
+      setTimeout(function() {
+        Swal.close();
+      }, 2000);
+    }
+    
+    // Export to Excel function
+    function exportToExcel() {
+      const facultyId = $('#faculty-select').val();
+      const subjectId = $('#subject-select').val();
+      const sectionId = $('#section-select').val();
+      const academicYearId = $('#academic-year-select').val();
+      const periodId = $('#period-select').val();
+      
+      if (!facultyId || !subjectId || !academicYearId || !periodId) {
+        Swal.fire({
+          icon: 'warning',
+          title: 'Cannot Export',
+          text: 'Please load results first before exporting'
+        });
+        return;
+      }
+      
+      // Show loading
+      Swal.fire({
+        title: 'Generating Excel...',
+        text: 'Please wait while we prepare your report',
+        allowOutsideClick: false,
+        showConfirmButton: false,
+        willOpen: () => {
+          Swal.showLoading();
+        }
+      });
+      
+      // Build URL with all parameters
+      let url = '/api/guidance/export-evaluation-excel/' + facultyId;
+      url += '?subject_id=' + subjectId;
+      url += '&academic_year_id=' + academicYearId;
+      url += '&period_id=' + periodId;
+      
+      if (sectionId) {
+        url += '&section_id=' + sectionId;
+      }
+      
+      // Download Excel
+      window.location.href = url;
+      
+      // Close loading after a delay
+      setTimeout(function() {
+        Swal.close();
+      }, 2000);
+    }
+    
+    // ============================================
+    // SIGNATURE POSITIONING FUNCTIONALITY
+    // ============================================
+    
+    let signaturePositions = {
+      faculty: { top: 50, left: 50 },
+      dean: { top: 200, left: 50 },
+      president: { top: 350, left: 50 }
+    };
+    
+    // Open signature preview modal
+    function openSignaturePreview() {
+      $('#signature-preview-modal').removeClass('hidden');
+      
+      // Wait for modal to be fully rendered before initializing draggable
+      setTimeout(function() {
+        initializeDraggableSignatures();
+      }, 100);
+    }
+    
+    // Close signature preview modal
+    function closeSignaturePreview() {
+      $('#signature-preview-modal').addClass('hidden');
+    }
+    
+    // Initialize jQuery UI draggable
+    function initializeDraggableSignatures() {
+      $('.draggable-signature').draggable({
+        containment: '#signature-canvas',
+        // axis: 'y' removed to allow both X and Y movement
+        grid: [10, 10], // Snap to 10px grid
+        scroll: false,
+        drag: function(event, ui) {
+          // Update position indicator while dragging (show both X and Y)
+          const signatureId = $(this).data('signature-id');
+          const topPosition = ui.position.top;
+          const leftPosition = ui.position.left;
+          $(this).find('.pos-value').text(`X:${leftPosition}px Y:${topPosition}px`);
+        },
+        stop: function(event, ui) {
+          // Save position when drag stops (both X and Y)
+          const signatureId = $(this).data('signature-id');
+          const topPosition = ui.position.top;
+          const leftPosition = ui.position.left;
+          signaturePositions[signatureId] = { 
+            top: topPosition,
+            left: leftPosition 
+          };
+          
+          console.log('Signature positions updated:', signaturePositions);
+        }
+      });
+    }
+    
+    // Reset signature positions to default
+    function resetSignaturePositions() {
+      signaturePositions = {
+        faculty: { top: 50, left: 50 },
+        dean: { top: 200, left: 50 },
+        president: { top: 350, left: 50 }
+      };
+      
+      // Reset visual positions (both top and left)
+      $('#signature-faculty').css({ top: '50px', left: '50px' }).find('.pos-value').text('X:50px Y:50px');
+      $('#signature-dean').css({ top: '200px', left: '50px' }).find('.pos-value').text('X:50px Y:200px');
+      $('#signature-president').css({ top: '350px', left: '50px' }).find('.pos-value').text('X:50px Y:350px');
+      
+      Swal.fire({
+        icon: 'success',
+        title: 'Positions Reset',
+        text: 'Signature positions have been reset to defaults',
+        timer: 2000,
+        showConfirmButton: false
+      });
+    }
+    
+    // Export to PDF with custom signature positions
+    function exportToPDFWithPositions() {
+      const facultyId = $('#faculty-select').val();
+      const subjectId = $('#subject-select').val();
+      const sectionId = $('#section-select').val();
+      const academicYearId = $('#academic-year-select').val();
+      const periodId = $('#period-select').val();
+      
+      if (!facultyId || !subjectId || !academicYearId || !periodId) {
+        Swal.fire({
+          icon: 'warning',
+          title: 'Cannot Export',
+          text: 'Please load results first before exporting'
+        });
+        return;
+      }
+      
+      // Close the preview modal
+      closeSignaturePreview();
+      
+      // Show loading
+      Swal.fire({
+        title: 'Generating PDF with Custom Positions...',
+        html: 'Please wait while we prepare your report<br><small>Applying signature positions...</small>',
+        allowOutsideClick: false,
+        showConfirmButton: false,
+        willOpen: () => {
+          Swal.showLoading();
+        }
+      });
+      
+      // Build URL with all parameters including signature positions
+      let url = '/api/guidance/export-evaluation-pdf/' + facultyId;
+      url += '?subject_id=' + subjectId;
+      url += '&academic_year_id=' + academicYearId;
+      url += '&period_id=' + periodId;
+      
+      if (sectionId) {
+        url += '&section_id=' + sectionId;
+      }
+      
+      // Add signature positions as query parameters
+      // Convert pixel positions to percentage of canvas dimensions
+      const $canvas = $('#signature-canvas');
+      
+      // Get the actual content dimensions
+      // Use outerWidth/outerHeight to get full dimensions including padding
+      let canvasWidth = $canvas.width();
+      let canvasHeight = $canvas.height();
+      
+      // Fallback: If dimensions are 0 or invalid, calculate from outer dimensions
+      if (!canvasWidth || canvasWidth <= 0) {
+        canvasWidth = $canvas.outerWidth() - 80; // Subtract padding (40px * 2)
+      }
+      if (!canvasHeight || canvasHeight <= 0) {
+        canvasHeight = $canvas.outerHeight() - 80; // Subtract padding (40px * 2)
+      }
+      
+      // Final fallback: Use minimum dimensions
+      if (!canvasWidth || canvasWidth <= 0) canvasWidth = 800;
+      if (!canvasHeight || canvasHeight <= 0) canvasHeight = 600;
+      
+      console.log('Canvas dimensions:', { 
+        width: canvasWidth, 
+        height: canvasHeight
+      });
+      console.log('Signature positions (pixels):', signaturePositions);
+      
+      // Calculate percentages based on actual canvas content dimensions
+      const facultyPercentY = (signaturePositions.faculty.top / canvasHeight * 100).toFixed(2);
+      const facultyPercentX = (signaturePositions.faculty.left / canvasWidth * 100).toFixed(2);
+      
+      const deanPercentY = (signaturePositions.dean.top / canvasHeight * 100).toFixed(2);
+      const deanPercentX = (signaturePositions.dean.left / canvasWidth * 100).toFixed(2);
+      
+      const presidentPercentY = (signaturePositions.president.top / canvasHeight * 100).toFixed(2);
+      const presidentPercentX = (signaturePositions.president.left / canvasWidth * 100).toFixed(2);
+      
+      console.log('Faculty:', { x: facultyPercentX + '%', y: facultyPercentY + '%' });
+      console.log('Dean:', { x: deanPercentX + '%', y: deanPercentY + '%' });
+      console.log('President:', { x: presidentPercentX + '%', y: presidentPercentY + '%' });
+      
+      url += '&sig_faculty_y=' + facultyPercentY;
+      url += '&sig_faculty_x=' + facultyPercentX;
+      url += '&sig_dean_y=' + deanPercentY;
+      url += '&sig_dean_x=' + deanPercentX;
+      url += '&sig_president_y=' + presidentPercentY;
+      url += '&sig_president_x=' + presidentPercentX;
+      
+      console.log('PDF Export URL with positions:', url);
+      
+      // Download PDF
+      window.location.href = url;
+      
+      // Close loading after a delay
+      setTimeout(function() {
+        Swal.fire({
+          icon: 'success',
+          title: 'PDF Generated!',
+          text: 'Your PDF has been generated with custom signature positions',
+          timer: 3000,
+          showConfirmButton: false
+        });
+      }, 2000);
+    }
+    
+    // ============================================
+    // DEPARTMENT ANALYSIS FUNCTIONALITY
+    // ============================================
+    
+    let allDepartments = [];
+    let allDeptAcademicYears = [];
+    let allDeptPeriods = [];
+    
+    // Load department list
+    function loadDepartmentList() {
+      $.ajax({
+        url: '/api/departments',
+        method: 'GET',
+        success: function(response) {
+          if (response.success && response.data) {
+            allDepartments = response.data;
+            
+            const $deptSelect = $('#dept-select');
+            $deptSelect.empty().append('<option value="">-- Select Department --</option>');
+            
+            allDepartments.forEach(function(dept) {
+              $deptSelect.append(`<option value="${dept.program_id}">${dept.name}</option>`);
+            });
+            
+            console.log('Departments loaded:', allDepartments.length);
+          }
+        },
+        error: function(xhr, status, error) {
+          console.error('Error loading departments:', error);
+          Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: 'Failed to load departments'
+          });
+        }
+      });
+    }
+    
+    // Load academic years for department
+    function loadDeptAcademicYears() {
+      $.ajax({
+        url: '/api/guidance/academic-years',
+        method: 'GET',
+        success: function(response) {
+          if (response.success && response.academic_years) {
+            allDeptAcademicYears = response.academic_years;
+            
+            const $select = $('#dept-academic-year-select');
+            $select.empty().append('<option value="">-- Select Year --</option>');
+            
+            allDeptAcademicYears.forEach(function(year) {
+              $select.append(`<option value="${year.academic_year_id}">${year.year_code}</option>`);
+            });
+            
+            $select.prop('disabled', false);
+            console.log('Department academic years loaded:', allDeptAcademicYears.length);
+          }
+        },
+        error: function(xhr, status, error) {
+          console.error('Error loading academic years:', error);
+        }
+      });
+    }
+    
+    // Load periods for department
+    function loadDeptPeriods(academicYearId) {
+      console.log('🔄 Loading department periods for academic year:', academicYearId);
+      
+      if (!academicYearId) {
+        $('#dept-period-select').empty().append('<option value="">-- Select Period --</option>').prop('disabled', true);
+        allDeptPeriods = [];
+        return;
+      }
+      
+      const url = '/api/guidance/evaluation-periods?academic_year_id=' + academicYearId;
+      console.log('📡 Making AJAX request to:', url);
+      
+      $.ajax({
+        url: url,
+        method: 'GET',
+        success: function(response) {
+          console.log('Department periods API response:', response);
+          
+          if (response.success && response.data) {
+            allDeptPeriods = response.data;
+            
+            const $select = $('#dept-period-select');
+            $select.empty().append('<option value="">-- Select Period --</option>');
+            
+            if (allDeptPeriods.length > 0) {
+              allDeptPeriods.forEach(function(period) {
+                let statusBadge = '';
+                if (period.status === 'Active') statusBadge = ' (Active)';
+                else if (period.status === 'Upcoming' || period.status === 'Pending') statusBadge = ' (Upcoming)';
+                else if (period.status === 'Closed') statusBadge = ' (Closed)';
+                
+                $select.append(`<option value="${period.period_id}">${period.title || period.period_name}${statusBadge}</option>`);
+              });
+              $select.prop('disabled', false);
+            } else {
+              $select.append('<option value="" disabled>No periods available</option>');
+              $select.prop('disabled', true);
+            }
+            
+            console.log('✅ Department periods loaded:', allDeptPeriods.length);
+          } else {
+            console.error('Department periods API error:', response.message || 'Unknown error');
+            $('#dept-period-select').empty().append('<option value="" disabled>Error loading periods</option>').prop('disabled', true);
+            allDeptPeriods = [];
+          }
+        },
+        error: function(xhr, status, error) {
+          console.error('Error loading department periods:', error);
+          console.error('Status:', status);
+          console.error('Response:', xhr.responseText);
+          $('#dept-period-select').empty().append('<option value="" disabled>Error loading periods</option>').prop('disabled', true);
+          allDeptPeriods = [];
+        }
+      });
+    }
+    
+    // Check if load department button should be enabled
+    function checkLoadDeptButtonState() {
+      const deptId = $('#dept-select').val();
+      const academicYearId = $('#dept-academic-year-select').val();
+      const periodId = $('#dept-period-select').val();
+      
+      $('#load-dept-results-btn').prop('disabled', !(deptId && academicYearId && periodId));
+    }
+    
+    // Reset department filters
+    function resetDepartmentFilters() {
+      $('#dept-select').val('');
+      $('#dept-academic-year-select').empty().append('<option value="">-- Select Year --</option>').prop('disabled', true);
+      $('#dept-period-select').empty().append('<option value="">-- Select Period --</option>').prop('disabled', true);
+      $('#load-dept-results-btn').prop('disabled', true);
+      
+      // Hide results and show no results state
+      $('#dept-results-container').addClass('hidden');
+      $('#dept-loading-container').addClass('hidden');
+      $('#dept-no-results-container').removeClass('hidden');
+      $('#preview-dept-signatures-btn').addClass('hidden');
+      $('#export-dept-pdf-btn').addClass('hidden');
+      $('#export-dept-excel-btn').addClass('hidden');
+      
+      allDeptAcademicYears = [];
+      allDeptPeriods = [];
+    }
+    
+    // Load department results
+    function loadDepartmentResults() {
+      const deptId = $('#dept-select').val();
+      const academicYearId = $('#dept-academic-year-select').val();
+      const periodId = $('#dept-period-select').val();
+      
+      if (!deptId || !academicYearId || !periodId) {
+        Swal.fire({
+          icon: 'warning',
+          title: 'Missing Information',
+          text: 'Please select all required filters'
+        });
+        return;
+      }
+      
+      // Show loading state
+      $('#dept-loading-container').removeClass('hidden');
+      $('#dept-no-results-container').addClass('hidden');
+      $('#dept-results-container').addClass('hidden');
+      
+      // Build URL
+      let url = '/api/guidance/department-analysis/' + deptId;
+      url += '?academic_year_id=' + academicYearId;
+      url += '&period_id=' + periodId;
+      
+      // Fetch results
+      $.ajax({
+        url: url,
+        method: 'GET',
+        success: function(response) {
+          if (response.success) {
+            displayDepartmentResults(response);
+          } else {
+            Swal.fire({
+              icon: 'error',
+              title: 'Error',
+              text: response.message || 'Failed to load department results'
+            });
+            $('#dept-loading-container').addClass('hidden');
+            $('#dept-no-results-container').removeClass('hidden');
+          }
+        },
+        error: function(xhr, status, error) {
+          console.error('Error loading department results:', error);
+          Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: 'Failed to load department results'
+          });
+          $('#dept-loading-container').addClass('hidden');
+          $('#dept-no-results-container').removeClass('hidden');
+        }
+      });
+    }
+    
+    // Display department results
+    function displayDepartmentResults(data) {
+      // Hide loading
+      $('#dept-loading-container').addClass('hidden');
+      
+      // Get period status from response
+      const periodStatus = data.period_status || 'Active';
+      
+      // Update header information
+      const deptName = $('#dept-select option:selected').text();
+      const yearName = $('#dept-academic-year-select option:selected').text();
+      const periodName = $('#dept-period-select option:selected').text().replace(/\s*\([^)]*\)\s*$/, '').trim();
+      
+      $('#dept-header-name').text(deptName);
+      $('#dept-header-year').text(yearName);
+      $('#dept-header-period').text(periodName);
+      
+      // Update print header
+      $('#print-dept-period').text(periodName + ', A.Y. ' + yearName);
+      
+      // Build categories HTML (same as faculty results)
+      const categories = data.categories || [];
+      const $categoriesContainer = $('#dept-categories-container');
+      $categoriesContainer.empty();
+      
+      if (categories.length === 0) {
+        $('#dept-no-results-container').removeClass('hidden');
+        return;
+      }
+      
+      // Calculate overall statistics
+      let totalMean = 0;
+      let totalCriteria = 0;
+      
+      categories.forEach(function(category) {
+        const categoryHtml = buildCategoryHtml(category);
+        $categoriesContainer.append(categoryHtml);
+        
+        // Sum up means for overall calculation
+        if (category.criteria && category.criteria.length > 0) {
+          category.criteria.forEach(function(criterion) {
+            if (criterion.mean > 0) {
+              totalMean += criterion.mean;
+              totalCriteria++;
+            }
+          });
+        }
+      });
+      
+      // Calculate and display overall rating
+      const overallMean = totalCriteria > 0 ? (totalMean / totalCriteria) : 0;
+      const overallRemarks = getRemarks(overallMean);
+      
+      $('#dept-total-rating').text(totalCriteria > 0 ? totalMean.toFixed(2) : 'N/A');
+      $('#dept-overall-mean').text(overallMean.toFixed(2));
+      $('#dept-overall-remarks').text(overallRemarks);
+      
+      // Show results container
+      $('#dept-results-container').removeClass('hidden');
+      
+      // Only show export buttons if period is closed (Status: 'Closed')
+      // Valid period status values: 'Pending', 'Active', 'Closed', 'Canceled'
+      if (periodStatus === 'Closed') {
+        $('#preview-dept-signatures-btn').removeClass('hidden');
+        $('#export-dept-pdf-btn').removeClass('hidden');
+        $('#export-dept-excel-btn').removeClass('hidden');
+      } else {
+        // Hide export buttons if period is not closed
+        $('#preview-dept-signatures-btn').addClass('hidden');
+        $('#export-dept-pdf-btn').addClass('hidden');
+        $('#export-dept-excel-btn').addClass('hidden');
+      }
+    }
+    
+    // Display department faculty table
+    function displayDepartmentFacultyTable(facultyList) {
+      const $tbody = $('#dept-faculty-table-body');
+      const $emptyState = $('#dept-table-empty');
+      
+      if (!facultyList || facultyList.length === 0) {
+        $tbody.empty();
+        $emptyState.removeClass('hidden');
+        return;
+      }
+      
+      $emptyState.addClass('hidden');
+      
+      // Sort by average rating descending
+      facultyList.sort((a, b) => (b.average_rating || 0) - (a.average_rating || 0));
+      
+      let html = '';
+      facultyList.forEach(function(faculty, index) {
+        const rank = index + 1;
+        const fullName = `${faculty.first_name} ${faculty.last_name}`;
+        const avgRating = (faculty.average_rating || 0).toFixed(2);
+        const remarks = getRemarks(faculty.average_rating || 0);
+        
+        // Determine rank badge color
+        let rankBadgeClass = 'bg-gray-100 text-gray-800';
+        if (rank === 1) rankBadgeClass = 'bg-yellow-100 text-yellow-800 border border-yellow-300';
+        else if (rank === 2) rankBadgeClass = 'bg-gray-200 text-gray-800 border border-gray-400';
+        else if (rank === 3) rankBadgeClass = 'bg-orange-100 text-orange-800 border border-orange-300';
+        
+        // Determine rating badge color
+        let ratingBadgeClass = 'bg-gray-100 text-gray-800';
+        if (faculty.average_rating >= 4.5) ratingBadgeClass = 'bg-green-100 text-green-800';
+        else if (faculty.average_rating >= 3.5) ratingBadgeClass = 'bg-blue-100 text-blue-800';
+        else if (faculty.average_rating >= 2.5) ratingBadgeClass = 'bg-yellow-100 text-yellow-800';
+        else if (faculty.average_rating >= 1.5) ratingBadgeClass = 'bg-orange-100 text-orange-800';
+        else ratingBadgeClass = 'bg-red-100 text-red-800';
+        
+        html += `
+          <tr class="hover:bg-gray-50 print:hover:bg-transparent">
+            <td class="px-6 py-4 whitespace-nowrap text-center print:border print:border-black print:py-2 print:px-3">
+              <span class="inline-flex items-center justify-center w-8 h-8 rounded-full text-sm font-bold ${rankBadgeClass} print:inline print:px-2 print:py-1">
+                ${rank}
+              </span>
+            </td>
+            <td class="px-6 py-4 whitespace-nowrap print:border print:border-black print:py-2 print:px-3 print:text-left">
+              <div class="flex items-center print:block">
+                <div class="h-10 w-10 rounded-full bg-primary-100 flex items-center justify-center flex-shrink-0 print:hidden">
+                  <span class="text-sm font-medium text-primary-600">${faculty.first_name.charAt(0)}${faculty.last_name.charAt(0)}</span>
+                </div>
+                <div class="ml-3 print:ml-0">
+                  <div class="text-sm font-medium text-gray-900">${fullName}</div>
+                </div>
+              </div>
+            </td>
+            <td class="px-6 py-4 whitespace-nowrap text-center text-sm text-gray-900 print:border print:border-black print:py-2 print:px-3">
+              ${faculty.subjects_taught || 0}
+            </td>
+            <td class="px-6 py-4 whitespace-nowrap text-center text-sm text-gray-900 print:border print:border-black print:py-2 print:px-3">
+              ${faculty.total_evaluations || 0}
+            </td>
+            <td class="px-6 py-4 whitespace-nowrap text-center print:border print:border-black print:py-2 print:px-3">
+              <span class="inline-flex px-3 py-1 text-sm font-semibold rounded-full ${ratingBadgeClass} print:inline print:px-2 print:py-1 print:rounded print:text-xs">
+                ${avgRating}
+              </span>
+            </td>
+            <td class="px-6 py-4 whitespace-nowrap text-center print:border print:border-black print:py-2 print:px-3">
+              <span class="inline-flex px-2 py-1 text-xs font-semibold rounded uppercase ${ratingBadgeClass} print:inline print:text-xs">
+                ${remarks}
+              </span>
+            </td>
+          </tr>
+        `;
+      });
+      
+      $tbody.html(html);
+    }
+    
+    // Export department PDF
+    function exportDepartmentPDF() {
+      const deptId = $('#dept-select').val();
+      const academicYearId = $('#dept-academic-year-select').val();
+      const periodId = $('#dept-period-select').val();
+      
+      if (!deptId || !academicYearId || !periodId) {
+        Swal.fire({
+          icon: 'warning',
+          title: 'Cannot Export',
+          text: 'Please load results first before exporting'
+        });
+        return;
+      }
+      
+      // Show loading
+      Swal.fire({
+        title: 'Generating PDF...',
+        text: 'Please wait while we prepare your department report',
+        allowOutsideClick: false,
+        showConfirmButton: false,
+        willOpen: () => {
+          Swal.showLoading();
+        }
+      });
+      
+      // Build URL
+      let url = '/api/guidance/export-department-pdf/' + deptId;
+      url += '?academic_year_id=' + academicYearId;
+      url += '&period_id=' + periodId;
+      
+      // Download PDF
+      window.location.href = url;
+      
+      // Close loading after a delay
+      setTimeout(function() {
+        Swal.close();
+      }, 2000);
+    }
+    
+    // Export department Excel
+    function exportDepartmentExcel() {
+      const deptId = $('#dept-select').val();
+      const academicYearId = $('#dept-academic-year-select').val();
+      const periodId = $('#dept-period-select').val();
+      
+      if (!deptId || !academicYearId || !periodId) {
+        Swal.fire({
+          icon: 'warning',
+          title: 'Cannot Export',
+          text: 'Please load results first before exporting'
+        });
+        return;
+      }
+      
+      // Show loading
+      Swal.fire({
+        title: 'Generating Excel...',
+        text: 'Please wait while we prepare your department report',
+        allowOutsideClick: false,
+        showConfirmButton: false,
+        willOpen: () => {
+          Swal.showLoading();
+        }
+      });
+      
+      // Build URL
+      let url = '/api/guidance/export-department-excel/' + deptId;
+      url += '?academic_year_id=' + academicYearId;
+      url += '&period_id=' + periodId;
+      
+      // Download Excel
+      window.location.href = url;
+      
+      // Close loading after a delay
+      setTimeout(function() {
+        Swal.close();
+      }, 2000);
+    }
+    
+    // ============================================
+    // DEPARTMENT SIGNATURE POSITIONING
+    // ============================================
+    
+    let deptSignaturePositions = {
+      head: { top: 50, left: 50 },
+      dean: { top: 200, left: 50 },
+      president: { top: 350, left: 50 }
+    };
+    
+    // Open department signature preview modal
+    function openDeptSignaturePreview() {
+      $('#dept-signature-preview-modal').removeClass('hidden');
+      
+      setTimeout(function() {
+        initializeDeptDraggableSignatures();
+      }, 100);
+    }
+    
+    // Close department signature preview modal
+    function closeDeptSignaturePreview() {
+      $('#dept-signature-preview-modal').addClass('hidden');
+    }
+    
+    // Initialize department draggable signatures
+    function initializeDeptDraggableSignatures() {
+      $('#dept-signature-canvas .draggable-signature').draggable({
+        containment: '#dept-signature-canvas',
+        grid: [10, 10],
+        scroll: false,
+        drag: function(event, ui) {
+          const signatureId = $(this).data('signature-id');
+          const topPosition = ui.position.top;
+          const leftPosition = ui.position.left;
+          $(this).find('.pos-value').text(`X:${leftPosition}px Y:${topPosition}px`);
+        },
+        stop: function(event, ui) {
+          const signatureId = $(this).data('signature-id');
+          const topPosition = ui.position.top;
+          const leftPosition = ui.position.left;
+          deptSignaturePositions[signatureId] = {
+            top: topPosition,
+            left: leftPosition
+          };
+          
+          console.log('Department signature positions updated:', deptSignaturePositions);
+        }
+      });
+    }
+    
+    // Reset department signature positions
+    function resetDeptSignaturePositions() {
+      deptSignaturePositions = {
+        head: { top: 50, left: 50 },
+        dean: { top: 200, left: 50 },
+        president: { top: 350, left: 50 }
+      };
+      
+      $('#dept-signature-head').css({ top: '50px', left: '50px' }).find('.pos-value').text('X:50px Y:50px');
+      $('#dept-signature-dean').css({ top: '200px', left: '50px' }).find('.pos-value').text('X:50px Y:200px');
+      $('#dept-signature-president').css({ top: '350px', left: '50px' }).find('.pos-value').text('X:50px Y:350px');
+      
+      Swal.fire({
+        icon: 'success',
+        title: 'Positions Reset',
+        text: 'Department signature positions have been reset to defaults',
+        timer: 2000,
+        showConfirmButton: false
+      });
+    }
+    
+    // Export department PDF with custom signature positions
+    function exportDeptPDFWithPositions() {
+      const deptId = $('#dept-select').val();
+      const academicYearId = $('#dept-academic-year-select').val();
+      const periodId = $('#dept-period-select').val();
+      
+      if (!deptId || !academicYearId || !periodId) {
+        Swal.fire({
+          icon: 'warning',
+          title: 'Cannot Export',
+          text: 'Please load results first before exporting'
+        });
+        return;
+      }
+      
+      closeDeptSignaturePreview();
+      
+      Swal.fire({
+        title: 'Generating Department PDF with Custom Positions...',
+        html: 'Please wait while we prepare your report<br><small>Applying signature positions...</small>',
+        allowOutsideClick: false,
+        showConfirmButton: false,
+        willOpen: () => {
+          Swal.showLoading();
+        }
+      });
+      
+      let url = '/api/guidance/export-department-pdf/' + deptId;
+      url += '?academic_year_id=' + academicYearId;
+      url += '&period_id=' + periodId;
+      
+      // Calculate percentages for signature positions
+      const $canvas = $('#dept-signature-canvas');
+      let canvasWidth = $canvas.width();
+      let canvasHeight = $canvas.height();
+      
+      if (!canvasWidth || canvasWidth <= 0) {
+        canvasWidth = $canvas.outerWidth() - 80;
+      }
+      if (!canvasHeight || canvasHeight <= 0) {
+        canvasHeight = $canvas.outerHeight() - 80;
+      }
+      
+      if (!canvasWidth || canvasWidth <= 0) canvasWidth = 800;
+      if (!canvasHeight || canvasHeight <= 0) canvasHeight = 600;
+      
+      const headPercentY = (deptSignaturePositions.head.top / canvasHeight * 100).toFixed(2);
+      const headPercentX = (deptSignaturePositions.head.left / canvasWidth * 100).toFixed(2);
+      
+      const deanPercentY = (deptSignaturePositions.dean.top / canvasHeight * 100).toFixed(2);
+      const deanPercentX = (deptSignaturePositions.dean.left / canvasWidth * 100).toFixed(2);
+      
+      const presidentPercentY = (deptSignaturePositions.president.top / canvasHeight * 100).toFixed(2);
+      const presidentPercentX = (deptSignaturePositions.president.left / canvasWidth * 100).toFixed(2);
+      
+      url += '&sig_head_y=' + headPercentY;
+      url += '&sig_head_x=' + headPercentX;
+      url += '&sig_dean_y=' + deanPercentY;
+      url += '&sig_dean_x=' + deanPercentX;
+      url += '&sig_president_y=' + presidentPercentY;
+      url += '&sig_president_x=' + presidentPercentX;
+      
+      console.log('Department PDF Export URL with positions:', url);
+      
+      window.location.href = url;
+      
+      setTimeout(function() {
+        Swal.fire({
+          icon: 'success',
+          title: 'PDF Generated!',
+          text: 'Your department PDF has been generated with custom signature positions',
+          timer: 3000,
+          showConfirmButton: false
+        });
+      }, 2000);
+    }
+    
+    // Add department event listeners when DOM is ready (in the existing $(document).ready function)
+    // These should be added after the existing event listeners
+    
+    // Department tab - Load departments when tab is activated
+    $('#tab-department').on('click', function() {
+      if (allDepartments.length === 0) {
+        loadDepartmentList();
+      }
+    });
+    
+    // Department filter change events
+    $('#dept-select').on('change', function() {
+      const deptId = $(this).val();
+      if (deptId) {
+        loadDeptAcademicYears();
+      } else {
+        $('#dept-academic-year-select').empty().append('<option value="">-- Select Year --</option>').prop('disabled', true);
+        $('#dept-period-select').empty().append('<option value="">-- Select Period --</option>').prop('disabled', true);
+      }
+      checkLoadDeptButtonState();
+    });
+    
+    $('#dept-academic-year-select').on('change', function() {
+      const academicYearId = $(this).val();
+      if (academicYearId) {
+        loadDeptPeriods(academicYearId);
+      } else {
+        $('#dept-period-select').empty().append('<option value="">-- Select Period --</option>').prop('disabled', true);
+      }
+      checkLoadDeptButtonState();
+    });
+    
+    $('#dept-period-select').on('change', function() {
+      checkLoadDeptButtonState();
+    });
+    
+    // Department button click events
+    $('#load-dept-results-btn').on('click', function() {
+      loadDepartmentResults();
+    });
+    
+    $('#reset-dept-filters-btn').on('click', function() {
+      resetDepartmentFilters();
+    });
+    
+    $('#export-dept-pdf-btn').on('click', function() {
+      exportDepartmentPDF();
+    });
+    
+    $('#export-dept-excel-btn').on('click', function() {
+      exportDepartmentExcel();
+    });
+    
+    // Department signature preview buttons
+    $('#preview-dept-signatures-btn').on('click', function() {
+      openDeptSignaturePreview();
+    });
+    
+    $('#dept-cancel-preview-btn').on('click', function() {
+      closeDeptSignaturePreview();
+    });
+    
+    $('#dept-reset-positions-btn').on('click', function() {
+      resetDeptSignaturePositions();
+    });
+    
+    $('#dept-generate-pdf-btn').on('click', function() {
+      exportDeptPDFWithPositions();
+    });
+    
+    // ============================================
+    // RANKINGS FUNCTIONALITY
+    // ============================================
+    
+    let allRankingDepartments = [];
+    let allRankingYears = [];
+    let allRankingPeriods = [];
+    
+    // Rankings tab - Load departments when tab is activated
+    $('#tab-ranking').on('click', function() {
+      if (allRankingDepartments.length === 0) {
+        loadRankingDepartments();
+      }
+      
+      // Also check if user has already made a selection and load academic years if needed
+      const deptSelectValue = $('#ranking-dept-select').val();
+      if (deptSelectValue !== null && allRankingYears.length === 0) {
+        // If "All Departments" is selected (empty string) or a specific department
+        loadRankingAcademicYears();
+      }
+    });
+    
+    // Load departments for ranking
+    function loadRankingDepartments() {
+      $.ajax({
+        url: '/api/departments',
+        method: 'GET',
+        success: function(response) {
+          if (response.success && response.data) {
+            allRankingDepartments = response.data;
+            
+            const $select = $('#ranking-dept-select');
+            $select.empty().append('<option value="">-- All Departments --</option>');
+            
+            response.data.forEach(function(dept) {
+              $select.append(`<option value="${dept.program_id}">${dept.name}</option>`);
+            });
+            
+            $select.prop('disabled', false);
+            console.log('✅ Loaded ranking departments:', response.data.length);
+            
+            // Automatically load academic years since "All Departments" is selected by default
+            loadRankingAcademicYears();
+          } else {
+            console.error('❌ Failed to load departments:', response.message);
+          }
+        },
+        error: function(xhr, status, error) {
+          console.error('Error loading ranking departments:', error);
+          Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: 'Failed to load departments for ranking'
+          });
+        }
+      });
+    }
+    
+    // Load academic years for ranking
+    function loadRankingAcademicYears() {
+      console.log('🔄 Loading ranking academic years...');
+      $.ajax({
+        url: '/api/guidance/academic-years',
+        method: 'GET',
+        success: function(response) {
+          console.log('📡 Academic years API response:', response);
+          if (response.success && response.academic_years) {
+            allRankingYears = response.academic_years;
+            
+            const $select = $('#ranking-year-select');
+            $select.empty().append('<option value="">-- Select Year --</option>').prop('disabled', false);
+            
+            response.academic_years.forEach(function(year) {
+              $select.append(`<option value="${year.academic_year_id}">${year.year_name}</option>`);
+            });
+            
+            console.log('✅ Loaded ranking academic years:', response.academic_years.length);
+            console.log('📋 Academic year dropdown enabled and populated');
+          } else {
+            console.error('❌ Invalid response format:', response);
+            $('#ranking-year-select').prop('disabled', true);
+          }
+        },
+        error: function(xhr, status, error) {
+          console.error('❌ Error loading ranking academic years:', {
+            status: xhr.status,
+            statusText: xhr.statusText,
+            error: error,
+            responseText: xhr.responseText?.substring(0, 200) + '...'
+          });
+          $('#ranking-year-select').prop('disabled', true);
+        }
+      });
+    }
+    
+    // Load periods for ranking
+    function loadRankingPeriods(academicYearId) {
+      console.log('🔄 Loading ranking periods for academic year:', academicYearId);
+      
+      if (!academicYearId) {
+        $('#ranking-period-select').empty().append('<option value="">-- Select Period --</option>').prop('disabled', true);
+        allRankingPeriods = [];
+        return;
+      }
+      
+      const url = '/api/guidance/evaluation-periods?academic_year_id=' + academicYearId;
+      console.log('📡 Making AJAX request to:', url);
+      
+      $.ajax({
+        url: url,
+        method: 'GET',
+        success: function(response) {
+          console.log('📡 Ranking periods API response:', response);
+          
+          if (response.success && response.data) {
+            allRankingPeriods = response.data;
+            
+            const $select = $('#ranking-period-select');
+            $select.empty().append('<option value="">-- Select Period --</option>');
+            
+            if (allRankingPeriods.length > 0) {
+              allRankingPeriods.forEach(function(period) {
+                const periodName = period.title || period.period_name || period.name;
+                const statusText = period.status ? ` (${period.status})` : '';
+                $select.append(`<option value="${period.period_id}">${periodName}${statusText}</option>`);
+              });
+              $select.prop('disabled', false);
+            } else {
+              $select.append('<option value="" disabled>No periods available</option>');
+              $select.prop('disabled', true);
+            }
+            
+            console.log('✅ Loaded ranking periods:', allRankingPeriods.length);
+            console.log('📋 Periods dropdown enabled and populated');
+          } else {
+            console.error('❌ Invalid rankings periods response format:', response);
+            $('#ranking-period-select').empty().append('<option value="" disabled>Error loading periods</option>').prop('disabled', true);
+            allRankingPeriods = [];
+          }
+        },
+        error: function(xhr, status, error) {
+          console.error('❌ Error loading ranking periods:', {
+            status: xhr.status,
+            statusText: xhr.statusText,
+            error: error,
+            responseText: xhr.responseText?.substring(0, 200) + '...'
+          });
+          $('#ranking-period-select').empty().append('<option value="" disabled>Error loading periods</option>').prop('disabled', true);
+          allRankingPeriods = [];
+        }
+      });
+    }
+    
+    // Check if load rankings button should be enabled
+    function checkLoadRankingsButtonState() {
+      const yearId = $('#ranking-year-select').val();
+      const periodId = $('#ranking-period-select').val();
+      
+      // Department is optional, year and period are required
+      $('#load-rankings-btn').prop('disabled', !(yearId && periodId));
+    }
+    
+    // Reset ranking filters
+    function resetRankingFilters() {
+      $('#ranking-dept-select').val('');
+      $('#ranking-year-select').empty().append('<option value="">-- Select Year --</option>').prop('disabled', true);
+      $('#ranking-period-select').empty().append('<option value="">-- Select Period --</option>').prop('disabled', true);
+      $('#load-rankings-btn').prop('disabled', true);
+      
+      // Hide results and show no results state
+      $('#ranking-results-container').addClass('hidden');
+      $('#ranking-loading-container').addClass('hidden');
+      $('#ranking-no-results-container').removeClass('hidden');
+      $('#preview-ranking-signatures-btn').addClass('hidden');
+      $('#export-ranking-pdf-btn').addClass('hidden');
+      $('#export-ranking-excel-btn').addClass('hidden');
+      
+      allRankingYears = [];
+      allRankingPeriods = [];
+    }
+    
+    // Load rankings data
+    function loadRankingsData() {
+      const deptId = $('#ranking-dept-select').val();
+      const yearId = $('#ranking-year-select').val();
+      const periodId = $('#ranking-period-select').val();
+      
+      if (!yearId || !periodId) {
+        Swal.fire({
+          icon: 'warning',
+          title: 'Missing Filters',
+          text: 'Please select Academic Year and Period'
+        });
+        return;
+      }
+      
+      // Show loading state
+      $('#ranking-loading-container').removeClass('hidden');
+      $('#ranking-no-results-container').addClass('hidden');
+      $('#ranking-results-container').addClass('hidden');
+      
+      // Build URL
+      let url = '/api/guidance/faculty-rankings';
+      url += '?academic_year_id=' + yearId;
+      url += '&period_id=' + periodId;
+      
+      if (deptId) {
+        url += '&department_id=' + deptId;
+      }
+      
+      // Fetch rankings
+      $.ajax({
+        url: url,
+        method: 'GET',
+        success: function(response) {
+          if (response.success) {
+            displayRankingsResults(response.data);
+          } else {
+            $('#ranking-loading-container').addClass('hidden');
+            $('#ranking-no-results-container').removeClass('hidden');
+            Swal.fire({
+              icon: 'info',
+              title: 'No Data',
+              text: response.message || 'No rankings data found for the selected filters'
+            });
+          }
+        },
+        error: function(xhr, status, error) {
+          $('#ranking-loading-container').addClass('hidden');
+          $('#ranking-no-results-container').removeClass('hidden');
+          console.error('Error loading rankings:', error);
+          Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: 'Failed to load rankings data. Please try again.'
+          });
+        }
+      });
+    }
+    
+    // Display rankings results
+    function displayRankingsResults(data) {
+      $('#ranking-loading-container').addClass('hidden');
+      
+      // Get period status from response
+      const periodStatus = data.period_status || 'Active';
+      
+      const rankings = data.rankings || [];
+      const deptId = $('#ranking-dept-select').val();
+      const deptName = $('#ranking-dept-select option:selected').text();
+      const yearName = $('#ranking-year-select option:selected').text();
+      const periodName = $('#ranking-period-select option:selected').text().replace(/\s*\([^)]*\)\s*$/, '').trim();
+      
+      // Update header based on filter selection (ISO 25010 format)
+      if (deptId) {
+        $('#ranking-report-type').text('Department Faculty Rankings');
+        $('#ranking-header-dept').text(deptName);
+        $('#ranking-header-dept-container').removeClass('hidden');
+        // Hide total evaluations column for department rankings
+        $('#total-evaluations-header').hide();
+      } else {
+        $('#ranking-report-type').text('Overall Faculty Rankings');
+        $('#ranking-header-dept-container').addClass('hidden');
+        // Show total evaluations column for overall rankings
+        $('#total-evaluations-header').show();
+      }
+      
+      // Update period with academic year (matching faculty results format)
+      $('#ranking-header-period').text(periodName + ', A.Y. ' + yearName);
+      
+      // Update print header with current period info (matching faculty results)
+      $('#print-ranking-semester').text(periodName + ', A.Y. ' + yearName);
+      
+      // Update print header department info
+      if (deptId) {
+        $('#print-ranking-dept-info').text('Department: ' + deptName).removeClass('hidden');
+      } else {
+        $('#print-ranking-dept-info').addClass('hidden');
+      }
+      
+      // Populate rankings table in ISO 25010 format
+      const $tbody = $('#ranking-table-body');
+      $tbody.empty();
+      
+      if (rankings.length === 0) {
+        const colspanCount = deptId ? '7' : '8'; // Adjust colspan based on whether total evaluations column is shown
+        $tbody.html(`
+          <tr>
+            <td colspan="${colspanCount}" class="text-center py-12 text-gray-500">
+              <i class="fas fa-inbox text-4xl mb-3 text-gray-300"></i>
+              <p class="text-lg">No rankings data available for the selected filters</p>
+            </td>
+          </tr>
+        `);
+      } else {
+        rankings.forEach(function(faculty, index) {
+          const rank = index + 1;
+          const fullName = `${faculty.first_name} ${faculty.last_name}`;
+          const department = faculty.department_name || faculty.program_name || 'N/A';
+          const evaluations = faculty.total_evaluations || 0;
+          const avgRating = (faculty.average_rating || 0).toFixed(2);
+          
+          // Extract category scores (use actual category values from API)
+          const learningDeliveryScore = (faculty.learning_delivery || 0).toFixed(2);
+          const assessmentLearningScore = (faculty.assessment_learning || 0).toFixed(2);
+          const studentEngagementScore = (faculty.student_engagement || 0).toFixed(2);
+          
+          // Build the row HTML in ISO 25010 academic table format
+          let row = `
+            <tr>
+              <td class="criteria-number">${rank}</td>
+              <td class="text-left">${fullName}</td>
+              <td class="text-center">${department}</td>
+              <td class="mean-cell">${avgRating}</td>
+              <td class="text-center">${learningDeliveryScore}</td>
+              <td class="text-center">${assessmentLearningScore}</td>
+              <td class="text-center">${studentEngagementScore}</td>
+          `;
+          
+          // Add total evaluations column only for overall rankings
+          if (!deptId) {
+            row += `<td class="text-center">${evaluations}</td>`;
+          }
+          
+          row += `</tr>`;
+          
+          $tbody.append(row);
+        });
+      }
+      
+      $('#ranking-results-container').removeClass('hidden');
+      
+      // Only show export buttons if period is closed (Status: 'Closed')
+      // Valid period status values: 'Pending', 'Active', 'Closed', 'Canceled'
+      if (periodStatus === 'Closed') {
+        $('#preview-ranking-signatures-btn').removeClass('hidden');
+        $('#export-ranking-pdf-btn').removeClass('hidden');
+        $('#export-ranking-excel-btn').removeClass('hidden');
+      } else {
+        // Hide export buttons if period is not closed
+        $('#preview-ranking-signatures-btn').addClass('hidden');
+        $('#export-ranking-pdf-btn').addClass('hidden');
+        $('#export-ranking-excel-btn').addClass('hidden');
+      }
+    }
+    
+    // Ranking filter event listeners
+    $('#ranking-dept-select').on('change', function() {
+      const deptId = $(this).val();
+      console.log('🏢 Department selection changed to:', deptId || 'All Departments');
+      
+      // Always load academic years when selection changes
+      // This includes when "All Departments" (empty value) is selected
+      loadRankingAcademicYears();
+      
+      // Reset dependent filters
+      $('#ranking-period-select').empty().append('<option value="">-- Select Period --</option>').prop('disabled', true);
+      allRankingPeriods = [];
+      
+      checkLoadRankingsButtonState();
+    });
+    
+    $('#ranking-year-select').on('change', function() {
+      const yearId = $(this).val();
+      console.log('📅 Academic year selection changed to:', yearId);
+      
+      if (yearId) {
+        loadRankingPeriods(yearId);
+      } else {
+        console.log('🔄 Resetting periods dropdown (no year selected)');
+        $('#ranking-period-select').empty().append('<option value="">-- Select Period --</option>').prop('disabled', true);
+        allRankingPeriods = [];
+      }
+      
+      checkLoadRankingsButtonState();
+    });
+    
+    $('#ranking-period-select').on('change', function() {
+      checkLoadRankingsButtonState();
+    });
+    
+    // Ranking button event listeners
+    $('#load-rankings-btn').on('click', function() {
+      loadRankingsData();
+    });
+    
+    $('#reset-ranking-filters-btn').on('click', function() {
+      resetRankingFilters();
+    });
+    
+    // Rankings export button event listeners
+    $('#export-ranking-pdf-btn').on('click', function() {
+      exportRankingPDF();
+    });
+    
+    $('#export-ranking-excel-btn').on('click', function() {
+      exportRankingExcel();
+    });
+    
+    // Rankings signature preview buttons
+    $('#preview-ranking-signatures-btn').on('click', function() {
+      openRankingSignaturePreview();
+    });
+    
+    $('#ranking-cancel-preview-btn').on('click', function() {
+      closeRankingSignaturePreview();
+    });
+    
+    $('#ranking-reset-positions-btn').on('click', function() {
+      resetRankingSignaturePositions();
+    });
+    
+    $('#ranking-generate-pdf-btn').on('click', function() {
+      exportRankingPDFWithPositions();
+    });
+    
+    // ============================================
+    // RANKINGS EXPORT AND SIGNATURE FUNCTIONALITY
+    // ============================================
+    
+    let rankingSignaturePositions = {
+      guidance: { top: 50, left: 50 },
+      dean: { top: 200, left: 50 },
+      president: { top: 350, left: 50 }
+    };
+    
+    // Export rankings PDF
+    function exportRankingPDF() {
+      const deptId = $('#ranking-dept-select').val();
+      const yearId = $('#ranking-year-select').val();
+      const periodId = $('#ranking-period-select').val();
+      
+      if (!yearId || !periodId) {
+        Swal.fire({
+          icon: 'warning',
+          title: 'Missing Information',
+          text: 'Please load rankings first before exporting'
+        });
+        return;
+      }
+      
+      // Show loading
+      Swal.fire({
+        title: 'Generating Rankings PDF...',
+        text: 'Please wait while we prepare your rankings report',
+        allowOutsideClick: false,
+        showConfirmButton: false,
+        willOpen: () => {
+          Swal.showLoading();
+        }
+      });
+      
+      // Build URL
+      let url = '/api/guidance/export-rankings-pdf';
+      url += '?academic_year_id=' + yearId;
+      url += '&period_id=' + periodId;
+      
+      if (deptId) {
+        url += '&department_id=' + deptId;
+      }
+      
+      // Download PDF
+      window.location.href = url;
+      
+      // Close loading after a delay
+      setTimeout(function() {
+        Swal.close();
+      }, 2000);
+    }
+    
+    // Export rankings Excel
+    function exportRankingExcel() {
+      const deptId = $('#ranking-dept-select').val();
+      const yearId = $('#ranking-year-select').val();
+      const periodId = $('#ranking-period-select').val();
+      
+      if (!yearId || !periodId) {
+        Swal.fire({
+          icon: 'warning',
+          title: 'Missing Information',
+          text: 'Please load rankings first before exporting'
+        });
+        return;
+      }
+      
+      // Show loading
+      Swal.fire({
+        title: 'Generating Rankings Excel...',
+        text: 'Please wait while we prepare your rankings report',
+        allowOutsideClick: false,
+        showConfirmButton: false,
+        willOpen: () => {
+          Swal.showLoading();
+        }
+      });
+      
+      // Build URL
+      let url = '/api/guidance/export-rankings-excel';
+      url += '?academic_year_id=' + yearId;
+      url += '&period_id=' + periodId;
+      
+      if (deptId) {
+        url += '&department_id=' + deptId;
+      }
+      
+      // Download Excel
+      window.location.href = url;
+      
+      // Close loading after a delay
+      setTimeout(function() {
+        Swal.close();
+      }, 2000);
+    }
+    
+    // Open rankings signature preview modal
+    function openRankingSignaturePreview() {
+      $('#ranking-signature-preview-modal').removeClass('hidden');
+      
+      setTimeout(function() {
+        initializeRankingDraggableSignatures();
+      }, 100);
+    }
+    
+    // Close rankings signature preview modal
+    function closeRankingSignaturePreview() {
+      $('#ranking-signature-preview-modal').addClass('hidden');
+    }
+    
+    // Initialize rankings draggable signatures
+    function initializeRankingDraggableSignatures() {
+      $('#ranking-signature-canvas .draggable-signature').draggable({
+        containment: '#ranking-signature-canvas',
+        grid: [10, 10], // Snap to 10px grid
+        scroll: false,
+        drag: function(event, ui) {
+          const topPosition = ui.position.top;
+          const leftPosition = ui.position.left;
+          $(this).find('.pos-value').text(`X:${leftPosition}px Y:${topPosition}px`);
+        },
+        stop: function(event, ui) {
+          const signatureId = $(this).attr('id').replace('ranking-signature-', '');
+          const topPosition = ui.position.top;
+          const leftPosition = ui.position.left;
+          
+          rankingSignaturePositions[signatureId] = {
+            top: topPosition,
+            left: leftPosition
+          };
+          
+          console.log('Updated ranking signature positions:', rankingSignaturePositions);
+        }
+      });
+    }
+    
+    // Reset rankings signature positions
+    function resetRankingSignaturePositions() {
+      rankingSignaturePositions = {
+        guidance: { top: 50, left: 50 },
+        dean: { top: 200, left: 50 },
+        president: { top: 350, left: 50 }
+      };
+      
+      $('#ranking-signature-guidance').css({ top: '50px', left: '50px' }).find('.pos-value').text('X:50px Y:50px');
+      $('#ranking-signature-dean').css({ top: '200px', left: '50px' }).find('.pos-value').text('X:50px Y:200px');
+      $('#ranking-signature-president').css({ top: '350px', left: '50px' }).find('.pos-value').text('X:50px Y:350px');
+      
+      Swal.fire({
+        icon: 'success',
+        title: 'Positions Reset',
+        text: 'Ranking signature positions have been reset to defaults',
+        timer: 2000,
+        showConfirmButton: false
+      });
+    }
+    
+    // Export rankings PDF with custom signature positions
+    function exportRankingPDFWithPositions() {
+      const deptId = $('#ranking-dept-select').val();
+      const yearId = $('#ranking-year-select').val();
+      const periodId = $('#ranking-period-select').val();
+      
+      if (!yearId || !periodId) {
+        Swal.fire({
+          icon: 'warning',
+          title: 'Missing Information',
+          text: 'Please load rankings first before exporting'
+        });
+        return;
+      }
+      
+      closeRankingSignaturePreview();
+      
+      Swal.fire({
+        title: 'Generating Rankings PDF with Custom Positions...',
+        html: 'Please wait while we prepare your report<br><small>Applying signature positions...</small>',
+        allowOutsideClick: false,
+        showConfirmButton: false,
+        willOpen: () => {
+          Swal.showLoading();
+        }
+      });
+      
+      let url = '/api/guidance/export-rankings-pdf';
+      url += '?academic_year_id=' + yearId;
+      url += '&period_id=' + periodId;
+      
+      if (deptId) {
+        url += '&department_id=' + deptId;
+      }
+      
+      // Calculate percentages for signature positions
+      const $canvas = $('#ranking-signature-canvas');
+      let canvasWidth = $canvas.width();
+      let canvasHeight = $canvas.height();
+      
+      if (!canvasWidth || canvasWidth <= 0) {
+        canvasWidth = $canvas.outerWidth();
+      }
+      if (!canvasHeight || canvasHeight <= 0) {
+        canvasHeight = $canvas.outerHeight();
+      }
+      
+      if (!canvasWidth || canvasWidth <= 0) canvasWidth = 800;
+      if (!canvasHeight || canvasHeight <= 0) canvasHeight = 600;
+      
+      const guidancePercentY = (rankingSignaturePositions.guidance.top / canvasHeight * 100).toFixed(2);
+      const guidancePercentX = (rankingSignaturePositions.guidance.left / canvasWidth * 100).toFixed(2);
+      
+      const deanPercentY = (rankingSignaturePositions.dean.top / canvasHeight * 100).toFixed(2);
+      const deanPercentX = (rankingSignaturePositions.dean.left / canvasWidth * 100).toFixed(2);
+      
+      const presidentPercentY = (rankingSignaturePositions.president.top / canvasHeight * 100).toFixed(2);
+      const presidentPercentX = (rankingSignaturePositions.president.left / canvasWidth * 100).toFixed(2);
+      
+      url += '&sig_guidance_y=' + guidancePercentY;
+      url += '&sig_guidance_x=' + guidancePercentX;
+      url += '&sig_dean_y=' + deanPercentY;
+      url += '&sig_dean_x=' + deanPercentX;
+      url += '&sig_president_y=' + presidentPercentY;
+      url += '&sig_president_x=' + presidentPercentX;
+      
+      console.log('Rankings PDF Export URL with positions:', url);
+      
+      window.location.href = url;
+      
+      setTimeout(function() {
+        Swal.fire({
+          icon: 'success',
+          title: 'PDF Generated!',
+          text: 'Your rankings report with custom signature positions has been downloaded.',
+          timer: 3000,
+          showConfirmButton: false
+        });
+      }, 2000);
+    }
+    
+  </script>
+</body>
+</html>

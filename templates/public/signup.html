@@ -1,0 +1,1120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+  <title>Sign Up | IntellEvalPro</title>
+  
+  <!-- Favicon -->
+  <link rel="icon" type="image/png" href="../static/images/nclogo.png">
+  <link rel="shortcut icon" type="image/png" href="../static/images/nclogo.png">
+  <link rel="apple-touch-icon" href="../static/images/nclogo.png">
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  
+  <!-- Font Awesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"/>
+  
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  
+  <!-- jQuery -->
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  
+  <!-- SweetAlert2 -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11.7.12/dist/sweetalert2.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.7.12/dist/sweetalert2.all.min.js"></script>
+  
+  <script>
+    tailwind.config = {
+      theme: {
+        fontFamily: {
+          'sans': ['Inter', 'system-ui', 'sans-serif'],
+        },
+        extend: {
+          colors: {
+            primary: {
+              50: '#e6f0ff',
+              100: '#b3d1ff',
+              200: '#80b3ff',
+              300: '#4d94ff', 
+              400: '#1a75ff',
+              500: '#0059cc', // Primary color
+              600: '#004db3',
+              700: '#004099',
+              800: '#003380',
+              900: '#002766',
+            },
+          },
+        }
+      }
+    }
+  </script>
+  
+  <!-- Custom CSS -->
+  <style>
+    /* Background blur styles */
+    .subtle-blur {
+      filter: blur(2px);
+      -webkit-filter: blur(2px);
+    }
+    
+    /* CSS Animations */
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+    
+    @keyframes slideUp {
+      from { transform: translateY(20px); opacity: 0; }
+      to { transform: translateY(0); opacity: 1; }
+    }
+    
+    .animate-fadeIn {
+      animation: fadeIn 0.8s ease-out forwards;
+    }
+    
+    .animate-slideUp {
+      animation: slideUp 0.6s ease-out forwards;
+    }
+    
+    /* Multi-step form styles */
+    .step-content {
+      display: none;
+    }
+    
+    .step-content.active {
+      display: block;
+      animation: slideUp 0.4s ease-out;
+    }
+    
+    .step-indicator {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 2rem;
+      position: relative;
+    }
+    
+    .step-indicator::before {
+      content: '';
+      position: absolute;
+      top: 20px;
+      left: 0;
+      right: 0;
+      height: 2px;
+      background: #e5e7eb;
+      z-index: 0;
+    }
+    
+    .step-indicator-progress {
+      position: absolute;
+      top: 20px;
+      left: 0;
+      height: 2px;
+      background: #0059cc;
+      transition: width 0.3s ease;
+      z-index: 1;
+    }
+    
+    .step-item {
+      flex: 1;
+      text-align: center;
+      position: relative;
+      z-index: 2;
+    }
+    
+    .step-circle {
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      background: #e5e7eb;
+      color: #6b7280;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 600;
+      margin: 0 auto 8px;
+      transition: all 0.3s ease;
+    }
+    
+    .step-item.active .step-circle {
+      background: #0059cc;
+      color: white;
+      box-shadow: 0 0 0 4px rgba(0, 89, 204, 0.2);
+    }
+    
+    .step-item.completed .step-circle {
+      background: #22c55e;
+      color: white;
+    }
+    
+    .step-label {
+      font-size: 0.875rem;
+      color: #6b7280;
+      font-weight: 500;
+    }
+    
+    .step-item.active .step-label {
+      color: #0059cc;
+      font-weight: 600;
+    }
+    
+    .step-item.completed .step-label {
+      color: #22c55e;
+    }
+    
+    /* Password Strength */
+    .password-strength-meter {
+      height: 4px;
+      width: 100%;
+      background-color: #e0e0e0;
+      margin-top: 4px;
+      border-radius: 2px;
+      overflow: hidden;
+    }
+    
+    .password-strength-meter div {
+      height: 100%;
+      transition: width 0.3s ease;
+    }
+    
+    /* Loading animation */
+    #loader-overlay {
+      position: fixed;
+      top: 0; 
+      left: 0;
+      width: 100vw; 
+      height: 100vh;
+      background: rgba(255,255,255,0.8);
+      z-index: 9999;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+    }
+    
+    .dot {
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      background: #0059cc;
+      display: inline-block;
+      animation: dotPulse 2s infinite;
+    }
+    
+    .dot:nth-child(2) { animation-delay: 0.4s; }
+    .dot:nth-child(3) { animation-delay: 0.8s; }
+    
+    @keyframes dotPulse {
+      0% { opacity: 0.3; transform: scale(1); }
+      50% { opacity: 1; transform: scale(1.3); }
+      100% { opacity: 0.3; transform: scale(1); }
+    }
+    
+    /* Custom form styles */
+    .form-input-group {
+      position: relative;
+    }
+    
+    .form-input-icon {
+      position: absolute;
+      left: 1rem;
+      top: 50%;
+      transform: translateY(-50%);
+      color: #6B7280;
+      pointer-events: none;
+    }
+    
+    .form-input {
+      width: 100%;
+      padding: 0.75rem 1rem 0.75rem 2.5rem;
+      border: 1px solid #D1D5DB;
+      border-radius: 0.5rem;
+      font-size: 1rem;
+      transition: all 0.2s;
+    }
+    
+    .form-input:focus {
+      outline: none;
+      border-color: #0059cc;
+      box-shadow: 0 0 0 3px rgba(0, 89, 204, 0.1);
+    }
+    
+    .form-select {
+      width: 100%;
+      padding: 0.75rem 1rem 0.75rem 2.5rem;
+      border: 1px solid #D1D5DB;
+      border-radius: 0.5rem;
+      font-size: 1rem;
+      transition: all 0.2s;
+      background-position: right 1rem center;
+    }
+    
+    .form-select:focus {
+      outline: none;
+      border-color: #0059cc;
+      box-shadow: 0 0 0 3px rgba(0, 89, 204, 0.1);
+    }
+    
+    .toggle-password {
+      position: absolute;
+      right: 1rem;
+      top: 50%;
+      transform: translateY(-50%);
+      color: #6B7280;
+      cursor: pointer;
+    }
+    
+    .form-button {
+      width: 100%;
+      padding: 0.75rem 1rem;
+      background-color: #0059cc;
+      color: white;
+      font-weight: 600;
+      border-radius: 0.5rem;
+      transition: all 0.2s;
+    }
+    
+    .form-button:hover {
+      background-color: #004db3;
+      transform: translateY(-1px);
+    }
+    
+    .form-button:focus {
+      outline: none;
+      box-shadow: 0 0 0 3px rgba(0, 89, 204, 0.3);
+    }
+    
+    .form-button:disabled {
+      background-color: #b3d1ff;
+      cursor: not-allowed;
+      transform: none;
+    }
+  </style>
+  
+  <!-- Loading Screen -->
+  <div id="loader-overlay">
+  <img src="{{ url_for('static', filename='images/nclogo.png') }}" alt="Logo" style="width:120px; height:auto; margin-bottom:30px;">
+    <div style="display:flex; gap:10px;">
+      <span class="dot"></span>
+      <span class="dot"></span>
+      <span class="dot"></span>
+    </div>
+  </div>
+</head>
+
+<body class="font-sans min-h-screen flex items-center justify-center px-4 py-8 animate-fadeIn relative">
+  <!-- Background image with semi blur -->
+  <div class="fixed inset-0 z-0">
+    <img src="../static/images/ncfront.png" alt="Background" class="w-full h-full object-cover" style="filter: blur(2px);">
+    <div class="absolute inset-0 bg-black bg-opacity-15"></div> <!-- Very light overlay for minimal blur effect -->
+  </div>
+  
+  <div class="w-full max-w-4xl mx-auto animate-slideUp relative z-10">
+    <!-- Card Container -->
+    <div class="bg-white bg-opacity-95 rounded-2xl overflow-hidden shadow-xl">
+      <!-- Header -->
+      <div class="p-6 text-center border-b border-gray-100">
+        <img src="../static/images/nclogo.png" alt="IntellEvalPro Logo" class="h-20 mx-auto mb-4">
+        <h1 class="text-3xl font-bold text-gray-800">Student Registration</h1>
+        <p class="text-primary-500 mt-2">Complete all steps to create your account</p>
+      </div>
+      
+      <!-- Step Indicator -->
+      <div class="px-6 pt-6">
+        <div class="step-indicator">
+          <div class="step-indicator-progress" id="progress-bar" style="width: 25%;"></div>
+          <div class="step-item active" data-step="1">
+            <div class="step-circle">1</div>
+            <div class="step-label">Personal Info</div>
+          </div>
+          <div class="step-item" data-step="2">
+            <div class="step-circle">2</div>
+            <div class="step-label">Academic Info</div>
+          </div>
+          <div class="step-item" data-step="3">
+            <div class="step-circle">3</div>
+            <div class="step-label">Contact Info</div>
+          </div>
+          <div class="step-item" data-step="4">
+            <div class="step-circle">4</div>
+            <div class="step-label">Account Setup</div>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Alert Messages Container -->
+      <div id="message-container" class="hidden mx-6 mb-4"></div>
+      
+      <!-- Form Container -->
+      <div class="p-6">
+        <form id="signup-form">
+          <!-- Step 1: Personal Information -->
+          <div class="step-content active" data-step="1">
+            <h3 class="text-xl font-semibold text-gray-800 mb-4">Personal Information</h3>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <!-- Student Number -->
+              <div class="md:col-span-2">
+                <label for="student_number" class="block text-sm font-medium text-gray-700 mb-1">Student Number *</label>
+                <div class="form-input-group">
+                  <i class="fas fa-id-card form-input-icon"></i>
+                  <input type="text" id="student_number" name="student_number" 
+                         class="form-input"
+                         placeholder="e.g., 2022-0215" required>
+                </div>
+                <p class="text-xs text-gray-500 mt-1">Use your official student number as registered</p>
+              </div>
+              
+              <!-- First Name -->
+              <div>
+                <label for="first_name" class="block text-sm font-medium text-gray-700 mb-1">First Name *</label>
+                <div class="form-input-group">
+                  <i class="fas fa-user form-input-icon"></i>
+                  <input type="text" id="first_name" name="first_name" 
+                         class="form-input"
+                         placeholder="Enter your first name" required>
+                </div>
+              </div>
+              
+              <!-- Middle Name -->
+              <div>
+                <label for="middle_name" class="block text-sm font-medium text-gray-700 mb-1">Middle Name</label>
+                <div class="form-input-group">
+                  <i class="fas fa-user form-input-icon"></i>
+                  <input type="text" id="middle_name" name="middle_name" 
+                         class="form-input"
+                         placeholder="Enter your middle name (optional)">
+                </div>
+              </div>
+              
+              <!-- Last Name -->
+              <div>
+                <label for="last_name" class="block text-sm font-medium text-gray-700 mb-1">Last Name *</label>
+                <div class="form-input-group">
+                  <i class="fas fa-user form-input-icon"></i>
+                  <input type="text" id="last_name" name="last_name" 
+                         class="form-input"
+                         placeholder="Enter your last name" required>
+                </div>
+              </div>
+              
+              <!-- Suffix -->
+              <div>
+                <label for="suffix" class="block text-sm font-medium text-gray-700 mb-1">Suffix</label>
+                <div class="form-input-group">
+                  <i class="fas fa-user-tag form-input-icon"></i>
+                  <input type="text" id="suffix" name="suffix" 
+                         class="form-input"
+                         placeholder="e.g., Jr., Sr., III (optional)">
+                </div>
+              </div>
+              
+              <!-- Gender -->
+              <div>
+                <label for="gender" class="block text-sm font-medium text-gray-700 mb-1">Gender *</label>
+                <div class="form-input-group">
+                  <i class="fas fa-venus-mars form-input-icon"></i>
+                  <select id="gender" name="gender" class="form-select" required>
+                    <option value="">Select gender</option>
+                    <option value="Male">Male</option>
+                    <option value="Female">Female</option>
+                    <option value="Other">Other</option>
+                  </select>
+                </div>
+              </div>
+              
+              <!-- Birthdate -->
+              <div>
+                <label for="birthdate" class="block text-sm font-medium text-gray-700 mb-1">Birthdate *</label>
+                <div class="form-input-group">
+                  <i class="fas fa-calendar form-input-icon"></i>
+                  <input type="date" id="birthdate" name="birthdate" 
+                         class="form-input"
+                         placeholder="Select your birthdate" required>
+                </div>
+              </div>
+              
+              <!-- Age (Auto-calculated from birthdate) -->
+              <div>
+                <label for="age" class="block text-sm font-medium text-gray-700 mb-1">Age *</label>
+                <div class="form-input-group">
+                  <i class="fas fa-birthday-cake form-input-icon"></i>
+                  <input type="number" id="age" name="age" 
+                         class="form-input bg-gray-50"
+                         placeholder="Auto-calculated" readonly required>
+                </div>
+                <p class="text-xs text-gray-500 mt-1">Age will be calculated from your birthdate</p>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Step 2: Academic Information -->
+          <div class="step-content" data-step="2">
+            <h3 class="text-xl font-semibold text-gray-800 mb-4">Academic Information</h3>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <!-- Program -->
+              <div class="md:col-span-2">
+                <label for="program" class="block text-sm font-medium text-gray-700 mb-1">Program *</label>
+                <div class="form-input-group">
+                  <i class="fas fa-graduation-cap form-input-icon"></i>
+                  <select id="program" name="program" class="form-select" required>
+                    <option value="">Select program</option>
+                  </select>
+                </div>
+              </div>
+              
+              <!-- Year Level -->
+              <div>
+                <label for="year_level" class="block text-sm font-medium text-gray-700 mb-1">Year Level *</label>
+                <div class="form-input-group">
+                  <i class="fas fa-layer-group form-input-icon"></i>
+                  <select id="year_level" name="year_level" class="form-select" required>
+                    <option value="">Select year level</option>
+                    <option value="1">1st Year</option>
+                    <option value="2">2nd Year</option>
+                    <option value="3">3rd Year</option>
+                    <option value="4">4th Year</option>
+                  </select>
+                </div>
+              </div>
+              
+              <!-- Section -->
+              <div>
+                <label for="section" class="block text-sm font-medium text-gray-700 mb-1">Section *</label>
+                <div class="form-input-group">
+                  <i class="fas fa-users form-input-icon"></i>
+                  <select id="section" name="section" class="form-select" required>
+                    <option value="">Select section</option>
+                  </select>
+                </div>
+              </div>
+              
+              <!-- Status -->
+              <div>
+                <label for="status" class="block text-sm font-medium text-gray-700 mb-1">Status *</label>
+                <div class="form-input-group">
+                  <i class="fas fa-info-circle form-input-icon"></i>
+                  <select id="status" name="status" class="form-select" required>
+                    <option value="">Select status</option>
+                    <option value="Enrolled" selected>Enrolled</option>
+                    <option value="Irregular">Irregular</option>
+                    <option value="On Leave">On Leave</option>
+                  </select>
+                </div>
+              </div>
+              
+              <!-- Enrollment Type -->
+              <div>
+                <label for="enrollment_type" class="block text-sm font-medium text-gray-700 mb-1">Enrollment Type</label>
+                <div class="form-input-group">
+                  <i class="fas fa-clipboard-check form-input-icon"></i>
+                  <select id="enrollment_type" name="enrollment_type" class="form-select">
+                    <option value="">Select type</option>
+                    <option value="Regular">Regular</option>
+                    <option value="Irregular">Irregular</option>
+                    <option value="Transferee">Transferee</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Step 3: Contact Information -->
+          <div class="step-content" data-step="3">
+            <h3 class="text-xl font-semibold text-gray-800 mb-4">Contact Information</h3>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <!-- Email -->
+              <div class="md:col-span-2">
+                <label for="email" class="block text-sm font-medium text-gray-700 mb-1">Email Address *</label>
+                <div class="form-input-group">
+                  <i class="fas fa-envelope form-input-icon"></i>
+                  <input type="email" id="email" name="email" 
+                         class="form-input"
+                         placeholder="Enter your email address" required>
+                </div>
+              </div>
+              
+              <!-- Phone -->
+              <div>
+                <label for="phone" class="block text-sm font-medium text-gray-700 mb-1">Phone Number</label>
+                <div class="form-input-group">
+                  <i class="fas fa-phone form-input-icon"></i>
+                  <input type="tel" id="phone" name="phone" 
+                         class="form-input"
+                         placeholder="e.g., 09123456789">
+                </div>
+              </div>
+              
+              <!-- Address -->
+              <div class="md:col-span-2">
+                <label for="address" class="block text-sm font-medium text-gray-700 mb-1">Address</label>
+                <div class="form-input-group">
+                  <i class="fas fa-map-marker-alt form-input-icon"></i>
+                  <textarea id="address" name="address" rows="3"
+                         class="form-input"
+                         placeholder="Enter your complete address (optional)"></textarea>
+                </div>
+              </div>
+              
+              <!-- Guardian Name -->
+              <div>
+                <label for="guardian_name" class="block text-sm font-medium text-gray-700 mb-1">Guardian/Parent Name</label>
+                <div class="form-input-group">
+                  <i class="fas fa-user-friends form-input-icon"></i>
+                  <input type="text" id="guardian_name" name="guardian_name" 
+                         class="form-input"
+                         placeholder="Enter guardian/parent name">
+                </div>
+              </div>
+              
+              <!-- Guardian Contact -->
+              <div>
+                <label for="guardian_contact" class="block text-sm font-medium text-gray-700 mb-1">Guardian/Parent Contact</label>
+                <div class="form-input-group">
+                  <i class="fas fa-phone-alt form-input-icon"></i>
+                  <input type="tel" id="guardian_contact" name="guardian_contact" 
+                         class="form-input"
+                         placeholder="Guardian/parent phone number">
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Step 4: Account Setup -->
+          <div class="step-content" data-step="4">
+            <h3 class="text-xl font-semibold text-gray-800 mb-4">Account Setup & Confirmation</h3>
+            <div class="grid grid-cols-1 gap-4">
+              
+              <!-- Auto-Generated Password Info -->
+              <div class="bg-blue-50 border-l-4 border-blue-500 rounded-lg p-4">
+                <div class="flex">
+                  <i class="fas fa-key text-blue-600 text-2xl mt-1 mr-3"></i>
+                  <div class="text-sm text-blue-800">
+                    <p class="font-semibold mb-2 text-lg">🔐 Automatic Account Creation</p>
+                    <p class="mb-2">Your account will be created automatically with these credentials:</p>
+                    <ul class="list-disc list-inside space-y-1 ml-2">
+                      <li><strong>Username:</strong> Your Student Number</li>
+                      <li><strong>Password:</strong> <span class="font-mono bg-blue-100 px-2 py-1 rounded">YourLastName + StudentNumber</span></li>
+                    </ul>
+                    <p class="mt-3 text-xs italic">Example: If your last name is "Cruz" and student number is "2022-0215", your password will be: <span class="font-mono bg-blue-100 px-2 py-1 rounded">Cruz2022-0215</span></p>
+                  </div>
+                </div>
+              </div>
+              
+              <!-- Info Notice -->
+              <div class="bg-amber-50 border border-amber-200 rounded-lg p-4">
+                <div class="flex">
+                  <i class="fas fa-info-circle text-amber-600 mt-1 mr-3"></i>
+                  <div class="text-sm text-amber-800">
+                    <p class="font-semibold mb-1">Important Information:</p>
+                    <ul class="list-disc list-inside space-y-1">
+                      <li>Make sure all your information is correct before submitting</li>
+                      <li>Your auto-generated password will be shown after successful registration</li>
+                      <li>You can change your password after logging in</li>
+                      <li>Contact admin if you encounter any issues</li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+              
+              <!-- Terms and Conditions -->
+              <div class="flex items-start">
+                <input type="checkbox" id="terms" name="terms" class="mt-1 mr-2" required>
+                <label for="terms" class="text-sm text-gray-700">
+                  I agree to the <a href="#" class="text-primary-500 hover:text-primary-600">Terms and Conditions</a> and 
+                  <a href="#" class="text-primary-500 hover:text-primary-600">Privacy Policy</a>. I confirm that all information provided is accurate.
+                </label>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Hidden field -->
+          <input type="hidden" name="user_type" id="user_type" value="student">
+          
+          <!-- Navigation Buttons -->
+          <div class="flex justify-between mt-6 pt-6 border-t border-gray-100">
+            <button type="button" id="prev-btn" class="px-6 py-2 border border-gray-300 rounded-lg text-gray-700 font-medium hover:bg-gray-50 transition-all" style="display: none;">
+              <i class="fas fa-arrow-left mr-2"></i>Previous
+            </button>
+            <div class="flex-1"></div>
+            <button type="button" id="next-btn" class="px-6 py-2 bg-primary-600 text-white rounded-lg font-medium hover:bg-primary-700 transition-all">
+              Next<i class="fas fa-arrow-right ml-2"></i>
+            </button>
+            <button type="submit" id="submit-btn" class="px-6 py-2 bg-green-600 text-white rounded-lg font-medium hover:bg-green-700 transition-all" style="display: none;">
+              <i class="fas fa-check mr-2"></i>Create Account
+            </button>
+          </div>
+          
+          <!-- Login Link -->
+          <div class="mt-6 text-center">
+            <p class="text-gray-700">
+              Already have an account? <a href="{{ url_for('auth.login') }}" class="text-primary-500 font-medium hover:text-primary-600 transition-all">Sign In</a>
+            </p>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Multi-step form state
+    let currentStep = 1;
+    const totalSteps = 4;
+    
+    // Hide loading screen after page loads
+    window.addEventListener('load', function() {
+      setTimeout(function() {
+        const overlay = document.getElementById('loader-overlay');
+        overlay.style.opacity = '0';
+        overlay.style.transition = 'opacity 0.5s ease';
+        setTimeout(() => {
+          overlay.style.display = 'none';
+        }, 500);
+      }, 500);
+      
+      // Load programs and sections
+      loadPrograms();
+      loadSections();
+    });
+    
+    // Load programs from API
+    async function loadPrograms() {
+      try {
+        const response = await fetch('/api/programs');
+        const result = await response.json();
+        console.log('Programs API response:', result);
+        if (result.success) {
+          const programSelect = document.getElementById('program');
+          result.data.forEach(program => {
+            const option = document.createElement('option');
+            option.value = program.program_id;
+            option.textContent = program.name; // Changed from program.program_name to program.name
+            programSelect.appendChild(option);
+          });
+          console.log(`Loaded ${result.data.length} programs`);
+        } else {
+          console.error('Failed to load programs:', result.error);
+        }
+      } catch (error) {
+        console.error('Error loading programs:', error);
+      }
+    }
+    
+    // Load sections from API
+    async function loadSections() {
+      try {
+        const response = await fetch('/api/sections-master');
+        const result = await response.json();
+        console.log('Sections API response:', result);
+        if (result.success) {
+          window.allSections = result.data;
+          console.log(`Loaded ${result.data.length} sections`);
+        } else {
+          console.error('Failed to load sections:', result.error);
+        }
+      } catch (error) {
+        console.error('Error loading sections:', error);
+      }
+    }
+    
+    // Filter sections based on year level
+    function filterSections() {
+      const yearLevel = document.getElementById('year_level').value;
+      const sectionSelect = document.getElementById('section');
+      
+      // Clear existing options
+      sectionSelect.innerHTML = '<option value="">Select section</option>';
+      
+      if (!yearLevel || !window.allSections) return;
+      
+      // Filter sections by year level
+      const filtered = window.allSections.filter(s => s.year_level == yearLevel);
+      filtered.forEach(section => {
+        const option = document.createElement('option');
+        option.value = section.section_id;
+        option.textContent = section.section_name;
+        sectionSelect.appendChild(option);
+      });
+    }
+    
+    // Year level change listener
+    document.addEventListener('DOMContentLoaded', function() {
+      document.getElementById('year_level').addEventListener('change', filterSections);
+      
+      // Auto-calculate age from birthdate
+      document.getElementById('birthdate').addEventListener('change', function() {
+        const birthdate = new Date(this.value);
+        const today = new Date();
+        let age = today.getFullYear() - birthdate.getFullYear();
+        const monthDiff = today.getMonth() - birthdate.getMonth();
+        
+        // Adjust age if birthday hasn't occurred yet this year
+        if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthdate.getDate())) {
+          age--;
+        }
+        
+        // Set calculated age
+        document.getElementById('age').value = age;
+      });
+    });
+
+    // Password toggle visibility
+    function togglePasswordVisibility(fieldId) {
+      const passwordInput = document.getElementById(fieldId);
+      const icon = passwordInput.nextElementSibling.querySelector('i');
+      
+      if (passwordInput.type === 'password') {
+        passwordInput.type = 'text';
+        icon.classList.remove('fa-eye');
+        icon.classList.add('fa-eye-slash');
+      } else {
+        passwordInput.type = 'password';
+        icon.classList.remove('fa-eye-slash');
+        icon.classList.add('fa-eye');
+      }
+    }
+    
+    // Show message helper function
+    function showMessage(message, type) {
+      const container = document.getElementById('message-container');
+      container.innerHTML = message;
+      
+      // Remove existing classes
+      container.className = '';
+      container.classList.add('p-4', 'mb-4', 'rounded-lg', 'text-sm');
+      
+      // Add styling based on message type
+      if (type === 'error') {
+        container.classList.add('bg-red-50', 'border-l-4', 'border-red-500', 'text-red-800');
+      } else {
+        container.classList.add('bg-green-50', 'border-l-4', 'border-green-500', 'text-green-800');
+      }
+      
+      // Show the container
+      container.classList.remove('hidden');
+      
+      // Scroll to the top to show the message
+      container.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+    
+    // Password strength checker
+    function checkPasswordStrength(password) {
+      const strengthBar = document.getElementById('password-strength-bar');
+      const strengthText = document.getElementById('password-strength-text');
+      
+      // Calculate strength
+      let strength = 0;
+      let feedback = '';
+      
+      if (password.length > 0) {
+        // Length check
+        if (password.length >= 8) strength += 25;
+        
+        // Complexity checks
+        if (/[A-Z]/.test(password)) strength += 25;
+        if (/[a-z]/.test(password)) strength += 25;
+        if (/[0-9]/.test(password)) strength += 12.5;
+        if (/[^A-Za-z0-9]/.test(password)) strength += 12.5;
+        
+        // Update visual indicator
+        strengthBar.style.width = strength + '%';
+        
+        // Set color and text based on strength
+        if (strength < 40) {
+          strengthBar.className = 'bg-red-500';
+          feedback = 'Weak - Add uppercase letters, numbers, and symbols';
+        } else if (strength < 70) {
+          strengthBar.className = 'bg-yellow-500';
+          feedback = 'Moderate - Add more variety for a stronger password';
+        } else {
+          strengthBar.className = 'bg-green-500';
+          feedback = 'Strong - Good job!';
+        } 
+      } else {
+        strengthBar.style.width = '0%';
+        strengthBar.className = 'bg-gray-300';
+        feedback = 'Password strength: Enter a password';
+      }
+      
+      strengthText.textContent = feedback;
+      return strength >= 70; // Return true if password is strong
+    }
+    
+    // Show loading overlay
+    function showLoading() {
+      const loader = document.createElement('div');
+      loader.id = 'nclogo-loader';
+      loader.style = `position:fixed;top:0;left:0;width:100vw;height:100vh;background:rgba(255,255,255,0.8);
+                      z-index:9999;display:flex;flex-direction:column;justify-content:center;align-items:center;`;
+      
+      loader.innerHTML = `
+        <img src="{{ url_for('static', filename='images/nclogo.png') }}" alt="Logo" style="width:120px;height:auto;margin-bottom:30px;">
+        <div style="display:flex;gap:10px;">
+          <span class='dot'></span>
+          <span class='dot'></span>
+          <span class='dot'></span>
+        </div>
+      `;
+      
+      document.body.prepend(loader);
+    }
+    
+    // Hide loading overlay
+    function hideLoading() {
+      const loader = document.getElementById('nclogo-loader');
+      if (loader) {
+        loader.style.opacity = '0';
+        loader.style.transition = 'opacity 0.3s ease';
+        setTimeout(() => {
+          loader.remove();
+        }, 300);
+      }
+    }
+    
+    // Update step indicator
+    function updateStepIndicator() {
+      // Update step circles and labels
+      document.querySelectorAll('.step-item').forEach((item, index) => {
+        const step = index + 1;
+        if (step < currentStep) {
+          item.classList.add('completed');
+          item.classList.remove('active');
+          item.querySelector('.step-circle').innerHTML = '<i class="fas fa-check"></i>';
+        } else if (step === currentStep) {
+          item.classList.add('active');
+          item.classList.remove('completed');
+          item.querySelector('.step-circle').textContent = step;
+        } else {
+          item.classList.remove('active', 'completed');
+          item.querySelector('.step-circle').textContent = step;
+        }
+      });
+      
+      // Update progress bar
+      const progress = ((currentStep - 1) / (totalSteps - 1)) * 100;
+      document.getElementById('progress-bar').style.width = progress + '%';
+      
+      // Update button visibility
+      document.getElementById('prev-btn').style.display = currentStep === 1 ? 'none' : 'block';
+      document.getElementById('next-btn').style.display = currentStep === totalSteps ? 'none' : 'block';
+      document.getElementById('submit-btn').style.display = currentStep === totalSteps ? 'block' : 'none';
+    }
+    
+    // Validate current step
+    function validateCurrentStep() {
+      const currentStepContent = document.querySelector(`.step-content[data-step="${currentStep}"]`);
+      const inputs = currentStepContent.querySelectorAll('input[required], select[required], textarea[required]');
+      
+      let isValid = true;
+      let errorMessage = '';
+      
+      inputs.forEach(input => {
+        if (!input.value.trim()) {
+          isValid = false;
+          input.classList.add('border-red-500');
+          if (!errorMessage) {
+            errorMessage = 'Please fill in all required fields';
+          }
+        } else {
+          input.classList.remove('border-red-500');
+        }
+      });
+      
+      // Additional validation based on step
+      if (currentStep === 1) {
+        const studentNumber = document.getElementById('student_number').value;
+        const birthdate = document.getElementById('birthdate').value;
+        const age = document.getElementById('age').value;
+        
+        if (studentNumber.length < 3) {
+          isValid = false;
+          errorMessage = 'Student number must be at least 3 characters';
+        }
+        
+        if (!birthdate) {
+          isValid = false;
+          errorMessage = 'Please select your birthdate';
+        }
+        
+        if (age && (age < 15 || age > 100)) {
+          isValid = false;
+          errorMessage = 'Please enter a valid age (15-100)';
+        }
+      }
+      
+      if (currentStep === 3) {
+        const email = document.getElementById('email').value;
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (email && !emailRegex.test(email)) {
+          isValid = false;
+          errorMessage = 'Please enter a valid email address';
+        }
+      }
+      
+      if (currentStep === 4) {
+        const terms = document.getElementById('terms').checked;
+        
+        if (!terms) {
+          isValid = false;
+          errorMessage = 'You must agree to the terms and conditions';
+        }
+      }
+      
+      if (!isValid && errorMessage) {
+        showMessage(errorMessage, 'error');
+      }
+      
+      return isValid;
+    }
+    
+    // Go to next step
+    function nextStep() {
+      if (!validateCurrentStep()) {
+        return;
+      }
+      
+      if (currentStep < totalSteps) {
+        // Hide current step
+        document.querySelector(`.step-content[data-step="${currentStep}"]`).classList.remove('active');
+        
+        // Show next step
+        currentStep++;
+        document.querySelector(`.step-content[data-step="${currentStep}"]`).classList.add('active');
+        
+        // Update indicator
+        updateStepIndicator();
+        
+        // Hide any error messages
+        document.getElementById('message-container').classList.add('hidden');
+        
+        // Scroll to top
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      }
+    }
+    
+    // Go to previous step
+    function prevStep() {
+      if (currentStep > 1) {
+        // Hide current step
+        document.querySelector(`.step-content[data-step="${currentStep}"]`).classList.remove('active');
+        
+        // Show previous step
+        currentStep--;
+        document.querySelector(`.step-content[data-step="${currentStep}"]`).classList.add('active');
+        
+        // Update indicator
+        updateStepIndicator();
+        
+        // Hide any error messages
+        document.getElementById('message-container').classList.add('hidden');
+        
+        // Scroll to top
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      }
+    }
+
+    // Initialize when document is ready
+    document.addEventListener('DOMContentLoaded', function() {
+      // Navigation buttons
+      document.getElementById('next-btn').addEventListener('click', nextStep);
+      document.getElementById('prev-btn').addEventListener('click', prevStep);
+      
+      // Handle form submission
+      document.getElementById('signup-form').addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        if (!validateCurrentStep()) {
+          return false;
+        }
+        
+        const submitBtn = document.getElementById('submit-btn');
+        
+        // Update button state and show loading
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = '<i class="fas fa-circle-notch fa-spin mr-2"></i> Creating Account...';
+        showLoading();
+        
+        // Prepare data (password is auto-generated on backend)
+        const formData = {
+          student_number: document.getElementById('student_number').value,
+          first_name: document.getElementById('first_name').value,
+          middle_name: document.getElementById('middle_name').value || null,
+          last_name: document.getElementById('last_name').value,
+          suffix: document.getElementById('suffix').value || null,
+          gender: document.getElementById('gender').value,
+          birthdate: document.getElementById('birthdate').value,
+          age: parseInt(document.getElementById('age').value),
+          program_id: parseInt(document.getElementById('program').value),
+          year_level: parseInt(document.getElementById('year_level').value),
+          section_id: parseInt(document.getElementById('section').value),
+          status: document.getElementById('status').value,
+          enrollment_type: document.getElementById('enrollment_type').value || null,
+          email: document.getElementById('email').value,
+          phone: document.getElementById('phone').value || null,
+          address: document.getElementById('address').value || null,
+          guardian_name: document.getElementById('guardian_name').value || null,
+          guardian_contact: document.getElementById('guardian_contact').value || null
+        };
+        
+        // Submit form via AJAX
+        $.ajax({
+          url: '/signup',
+          type: 'POST',
+          contentType: 'application/json',
+          data: JSON.stringify(formData),
+          success: function(response) {
+            hideLoading();
+            submitBtn.disabled = false;
+            submitBtn.innerHTML = '<i class="fas fa-check mr-2"></i>Create Account';
+            
+            if (response.success) {
+              Swal.fire({
+                icon: 'success',
+                title: 'Account Created Successfully!',
+                html: `
+                  <div class="text-left">
+                    <p class="mb-4">Your account has been created. Please save your login credentials:</p>
+                    <div class="bg-blue-50 border-l-4 border-blue-500 p-4 mb-4">
+                      <p class="font-semibold mb-2">Login Credentials:</p>
+                      <p><strong>Username:</strong> <span class="font-mono bg-white px-2 py-1 rounded">${response.username}</span></p>
+                      <p><strong>Password:</strong> <span class="font-mono bg-white px-2 py-1 rounded">${response.auto_password}</span></p>
+                    </div>
+                    <p class="text-sm text-red-600">
+                      <i class="fas fa-exclamation-triangle mr-1"></i>
+                      Please write down or screenshot your password now. You can change it after logging in.
+                    </p>
+                  </div>
+                `,
+                confirmButtonColor: '#0059cc',
+                confirmButtonText: 'Go to Login',
+                allowOutsideClick: false,
+                allowEscapeKey: false
+              }).then(function() {
+                window.location.href = '/login';
+              });
+            } else {
+              showMessage(response.message || 'An error occurred during signup.', 'error');
+            }
+          },
+          error: function(xhr, status, error) {
+            hideLoading();
+            submitBtn.disabled = false;
+            submitBtn.innerHTML = '<i class="fas fa-check mr-2"></i>Create Account';
+            
+            let errorMessage = 'An error occurred during signup. Please try again.';
+            
+            if (xhr.responseJSON && xhr.responseJSON.message) {
+              errorMessage = xhr.responseJSON.message;
+            }
+            
+            showMessage(errorMessage, 'error');
+          }
+        });
+      });
+    });
+  </script>
+</body>
+</html>

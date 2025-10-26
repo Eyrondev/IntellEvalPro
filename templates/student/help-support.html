@@ -1,0 +1,700 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+  <title>Help & Support | IntellEvalPro</title>
+  
+  <!-- Favicon -->
+  <link rel="icon" type="image/png" href="{{ url_for('static', filename='images/nclogo.png') }}">
+  <link rel="shortcut icon" type="image/png" href="{{ url_for('static', filename='images/nclogo.png') }}">
+  <link rel="apple-touch-icon" href="{{ url_for('static', filename='images/nclogo.png') }}">
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  
+  <!-- Font Awesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"/>
+  
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  
+  <!-- jQuery -->
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  
+  <!-- SweetAlert2 -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11.7.12/dist/sweetalert2.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.7.12/dist/sweetalert2.all.min.js"></script>
+  
+  <script>
+    tailwind.config = {
+      theme: {
+        fontFamily: {
+          'sans': ['Inter', 'system-ui', 'sans-serif'],
+        },
+        extend: {
+          colors: {
+            primary: {
+              50: '#e6f0ff',
+              100: '#b3d1ff',
+              200: '#80b3ff',
+              300: '#4d94ff', 
+              400: '#1a75ff',
+              500: '#0059cc',
+              600: '#004db3',
+              700: '#004099',
+              800: '#003380',
+              900: '#002966'
+            }
+          }
+        }
+      }
+    }
+  </script>
+</head>
+<body class="bg-gray-50">
+  <div class="min-h-screen flex">
+    <!-- Sidebar Navigation -->
+    <div id="sidebar-container"></div>
+    
+    <!-- Main content -->
+    <div class="flex-1 lg:ml-64">
+      <!-- Header -->
+      <div id="header-container"></div>
+      
+      <!-- Page Content -->
+      <main class="p-6">
+        <!-- Page Title -->
+        <div class="mb-6">
+          <h1 class="text-2xl font-bold text-gray-900 mb-2">Help & Support</h1>
+          <p class="text-gray-600">Find answers to common questions and get assistance with IntellEvalPro</p>
+        </div>
+
+        <!-- Quick Help Cards -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+          <!-- Getting Started -->
+          <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6 hover:shadow-md transition-shadow cursor-pointer" onclick="scrollToSection('getting-started')">
+            <div class="flex items-center mb-4">
+              <div class="p-3 rounded-lg bg-blue-100">
+                <i class="fas fa-rocket text-blue-600 text-xl"></i>
+              </div>
+              <h3 class="text-lg font-semibold text-gray-900 ml-3">Getting Started</h3>
+            </div>
+            <p class="text-gray-600">Learn the basics of using IntellEvalPro for student evaluations</p>
+          </div>
+
+          <!-- Evaluation Help -->
+          <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6 hover:shadow-md transition-shadow cursor-pointer" onclick="scrollToSection('evaluation-help')">
+            <div class="flex items-center mb-4">
+              <div class="p-3 rounded-lg bg-green-100">
+                <i class="fas fa-clipboard-check text-green-600 text-xl"></i>
+              </div>
+              <h3 class="text-lg font-semibold text-gray-900 ml-3">Evaluation Help</h3>
+            </div>
+            <p class="text-gray-600">Find help with completing and submitting evaluations</p>
+          </div>
+
+          <!-- Dashboard & Progress -->
+          <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6 hover:shadow-md transition-shadow cursor-pointer" onclick="scrollToSection('dashboard-progress')">
+            <div class="flex items-center mb-4">
+              <div class="p-3 rounded-lg bg-purple-100">
+                <i class="fas fa-chart-line text-purple-600 text-xl"></i>
+              </div>
+              <h3 class="text-lg font-semibold text-gray-900 ml-3">Dashboard & Progress</h3>
+            </div>
+            <p class="text-gray-600">Learn about tracking your evaluation progress</p>
+          </div>
+        </div>
+
+        <!-- FAQ Section -->
+        <div class="bg-white rounded-xl shadow-sm border border-gray-200 mb-6">
+          <div class="p-6 border-b border-gray-200">
+            <h2 class="text-xl font-semibold text-gray-900">Frequently Asked Questions</h2>
+          </div>
+          <div class="p-6">
+            <!-- Search FAQ -->
+            <div class="mb-6">
+              <div class="relative">
+                <input type="text" id="faq-search" placeholder="Search FAQ..." class="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-primary-500 focus:border-primary-500">
+                <i class="fas fa-search absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
+              </div>
+            </div>
+
+            <!-- Getting Started FAQs -->
+            <div id="getting-started" class="mb-8">
+              <h3 class="text-lg font-semibold text-gray-900 mb-4 flex items-center">
+                <i class="fas fa-rocket text-primary-600 mr-2"></i>
+                Getting Started
+              </h3>
+              <div class="space-y-4">
+                <div class="faq-item border border-gray-200 rounded-lg">
+                  <button class="faq-question w-full text-left px-4 py-3 font-medium text-gray-900 hover:bg-gray-50 focus:outline-none flex items-center justify-between">
+                    How do I log in to IntellEvalPro?
+                    <i class="fas fa-chevron-down transform transition-transform"></i>
+                  </button>
+                  <div class="faq-answer hidden px-4 pb-3 text-gray-600">
+                    To log in to IntellEvalPro, use your student credentials provided by your institution. Enter your username and password on the login page. If you're having trouble logging in or forgot your password, use the "Forgot Password" link or contact your academic office for assistance.
+                  </div>
+                </div>
+
+                <div class="faq-item border border-gray-200 rounded-lg">
+                  <button class="faq-question w-full text-left px-4 py-3 font-medium text-gray-900 hover:bg-gray-50 focus:outline-none flex items-center justify-between">
+                    What is the evaluation system for?
+                    <i class="fas fa-chevron-down transform transition-transform"></i>
+                  </button>
+                  <div class="faq-answer hidden px-4 pb-3 text-gray-600">
+                    The IntellEvalPro system allows students to provide anonymous feedback on their faculty and courses. Your evaluations help improve the quality of education and assist faculty in enhancing their teaching methods. All responses are confidential and contribute to improving the learning experience.
+                  </div>
+                </div>
+
+                <div class="faq-item border border-gray-200 rounded-lg">
+                  <button class="faq-question w-full text-left px-4 py-3 font-medium text-gray-900 hover:bg-gray-50 focus:outline-none flex items-center justify-between">
+                    How do I navigate the student dashboard?
+                    <i class="fas fa-chevron-down transform transition-transform"></i>
+                  </button>
+                  <div class="faq-answer hidden px-4 pb-3 text-gray-600">
+                    The student dashboard displays your evaluation progress, pending evaluations, and deadline information. Use the sidebar navigation to access: <strong>Dashboard</strong> (overview), <strong>Pending Evaluations</strong> (faculty to evaluate), <strong>My Evaluations</strong> (history), and <strong>Help & Support</strong>. The dashboard shows a progress bar indicating how many evaluations you've completed.
+                  </div>
+                </div>
+
+                <div class="faq-item border border-gray-200 rounded-lg">
+                  <button class="faq-question w-full text-left px-4 py-3 font-medium text-gray-900 hover:bg-gray-50 focus:outline-none flex items-center justify-between">
+                    What happens if there's no active evaluation period?
+                    <i class="fas fa-chevron-down transform transition-transform"></i>
+                  </button>
+                  <div class="faq-answer hidden px-4 pb-3 text-gray-600">
+                    If there's no active evaluation period, you'll see a notification page indicating that evaluations are not currently available. Check back during Mid-term or Final evaluation periods, or contact your academic office for information about upcoming evaluation schedules.
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Evaluation Help FAQs -->
+            <div id="evaluation-help" class="mb-8">
+              <h3 class="text-lg font-semibold text-gray-900 mb-4 flex items-center">
+                <i class="fas fa-clipboard-check text-primary-600 mr-2"></i>
+                Evaluation Help
+              </h3>
+              <div class="space-y-4">
+                <div class="faq-item border border-gray-200 rounded-lg">
+                  <button class="faq-question w-full text-left px-4 py-3 font-medium text-gray-900 hover:bg-gray-50 focus:outline-none flex items-center justify-between">
+                    How do I complete an evaluation?
+                    <i class="fas fa-chevron-down transform transition-transform"></i>
+                  </button>
+                  <div class="faq-answer hidden px-4 pb-3 text-gray-600">
+                    Navigate to <strong>Pending Evaluations</strong> from the sidebar. You'll see all faculty assigned to you for the current evaluation period. Click <strong>"Start Evaluation"</strong> on a faculty card to begin. Rate each criterion using the 1-5 scale (1 = Strongly Disagree, 5 = Strongly Agree), provide optional comments, then click <strong>"Submit Evaluation"</strong>. All rating fields must be completed before submission.
+                  </div>
+                </div>
+
+                <div class="faq-item border border-gray-200 rounded-lg">
+                  <button class="faq-question w-full text-left px-4 py-3 font-medium text-gray-900 hover:bg-gray-50 focus:outline-none flex items-center justify-between">
+                    What do the rating numbers mean?
+                    <i class="fas fa-chevron-down transform transition-transform"></i>
+                  </button>
+                  <div class="faq-answer hidden px-4 pb-3 text-gray-600">
+                    The evaluation uses a 5-point rating scale: <strong>5 = Strongly Agree</strong> (Excellent), <strong>4 = Agree</strong> (Very Good), <strong>3 = Neutral</strong> (Satisfactory), <strong>2 = Disagree</strong> (Needs Improvement), <strong>1 = Strongly Disagree</strong> (Poor). Choose the rating that best reflects your experience with each criterion.
+                  </div>
+                </div>
+
+                <div class="faq-item border border-gray-200 rounded-lg">
+                  <button class="faq-question w-full text-left px-4 py-3 font-medium text-gray-900 hover:bg-gray-50 focus:outline-none flex items-center justify-between">
+                    Can I save my evaluation and continue later?
+                    <i class="fas fa-chevron-down transform transition-transform"></i>
+                  </button>
+                  <div class="faq-answer hidden px-4 pb-3 text-gray-600">
+                    Yes! The evaluation form has an <strong>"Save Progress"</strong> button. Your responses are automatically saved as you fill out the form. You can safely leave and return to continue your evaluation before the deadline. Your progress is preserved until you click "Submit Evaluation" to finalize it.
+                  </div>
+                </div>
+
+                <div class="faq-item border border-gray-200 rounded-lg">
+                  <button class="faq-question w-full text-left px-4 py-3 font-medium text-gray-900 hover:bg-gray-50 focus:outline-none flex items-center justify-between">
+                    Are my evaluations anonymous?
+                    <i class="fas fa-chevron-down transform transition-transform"></i>
+                  </button>
+                  <div class="faq-answer hidden px-4 pb-3 text-gray-600">
+                    <strong>Yes, absolutely!</strong> All student evaluations are completely anonymous. Faculty members and administrators can only see aggregated results and cannot identify who submitted specific ratings or comments. Your identity is fully protected, so please provide honest, constructive feedback.
+                  </div>
+                </div>
+
+                <div class="faq-item border border-gray-200 rounded-lg">
+                  <button class="faq-question w-full text-left px-4 py-3 font-medium text-gray-900 hover:bg-gray-50 focus:outline-none flex items-center justify-between">
+                    What happens if I miss the evaluation deadline?
+                    <i class="fas fa-chevron-down transform transition-transform"></i>
+                  </button>
+                  <div class="faq-answer hidden px-4 pb-3 text-gray-600">
+                    Once the evaluation period closes, you cannot submit new evaluations or modify existing ones. The dashboard shows days remaining until the deadline. If you miss it due to special circumstances, contact your academic office or guidance counselor for assistance.
+                  </div>
+                </div>
+
+                <div class="faq-item border border-gray-200 rounded-lg">
+                  <button class="faq-question w-full text-left px-4 py-3 font-medium text-gray-900 hover:bg-gray-50 focus:outline-none flex items-center justify-between">
+                    Can I change my evaluation after submitting it?
+                    <i class="fas fa-chevron-down transform transition-transform"></i>
+                  </button>
+                  <div class="faq-answer hidden px-4 pb-3 text-gray-600">
+                    No, once you click "Submit Evaluation," your responses are final and cannot be modified. This ensures the integrity of the evaluation process. Make sure to review all your ratings and comments carefully before submitting.
+                  </div>
+                </div>
+
+                <div class="faq-item border border-gray-200 rounded-lg">
+                  <button class="faq-question w-full text-left px-4 py-3 font-medium text-gray-900 hover:bg-gray-50 focus:outline-none flex items-center justify-between">
+                    How can I view my evaluation history?
+                    <i class="fas fa-chevron-down transform transition-transform"></i>
+                  </button>
+                  <div class="faq-answer hidden px-4 pb-3 text-gray-600">
+                    Go to <strong>My Evaluations</strong> from the sidebar to view your complete evaluation history. You can see all completed evaluations with details including course, faculty, evaluation period, and completion date. Use filters to search by status, period, or course.
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Dashboard & Progress -->
+            <div id="dashboard-progress" class="mb-8">
+              <h3 class="text-lg font-semibold text-gray-900 mb-4 flex items-center">
+                <i class="fas fa-chart-line text-primary-600 mr-2"></i>
+                Dashboard & Progress Tracking
+              </h3>
+              <div class="space-y-4">
+                <div class="faq-item border border-gray-200 rounded-lg">
+                  <button class="faq-question w-full text-left px-4 py-3 font-medium text-gray-900 hover:bg-gray-50 focus:outline-none flex items-center justify-between">
+                    What information does the dashboard show?
+                    <i class="fas fa-chevron-down transform transition-transform"></i>
+                  </button>
+                  <div class="faq-answer hidden px-4 pb-3 text-gray-600">
+                    Your dashboard displays: <strong>Welcome banner</strong> with current evaluation period, <strong>Progress overview</strong> showing completed vs. total evaluations with percentage, <strong>Evaluation deadline</strong> with days remaining, and <strong>Quick access cards</strong> to start pending evaluations. The circular progress indicator shows your completion status at a glance.
+                  </div>
+                </div>
+
+                <div class="faq-item border border-gray-200 rounded-lg">
+                  <button class="faq-question w-full text-left px-4 py-3 font-medium text-gray-900 hover:bg-gray-50 focus:outline-none flex items-center justify-between">
+                    How is my progress calculated?
+                    <i class="fas fa-chevron-down transform transition-transform"></i>
+                  </button>
+                  <div class="faq-answer hidden px-4 pb-3 text-gray-600">
+                    Progress is calculated as (Completed Evaluations ÷ Total Assigned Evaluations) × 100. For example, if you have 8 faculty to evaluate and completed 6, your progress is 75%. The dashboard updates in real-time as you complete evaluations.
+                  </div>
+                </div>
+
+                <div class="faq-item border border-gray-200 rounded-lg">
+                  <button class="faq-question w-full text-left px-4 py-3 font-medium text-gray-900 hover:bg-gray-50 focus:outline-none flex items-center justify-between">
+                    What are the filter options in Pending Evaluations?
+                    <i class="fas fa-chevron-down transform transition-transform"></i>
+                  </button>
+                  <div class="faq-answer hidden px-4 pb-3 text-gray-600">
+                    Click the <strong>"Filter"</strong> button to access filters including: <strong>Department</strong> (filter by academic department), <strong>Course</strong> (specific courses), <strong>Section</strong>, <strong>Status</strong> (Not Started/In Progress/Completed), and <strong>Search</strong> (find by faculty name or course code). Use "Clear All" to reset filters.
+                  </div>
+                </div>
+
+                <div class="faq-item border border-gray-200 rounded-lg">
+                  <button class="faq-question w-full text-left px-4 py-3 font-medium text-gray-900 hover:bg-gray-50 focus:outline-none flex items-center justify-between">
+                    How do I know which evaluations are urgent?
+                    <i class="fas fa-chevron-down transform transition-transform"></i>
+                  </button>
+                  <div class="faq-answer hidden px-4 pb-3 text-gray-600">
+                    The system uses color-coded indicators: <strong>Red badges</strong> appear when 3 or fewer days remain until deadline, <strong>Yellow badges</strong> for 4-7 days, and <strong>Green badges</strong> for more than 7 days. The dashboard banner also shows the total days remaining for the evaluation period.
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Technical Issues -->
+            <div id="technical-issues" class="mb-8">
+              <h3 class="text-lg font-semibold text-gray-900 mb-4 flex items-center">
+                <i class="fas fa-tools text-primary-600 mr-2"></i>
+                Technical Issues
+              </h3>
+              <div class="space-y-4">
+                <div class="faq-item border border-gray-200 rounded-lg">
+                  <button class="faq-question w-full text-left px-4 py-3 font-medium text-gray-900 hover:bg-gray-50 focus:outline-none flex items-center justify-between">
+                    What should I do if the system is running slowly?
+                    <i class="fas fa-chevron-down transform transition-transform"></i>
+                  </button>
+                  <div class="faq-answer hidden px-4 pb-3 text-gray-600">
+                    Try refreshing your browser page (F5 or Ctrl+R), clearing your browser cache, or using a different browser (Chrome, Firefox, Edge). Ensure you have a stable internet connection. If the problem persists during peak times, try accessing the system during off-peak hours or contact technical support.
+                  </div>
+                </div>
+
+                <div class="faq-item border border-gray-200 rounded-lg">
+                  <button class="faq-question w-full text-left px-4 py-3 font-medium text-gray-900 hover:bg-gray-50 focus:outline-none flex items-center justify-between">
+                    I can't see my faculty in the pending evaluations list. What should I do?
+                    <i class="fas fa-chevron-down transform transition-transform"></i>
+                  </button>
+                  <div class="faq-answer hidden px-4 pb-3 text-gray-600">
+                    First, verify that an evaluation period is active (check the dashboard for period dates). If the period is active but you don't see your faculty, try clicking the <strong>"Refresh List"</strong> button. If they still don't appear, ensure you're officially enrolled in your courses and contact your academic office to verify your enrollment and faculty assignments.
+                  </div>
+                </div>
+
+                <div class="faq-item border border-gray-200 rounded-lg">
+                  <button class="faq-question w-full text-left px-4 py-3 font-medium text-gray-900 hover:bg-gray-50 focus:outline-none flex items-center justify-between">
+                    How do I reset my password?
+                    <i class="fas fa-chevron-down transform transition-transform"></i>
+                  </button>
+                  <div class="faq-answer hidden px-4 pb-3 text-gray-600">
+                    Click <strong>"Forgot Password"</strong> on the login page. Enter your registered email address to receive a password reset link. Follow the instructions in the email to create a new password. If you don't receive the email, check your spam folder or contact your institution's IT support.
+                  </div>
+                </div>
+
+                <div class="faq-item border border-gray-200 rounded-lg">
+                  <button class="faq-question w-full text-left px-4 py-3 font-medium text-gray-900 hover:bg-gray-50 focus:outline-none flex items-center justify-between">
+                    The evaluation form won't submit. What should I do?
+                    <i class="fas fa-chevron-down transform transition-transform"></i>
+                  </button>
+                  <div class="faq-answer hidden px-4 pb-3 text-gray-600">
+                    Make sure all required rating fields are completed (you must rate all criteria). Check for any error messages displayed on the form. Ensure your internet connection is stable. Try clicking "Save Progress" first, then refresh the page and submit again. If the issue persists, contact support before the deadline.
+                  </div>
+                </div>
+
+                <div class="faq-item border border-gray-200 rounded-lg">
+                  <button class="faq-question w-full text-left px-4 py-3 font-medium text-gray-900 hover:bg-gray-50 focus:outline-none flex items-center justify-between">
+                    Does the system work on mobile devices?
+                    <i class="fas fa-chevron-down transform transition-transform"></i>
+                  </button>
+                  <div class="faq-answer hidden px-4 pb-3 text-gray-600">
+                    Yes! IntellEvalPro is fully responsive and works on smartphones and tablets. The evaluation form is optimized for touch screens with larger tap targets. For the best experience, use landscape mode on phones when filling out evaluations.
+                  </div>
+                </div>
+
+                <div class="faq-item border border-gray-200 rounded-lg">
+                  <button class="faq-question w-full text-left px-4 py-3 font-medium text-gray-900 hover:bg-gray-50 focus:outline-none flex items-center justify-between">
+                    What browsers are supported?
+                    <i class="fas fa-chevron-down transform transition-transform"></i>
+                  </button>
+                  <div class="faq-answer hidden px-4 pb-3 text-gray-600">
+                    IntellEvalPro works best on modern browsers including Google Chrome, Mozilla Firefox, Microsoft Edge, and Safari. Make sure your browser is updated to the latest version for optimal performance and security.
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </main>
+      
+      <!-- Footer -->
+      <div id="footer-container"></div>
+    </div>
+  </div>
+
+  <!-- Overlay for mobile sidebar -->
+  <div id="sidebar-overlay" class="fixed inset-0 z-30 bg-black bg-opacity-50 hidden lg:hidden"></div>
+
+  <!-- AI Chatbot Widget -->
+  <div id="ai-chatbot-container" class="fixed bottom-6 right-6 z-50">
+    <!-- Chat Button -->
+    <button id="chat-toggle-btn" class="bg-gradient-to-r from-primary-600 to-primary-700 text-white rounded-full p-4 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-110 flex items-center justify-center">
+      <i class="fas fa-robot text-2xl"></i>
+      <span class="ml-2 font-medium hidden md:inline">AI Assistant</span>
+    </button>
+
+    <!-- Chat Window -->
+    <div id="chat-window" class="hidden absolute bottom-20 right-0 w-96 max-w-[calc(100vw-3rem)] bg-white rounded-2xl shadow-2xl border border-gray-200 overflow-hidden flex flex-col" style="height: 500px; max-height: calc(100vh - 8rem);">
+      <!-- Chat Header -->
+      <div class="bg-gradient-to-r from-primary-600 to-primary-700 text-white p-4 flex items-center justify-between">
+        <div class="flex items-center">
+          <div class="w-10 h-10 bg-white rounded-full flex items-center justify-center mr-3">
+            <i class="fas fa-robot text-primary-600 text-xl"></i>
+          </div>
+          <div>
+            <h3 class="font-semibold text-lg">IntellEval Assistant</h3>
+            <p class="text-xs text-primary-100">Powered by Gemini AI</p>
+          </div>
+        </div>
+        <button id="chat-close-btn" class="text-white hover:bg-white hover:bg-opacity-20 rounded-full p-2 transition-colors">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+
+      <!-- Chat Messages -->
+      <div id="chat-messages" class="flex-1 overflow-y-auto p-4 space-y-4 bg-gray-50">
+        <!-- Welcome Message -->
+        <div class="flex items-start">
+          <div class="w-8 h-8 bg-primary-100 rounded-full flex items-center justify-center mr-2 flex-shrink-0">
+            <i class="fas fa-robot text-primary-600 text-sm"></i>
+          </div>
+          <div class="bg-white rounded-lg rounded-tl-none p-3 shadow-sm max-w-[80%]">
+            <p class="text-sm text-gray-800">Hi! 👋 I'm your IntellEvalPro AI Assistant. I can help you with questions about the evaluation system, navigation, features, and troubleshooting. How can I assist you today?</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Chat Input -->
+      <div class="border-t border-gray-200 p-4 bg-white">
+        <form id="chat-form" class="flex items-center space-x-2">
+          <input 
+            type="text" 
+            id="chat-input" 
+            placeholder="Ask me anything about IntellEvalPro..." 
+            class="flex-1 px-4 py-2 border border-gray-300 rounded-full focus:ring-2 focus:ring-primary-500 focus:border-primary-500 text-sm"
+            autocomplete="off"
+          />
+          <button 
+            type="submit" 
+            id="chat-send-btn"
+            class="bg-primary-600 text-white rounded-full p-2 hover:bg-primary-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed w-10 h-10 flex items-center justify-center"
+          >
+            <i class="fas fa-paper-plane"></i>
+          </button>
+        </form>
+        <p class="text-xs text-gray-500 mt-2 text-center">AI responses are based on system documentation</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Include loading animation and unified navigation scripts -->
+  <script src="{{ url_for('static', filename='js/loading-animation.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/student-navigation-unified.js') }}"></script>
+  
+  <!-- Prevent logout on browser back button -->
+  <script src="{{ url_for('static', filename='js/prevent-back-logout.js') }}"></script>
+
+  <!-- Session Timeout Monitor (Auto-logout after 1 hour) -->
+  <script src="{{ url_for('static', filename='js/session-timeout.js') }}"></script>
+  
+  <script>
+    // Initialize navigation for help & support page
+    loadStudentNavigation('help-support');
+    
+    // Page-specific functionality
+    $(document).ready(function() {
+      $('#footer-container').load('/student/footer');
+
+      // FAQ functionality
+      $('.faq-question').click(function() {
+        const answer = $(this).next('.faq-answer');
+        const icon = $(this).find('i.fa-chevron-down');
+        
+        // Toggle current FAQ
+        answer.slideToggle();
+        icon.toggleClass('rotate-180');
+      });
+
+      // FAQ search functionality
+      $('#faq-search').on('input', function() {
+        const searchTerm = $(this).val().toLowerCase();
+        
+        $('.faq-item').each(function() {
+          const questionText = $(this).find('.faq-question').text().toLowerCase();
+          const answerText = $(this).find('.faq-answer').text().toLowerCase();
+          
+          if (questionText.includes(searchTerm) || answerText.includes(searchTerm)) {
+            $(this).show();
+          } else {
+            $(this).hide();
+          }
+        });
+      });
+    });
+
+    function scrollToSection(sectionId) {
+      const element = document.getElementById(sectionId);
+      if (element) {
+        element.scrollIntoView({ 
+          behavior: 'smooth',
+          block: 'start'
+        });
+      }
+    }
+
+    // AI Chatbot Functionality
+    $(document).ready(function() {
+      const chatToggleBtn = $('#chat-toggle-btn');
+      const chatWindow = $('#chat-window');
+      const chatCloseBtn = $('#chat-close-btn');
+      const chatForm = $('#chat-form');
+      const chatInput = $('#chat-input');
+      const chatMessages = $('#chat-messages');
+      const chatSendBtn = $('#chat-send-btn');
+
+      // Toggle chat window
+      chatToggleBtn.click(function() {
+        chatWindow.toggleClass('hidden');
+        if (!chatWindow.hasClass('hidden')) {
+          chatInput.focus();
+        }
+      });
+
+      // Close chat window
+      chatCloseBtn.click(function() {
+        chatWindow.addClass('hidden');
+      });
+
+      // Handle chat form submission
+      chatForm.submit(function(e) {
+        e.preventDefault();
+        const message = chatInput.val().trim();
+        
+        if (!message) return;
+
+        // Add user message to chat
+        addUserMessage(message);
+        chatInput.val('');
+        
+        // Disable input while processing
+        chatInput.prop('disabled', true);
+        chatSendBtn.prop('disabled', true);
+        
+        // Show typing indicator
+        showTypingIndicator();
+
+        // Send message to AI
+        $.ajax({
+          url: '/api/ai-support-chat',
+          method: 'POST',
+          contentType: 'application/json',
+          data: JSON.stringify({ message: message }),
+          success: function(response) {
+            removeTypingIndicator();
+            if (response.success) {
+              addAiMessage(response.reply);
+            } else {
+              addAiMessage('Sorry, I encountered an error. Please try again or check the FAQs above.');
+            }
+          },
+          error: function() {
+            removeTypingIndicator();
+            addAiMessage('Sorry, I\'m having trouble connecting right now. Please try again in a moment.');
+          },
+          complete: function() {
+            chatInput.prop('disabled', false);
+            chatSendBtn.prop('disabled', false);
+            chatInput.focus();
+          }
+        });
+      });
+
+      function addUserMessage(message) {
+        const messageHtml = `
+          <div class="flex items-start justify-end">
+            <div class="bg-primary-600 text-white rounded-lg rounded-tr-none p-3 shadow-sm max-w-[80%]">
+              <p class="text-sm">${escapeHtml(message)}</p>
+            </div>
+            <div class="w-8 h-8 bg-primary-600 rounded-full flex items-center justify-center ml-2 flex-shrink-0">
+              <i class="fas fa-user text-white text-sm"></i>
+            </div>
+          </div>
+        `;
+        chatMessages.append(messageHtml);
+        scrollChatToBottom();
+      }
+
+      function addAiMessage(message) {
+        const messageHtml = `
+          <div class="flex items-start">
+            <div class="w-8 h-8 bg-primary-100 rounded-full flex items-center justify-center mr-2 flex-shrink-0">
+              <i class="fas fa-robot text-primary-600 text-sm"></i>
+            </div>
+            <div class="bg-white rounded-lg rounded-tl-none p-3 shadow-sm max-w-[80%]">
+              <p class="text-sm text-gray-800">${formatAiMessage(message)}</p>
+            </div>
+          </div>
+        `;
+        chatMessages.append(messageHtml);
+        scrollChatToBottom();
+      }
+
+      function showTypingIndicator() {
+        const typingHtml = `
+          <div class="flex items-start typing-indicator">
+            <div class="w-8 h-8 bg-primary-100 rounded-full flex items-center justify-center mr-2 flex-shrink-0">
+              <i class="fas fa-robot text-primary-600 text-sm"></i>
+            </div>
+            <div class="bg-white rounded-lg rounded-tl-none p-3 shadow-sm">
+              <div class="flex space-x-1">
+                <div class="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style="animation-delay: 0s"></div>
+                <div class="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style="animation-delay: 0.2s"></div>
+                <div class="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style="animation-delay: 0.4s"></div>
+              </div>
+            </div>
+          </div>
+        `;
+        chatMessages.append(typingHtml);
+        scrollChatToBottom();
+      }
+
+      function removeTypingIndicator() {
+        $('.typing-indicator').remove();
+      }
+
+      function scrollChatToBottom() {
+        chatMessages.scrollTop(chatMessages[0].scrollHeight);
+      }
+
+      function escapeHtml(text) {
+        const map = {
+          '&': '&amp;',
+          '<': '&lt;',
+          '>': '&gt;',
+          '"': '&quot;',
+          "'": '&#039;'
+        };
+        return text.replace(/[&<>"']/g, m => map[m]);
+      }
+
+      function formatAiMessage(message) {
+        // Convert **bold** to <strong>
+        message = message.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
+        // Convert line breaks
+        message = message.replace(/\n/g, '<br>');
+        // Convert bullet points
+        message = message.replace(/^- (.+)$/gm, '• $1');
+        return message;
+      }
+    });
+  </script>
+
+  <style>
+    .rotate-180 {
+      transform: rotate(180deg);
+    }
+
+    /* Chatbot animations */
+    #chat-window {
+      animation: slideUp 0.3s ease-out;
+    }
+
+    @keyframes slideUp {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    #chat-toggle-btn {
+      animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% {
+        box-shadow: 0 10px 15px -3px rgba(0, 89, 204, 0.3);
+      }
+      50% {
+        box-shadow: 0 10px 25px -3px rgba(0, 89, 204, 0.5);
+      }
+    }
+
+    /* Custom scrollbar for chat */
+    #chat-messages::-webkit-scrollbar {
+      width: 6px;
+    }
+
+    #chat-messages::-webkit-scrollbar-track {
+      background: #f1f1f1;
+      border-radius: 10px;
+    }
+
+    #chat-messages::-webkit-scrollbar-thumb {
+      background: #cbd5e0;
+      border-radius: 10px;
+    }
+
+    #chat-messages::-webkit-scrollbar-thumb:hover {
+      background: #a0aec0;
+    }
+  </style>
+</body>
+</html>

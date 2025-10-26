@@ -1,0 +1,536 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+  <title>Sign In | IntellEvalPro</title>
+  
+  <!-- Favicon -->
+  <link rel="icon" type="image/png" href="../static/images/nclogo.png">
+  <link rel="shortcut icon" type="image/png" href="../static/images/nclogo.png">
+  <link rel="apple-touch-icon" href="../static/images/nclogo.png">
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  
+  <!-- Font Awesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"/>
+  
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  
+  <!-- jQuery -->
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  
+  <!-- SweetAlert2 -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11.7.12/dist/sweetalert2.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.7.12/dist/sweetalert2.all.min.js"></script>
+
+  <script>
+    tailwind.config = {
+      theme: {
+        fontFamily: {
+          'sans': ['Inter', 'system-ui', 'sans-serif'],
+        },
+        extend: {
+          colors: {
+            primary: {
+              50: '#e6f0ff',
+              100: '#b3d1ff',
+              200: '#80b3ff',
+              300: '#4d94ff', 
+              400: '#1a75ff',
+              500: '#0059cc', // Primary color
+              600: '#004db3',
+              700: '#004099',
+              800: '#003380',
+              900: '#002766',
+            },
+          }
+        }
+      }
+    }
+  </script>
+  
+  <!-- Loading Screen & Custom Styles -->
+  <style>
+    /* Base styles */
+    body {
+      font-family: 'Inter', sans-serif;
+      background-color: #f0f5ff; /* Fallback color in case image fails to load */
+    }
+    
+    /* Background blur styles - very subtle */
+    .subtle-blur {
+      filter: blur(2px);
+      -webkit-filter: blur(2px);
+    }
+    
+    .backdrop-blur-sm {
+      backdrop-filter: blur(4px);
+      -webkit-backdrop-filter: blur(4px);
+    }
+    
+    /* Loader styles */
+    #loader-overlay {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100vw; height: 100vh;
+      background: rgba(255,255,255,0.95);
+      z-index: 9999;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      backdrop-filter: blur(5px);
+      transition: opacity 0.5s ease;
+    }
+    
+    .pulse-loader {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-top: 1.5rem;
+    }
+    
+    .pulse-loader div {
+      width: 12px;
+      height: 12px;
+      margin: 0 4px;
+      border-radius: 50%;
+      background-color: #0059cc;
+      animation: pulse 1.5s infinite ease-in-out;
+    }
+    
+    .pulse-loader div:nth-child(2) {
+      animation-delay: 0.2s;
+    }
+    
+    .pulse-loader div:nth-child(3) {
+      animation-delay: 0.4s;
+    }
+    
+    @keyframes pulse {
+      0%, 100% {
+        transform: scale(0.7);
+        opacity: 0.5;
+      }
+      50% {
+        transform: scale(1);
+        opacity: 1;
+      }
+    }
+    
+    /* Form input styles */
+    .form-input:focus {
+      box-shadow: 0 0 0 2px rgba(0, 89, 204, 0.2);
+      border-color: #0059cc;
+    }
+    
+    /* Animation classes */
+    .animate-fade-in {
+      animation: fadeIn 0.5s ease-out;
+    }
+    
+    .animate-slide-up {
+      animation: slideUp 0.5s ease-out;
+    }
+    
+    @keyframes fadeIn {
+      0% { opacity: 0; }
+      100% { opacity: 1; }
+    }
+    
+    @keyframes slideUp {
+      0% { transform: translateY(20px); opacity: 0; }
+      100% { transform: translateY(0); opacity: 1; }
+    }
+    
+    /* Mobile optimizations */
+    @media screen and (max-width: 640px) {
+      .auth-container {
+        box-shadow: none !important;
+        margin: 0.5rem;
+        border-radius: 1rem !important;
+      }
+      
+      input, select, textarea {
+        font-size: 16px !important;
+      }
+      
+      body {
+        padding: 0.5rem;
+      }
+      
+      .p-8 {
+        padding: 1.5rem !important;
+      }
+      
+      .text-3xl {
+        font-size: 1.75rem !important;
+        line-height: 2rem !important;
+      }
+      
+      .w-40 {
+        width: 8rem !important;
+      }
+    }
+    
+    @media screen and (max-width: 480px) {
+      .p-8 {
+        padding: 1rem !important;
+      }
+      
+      .space-y-6 > * + * {
+        margin-top: 1rem !important;
+      }
+      
+      .py-3 {
+        padding-top: 0.75rem !important;
+        padding-bottom: 0.75rem !important;
+      }
+      
+      .text-3xl {
+        font-size: 1.5rem !important;
+        line-height: 1.75rem !important;
+      }
+      
+      .w-40 {
+        width: 6rem !important;
+      }
+      
+      .mb-8 {
+        margin-bottom: 1.5rem !important;
+      }
+    }
+    
+    /* Custom checkbox */
+    .custom-checkbox {
+      position: relative;
+      height: 18px;
+      width: 18px;
+      background: white;
+      border: 2px solid #d1d5db;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    
+    .custom-checkbox svg {
+      position: absolute;
+      top: 1px;
+      left: 1px;
+      height: 12px;
+      width: 12px;
+      fill: none;
+      stroke: white;
+      stroke-width: 2px;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      stroke-dasharray: 16px;
+      stroke-dashoffset: 16px;
+      transition: all 0.2s ease;
+    }
+    
+    .custom-checkbox-input {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      z-index: 1;
+      cursor: pointer;
+      opacity: 0;
+    }
+    
+    .custom-checkbox-input:checked + .custom-checkbox {
+      background: #0059cc;
+      border-color: #0059cc;
+    }
+    
+    .custom-checkbox-input:checked + .custom-checkbox svg {
+      stroke-dashoffset: 0;
+    }
+  </style>
+</head>
+
+<body class="min-h-screen flex items-center justify-center p-2 sm:p-4 relative">
+  <!-- Background image with very subtle blur -->
+  <div class="fixed inset-0 z-0">
+    <img src="../static/images/ncfront.png" alt="Background" class="w-full h-full object-cover" style="filter: blur(3px);">
+    <div class="absolute inset-0 bg-black bg-opacity-15"></div> <!-- Very light overlay for minimal blur effect -->
+  </div>
+  
+  <!-- Loading overlay -->
+  <div id="loader-overlay" class="opacity-0 z-50">
+    <img src="../static/images/nclogo.png" alt="Logo" class="w-20 sm:w-32 h-auto mb-6 animate-bounce">
+    <div class="pulse-loader">
+      <div></div>
+      <div></div>
+      <div></div>
+    </div>
+  </div>
+
+  <div class="w-full max-w-sm sm:max-w-md animate-fade-in relative z-10">
+    <!-- Login container -->
+    <div class="bg-white bg-opacity-90 rounded-xl sm:rounded-2xl shadow-xl overflow-hidden auth-container">
+      <div class="p-4 sm:p-8">
+        <div class="text-center mb-6 sm:mb-8 animate-slide-up">
+          <img src="../static/images/nclogo.png" alt="IntellEvalPro Logo" class="w-24 sm:w-40 h-auto mx-auto">
+          <h1 class="text-2xl sm:text-3xl font-bold text-gray-800 mt-3 sm:mt-4 mb-1">Welcome NCians</h1>
+          <p class="text-sm sm:text-base text-gray-500">Sign in to your <span class="text-primary-500 ">IntellEvalPro</span> account</p>
+        </div>
+        
+        <!-- Alert container for error/success messages -->
+        <div id="alert-container" class="mb-6"></div>
+        
+        <!-- Alert for Flask error messages -->
+        {% if error %}
+        <div class="bg-red-50 border-l-4 border-red-500 text-red-700 p-4 rounded-md animate-fade-in mb-6">
+          <div class="flex">
+            <div class="flex-shrink-0">
+              <i class="fas fa-exclamation-circle mr-2"></i>
+            </div>
+            <div class="ml-2">
+              <p class="text-sm font-medium">{{ error }}</p>
+            </div>
+          </div>
+        </div>
+        {% endif %}
+        
+        <!-- Login form -->
+        <form id="login-form" class="space-y-4 sm:space-y-6 animate-slide-up" style="animation-delay: 0.1s" method="POST" action="{{ url_for('auth.login') }}">
+          <div>
+            <label for="username" class="block text-sm font-medium text-gray-700 mb-2">Student Number</label>
+            <div class="relative">
+              <span class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none text-gray-500">
+                <i class="fa-regular fa-id-card text-sm sm:text-base"></i>
+              </span>
+              <input type="text" id="username" name="username" 
+                class="form-input w-full py-2.5 sm:py-3 px-10 text-gray-800 bg-gray-50 border border-gray-300 rounded-lg focus:outline-none text-sm sm:text-base" 
+                required placeholder="20XX-XXXX">
+            </div>
+          </div>
+          
+          <div>
+            <div class="flex justify-between items-center mb-2">
+              <label for="password" class="block text-sm font-medium text-gray-700">Password</label>
+              <a href="{{ url_for('auth.forgot_password') }}" class="text-xs sm:text-sm text-primary-500 hover:text-primary-600 hover:underline">
+                Forgot password?
+              </a>
+            </div>
+            <div class="relative">
+              <span class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none text-gray-500">
+                <i class="fas fa-lock text-sm sm:text-base"></i>
+              </span>
+              <input type="password" id="password" name="password" 
+                class="form-input w-full py-2.5 sm:py-3 px-10 pr-10 text-gray-800 bg-gray-50 border border-gray-300 rounded-lg focus:outline-none text-sm sm:text-base" 
+                required placeholder="Enter your password">
+              <button type="button" id="togglePassword" class="absolute inset-y-0 right-0 flex items-center pr-3 text-gray-500 hover:text-gray-700 focus:outline-none">
+                <i class="fas fa-eye text-sm sm:text-base" id="show-password"></i>
+                <i class="fas fa-eye-slash hidden text-sm sm:text-base" id="hide-password"></i>
+              </button>
+            </div>
+          </div>
+          
+          <div class="flex items-center">
+            <div class="relative flex items-center">
+              <input type="checkbox" id="remember" name="remember" class="custom-checkbox-input">
+              <span class="custom-checkbox">
+                <svg viewBox="0 0 12 10">
+                  <polyline points="1.5 6 4.5 9 10.5 1"></polyline>
+                </svg>
+              </span>
+              <label for="remember" class="ml-2 text-xs sm:text-sm text-gray-700 cursor-pointer select-none">
+                Remember me
+              </label>
+            </div>
+          </div>
+          
+          <button type="submit" class="w-full bg-primary-500 hover:bg-primary-600 text-white font-medium py-2.5 sm:py-3 px-4 rounded-lg transition-all transform hover:-translate-y-0.5 active:translate-y-0 hover:shadow-md text-sm sm:text-base">
+            Sign In
+          </button>
+          
+          <!--<p class="text-center text-gray-600 text-sm mt-4">
+            Don't have an account? 
+            <a href="{{ url_for('auth.signup') }}" class="text-primary-500 font-medium hover:text-primary-600 hover:underline">
+              Create account
+            </a>
+          </p>  -->
+        </form>
+      </div>
+    </div>
+    
+    <div class="text-center mt-6 text-sm text-white relative z-10">
+      &copy; 2025 IntellEvalPro - Faculty Evaluation System
+    </div>
+  </div>
+
+  <script>
+    // Prevent any redirect loops - clear flags if we're legitimately on login page
+    (function() {
+      // If we made it to login page and no session expired flag, ensure clean slate
+      if (!sessionStorage.getItem('session_expired')) {
+        // Only clear if we're not in the middle of a legitimate redirect
+        const justLoggedOut = document.cookie.includes('just_logged_out=true');
+        if (!justLoggedOut) {
+          // Check if we arrived here from a redirect (not back button)
+          const navigation = performance.getEntriesByType('navigation')[0];
+          if (navigation && navigation.type === 'navigate') {
+            // Direct navigation - safe to clear
+            sessionStorage.removeItem('is_logged_in');
+            sessionStorage.removeItem('last_page');
+          }
+        }
+      }
+    })();
+    
+    // Hide loader when page is ready
+    $(document).ready(function() {
+      // Check if session expired (from session-timeout.js)
+      const sessionExpired = sessionStorage.getItem('session_expired');
+      
+      // Check if user used back button while logged in
+      const isLoggedIn = sessionStorage.getItem('is_logged_in');
+      const justLoggedOut = document.cookie.includes('just_logged_out=true');
+      
+      console.log('Login page - isLoggedIn:', isLoggedIn, 'justLoggedOut:', justLoggedOut, 'sessionExpired:', sessionExpired);
+      
+      // If session expired, clear everything and show message
+      if (sessionExpired === 'true') {
+        console.log('⏱️ Session expired, clearing all session data');
+        sessionStorage.clear();
+        showAlert('Your session has expired. Please log in again.', 'info');
+      }
+      // Only redirect if logged in AND not just logged out AND session didn't expire
+      else if (isLoggedIn === 'true' && !justLoggedOut) {
+        // User pressed back button while logged in, redirect to dashboard
+        console.log('🔙 Back button detected, user still logged in, redirecting...');
+        
+        const lastPage = sessionStorage.getItem('last_page');
+        
+        // Determine dashboard based on last page
+        let dashboardUrl = '/student/student-dashboard';
+        if (lastPage) {
+          if (lastPage.includes('/admin/')) dashboardUrl = '/admin/admin-dashboard';
+          else if (lastPage.includes('/guidance/')) dashboardUrl = '/guidance/guidance-dashboard';
+        }
+        
+        const redirectTo = (lastPage && !lastPage.includes('/logout') && !lastPage.includes('/login')) 
+          ? lastPage : dashboardUrl;
+        
+        console.log('↪️ Redirecting to:', redirectTo);
+        window.location.replace(redirectTo);
+        return;
+      }
+      
+      // Clear session storage on intentional logout
+      if (justLoggedOut) {
+        console.log('👋 Intentional logout, clearing session');
+        sessionStorage.clear();
+        document.cookie = 'just_logged_out=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
+      }
+      
+      setTimeout(function() {
+        $("#loader-overlay").css("opacity", "0");
+        setTimeout(function() {
+          $("#loader-overlay").css("display", "none");
+        }, 500);
+      }, 600);
+      
+      // Ensure form inputs are enabled and interactive
+      $('#username, #password').prop('disabled', false).css('pointer-events', 'auto');
+      $('input, button, a').css('pointer-events', 'auto');
+      
+      // Toggle password visibility
+      $("#togglePassword").click(function() {
+        const passwordInput = $("#password");
+        const showIcon = $("#show-password");
+        const hideIcon = $("#hide-password");
+        
+        if (passwordInput.attr("type") === "password") {
+          passwordInput.attr("type", "text");
+          showIcon.addClass("hidden");
+          hideIcon.removeClass("hidden");
+        } else {
+          passwordInput.attr("type", "password");
+          hideIcon.addClass("hidden");
+          showIcon.removeClass("hidden");
+        }
+      });
+      
+      // Handle form submission - allowing actual form submission with Flask
+      $("#login-form").submit(function(e) {
+        showLoader();
+        // Not preventing default - we want the form to submit to Flask
+        
+        // We could still validate fields here before submission
+        if(!$("#username").val() || !$("#password").val()) {
+          e.preventDefault();
+          hideLoader();
+          showAlert("Please enter both username and password", "error");
+        }
+        
+        // Let the form submit to Flask's route handler
+      });
+    });
+    
+    // Show alert messages
+    function showAlert(message, type) {
+      let alertClass = '';
+      let icon = '';
+      
+      if (type === 'error') {
+        alertClass = 'bg-red-50 border-l-4 border-red-500 text-red-700';
+        icon = '<i class="fas fa-exclamation-circle mr-2"></i>';
+      } else if (type === 'success') {
+        alertClass = 'bg-green-50 border-l-4 border-green-500 text-green-700';
+        icon = '<i class="fas fa-check-circle mr-2"></i>';
+      } else if (type === 'info') {
+        alertClass = 'bg-blue-50 border-l-4 border-blue-500 text-blue-700';
+        icon = '<i class="fas fa-info-circle mr-2"></i>';
+      }
+      
+      $('#alert-container').html(
+        `<div class="${alertClass} p-4 rounded-md animate-fade-in">
+          <div class="flex">
+            <div class="flex-shrink-0">
+              ${icon}
+            </div>
+            <div class="ml-2">
+              <p class="text-sm font-medium">${message}</p>
+            </div>
+          </div>
+        </div>`
+      );
+      
+      // Auto-dismiss success messages after 5 seconds
+      if (type === 'success') {
+        setTimeout(function() {
+          $('#alert-container').empty();
+        }, 5000);
+      }
+    }
+    
+    // Show loading indicator
+    function showLoader() {
+      $("#loader-overlay").css("display", "flex");
+      setTimeout(function() {
+        $("#loader-overlay").css("opacity", "1");
+      }, 10);
+    }
+    
+    // Hide loading indicator
+    function hideLoader() {
+      $("#loader-overlay").css("opacity", "0");
+      setTimeout(function() {
+        $("#loader-overlay").css("display", "none");
+      }, 500);
+    }
+    
+    // Aliases for backward compatibility
+    window.start_load = showLoader;
+    window.end_load = hideLoader;
+  </script>
+</body>
+</html>

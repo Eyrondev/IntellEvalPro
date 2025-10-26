@@ -1,0 +1,1116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Archives | IntellEvalPro</title>
+  
+  <!-- Favicon -->
+  <link rel="icon" type="image/png" href="{{ url_for('static', filename='images/nclogo.png') }}">
+  <link rel="shortcut icon" type="image/png" href="{{ url_for('static', filename='images/nclogo.png') }}">
+  <link rel="apple-touch-icon" href="{{ url_for('static', filename='images/nclogo.png') }}">
+  
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  
+  <!-- Font Awesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" integrity="sha512-SnH5WK+bZxgPHs44uWIX+LLJAJ9/2PkPKZ5QiAj6Ta86w+fsb2TkcmfRyVX3pBnMFcV7oQPJkl9QevSCWr3W6A==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+  
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  
+  <!-- jQuery -->
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  
+  <!-- SweetAlert2 -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11.7.12/dist/sweetalert2.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.7.12/dist/sweetalert2.all.min.js"></script>
+  
+  <script>
+    tailwind.config = {
+      theme: {
+        fontFamily: {
+          'sans': ['Inter', 'system-ui', 'sans-serif'],
+        },
+        extend: {
+          colors: {
+            primary: {
+              50: '#e6f0ff',
+              100: '#b3d1ff',
+              200: '#80b3ff',
+              300: '#4d94ff', 
+              400: '#1a75ff',
+              500: '#0059cc',
+              600: '#004db3',
+              700: '#004099',
+              800: '#003380',
+              900: '#002766',
+            }
+          }
+        }
+      }
+    }
+  </script>
+  
+  <style>
+    /* Custom scrollbar */
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    
+    ::-webkit-scrollbar-track {
+      background: #f1f1f1;
+      border-radius: 10px;
+    }
+    
+    ::-webkit-scrollbar-thumb {
+      background: #c1c1c1;
+      border-radius: 10px;
+    }
+    
+    ::-webkit-scrollbar-thumb:hover {
+      background: #a8a8a8;
+    }
+    
+    /* Hide scrollbar for mobile tabs */
+    .scrollbar-hide {
+      -ms-overflow-style: none;
+      scrollbar-width: none;
+    }
+    
+    .scrollbar-hide::-webkit-scrollbar {
+      display: none;
+    }
+    
+    /* Tab styling */
+    .tab-button {
+      position: relative;
+      transition: all 0.3s ease;
+    }
+    
+    .tab-button.active {
+      color: #0059cc;
+      font-weight: 600;
+    }
+    
+    .tab-button.active::after {
+      content: '';
+      position: absolute;
+      bottom: -2px;
+      left: 0;
+      right: 0;
+      height: 3px;
+      background-color: #0059cc;
+      border-radius: 2px 2px 0 0;
+    }
+    
+    /* Extra small breakpoint for showing/hiding text */
+    @media (min-width: 420px) {
+      .xs\:inline {
+        display: inline;
+      }
+      .xs\:hidden {
+        display: none;
+      }
+    }
+    
+    /* Mobile card styling */
+    .mobile-card {
+      transition: all 0.2s ease;
+    }
+    
+    .mobile-card:hover {
+      background-color: #f9fafb;
+    }
+    
+    /* Ensure Font Awesome icons render properly */
+    .fas, .far, .fab {
+      font-family: "Font Awesome 6 Free", "Font Awesome 6 Pro", "Font Awesome 6 Brands", sans-serif !important;
+      font-weight: 900;
+      -webkit-font-smoothing: antialiased;
+      display: inline-block;
+    }
+    
+    /* SweetAlert2 custom styling */
+    .swal2-input, .swal2-select {
+      margin: 0 !important;
+      padding: 0.5rem 0.75rem !important;
+      font-size: 0.875rem !important;
+      border: 1px solid #d1d5db !important;
+      border-radius: 0.5rem !important;
+    }
+    
+    .swal2-input:focus, .swal2-select:focus {
+      border-color: #0059cc !important;
+      box-shadow: 0 0 0 3px rgba(0, 89, 204, 0.1) !important;
+    }
+    
+    /* Responsive button sizing */
+    @media (max-width: 640px) {
+      .mobile-card-action {
+        padding: 0.5rem 0.75rem;
+        font-size: 0.75rem;
+      }
+    }
+  </style>
+</head>
+<body class="bg-gray-50 font-sans overflow-x-hidden">
+  <!-- Loading overlay -->
+  <div id="loader-overlay" class="fixed inset-0 z-50 flex flex-col items-center justify-center bg-white bg-opacity-90 backdrop-blur-sm transition-opacity duration-300">
+    <img src="{{ url_for('static', filename='images/nclogo.png') }}" alt="Logo" class="w-32 h-auto mb-6 animate-bounce">
+    <div class="flex items-center space-x-2">
+      <div class="w-3 h-3 rounded-full bg-primary-500 animate-pulse"></div>
+      <div class="w-3 h-3 rounded-full bg-primary-500 animate-pulse" style="animation-delay: 0.2s"></div>
+      <div class="w-3 h-3 rounded-full bg-primary-500 animate-pulse" style="animation-delay: 0.4s"></div>
+    </div>
+  </div>
+
+  <div class="flex h-screen bg-gray-50">
+    <!-- Sidebar (will be loaded dynamically) -->
+    <div id="admin-sidebar"></div>
+    
+    <!-- Main content -->
+    <div class="lg:ml-64 flex flex-col flex-1 min-h-screen">
+      <!-- Top Navigation (will be loaded dynamically) -->
+      <div id="admin-header"></div>
+
+      <!-- Main content area -->
+      <main id="main-content" class="flex-1 overflow-auto p-3 sm:p-4 md:p-6 bg-gray-50">
+
+        <!-- Page header -->
+        <div class="mb-4 sm:mb-6">
+          <div class="flex flex-col space-y-3 sm:space-y-4 md:flex-row md:space-y-0 md:items-center md:justify-between">
+            <div>
+              <h1 class="text-xl sm:text-2xl font-bold text-gray-800">
+                <i class="fas fa-archive mr-2 text-gray-600"></i>
+                Archives
+              </h1>
+              <p class="text-gray-500 mt-1 text-sm sm:text-base">View and manage all archived records</p>
+            </div>
+            <div class="w-full md:w-auto">
+              <button type="button" id="bulk-restore-btn" class="w-full md:w-auto inline-flex items-center justify-center px-4 py-3 md:py-2 bg-green-600 hover:bg-green-700 text-white text-sm font-medium rounded-lg shadow-sm transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 hidden min-h-[44px]">
+                <i class="fas fa-undo mr-2"></i>
+                Restore Selected
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Search and Filter Section -->
+        <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-4 sm:p-6 mb-4 sm:mb-6">
+          <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between mb-4 space-y-2 sm:space-y-0">
+            <div class="flex items-center space-x-2">
+              <div class="w-2 h-2 bg-primary-500 rounded-full"></div>
+              <h3 class="text-base sm:text-lg font-semibold text-gray-800">Search Archives</h3>
+            </div>
+            <span id="results-count" class="text-xs sm:text-sm text-gray-500 bg-gray-50 px-3 py-1 rounded-full self-start sm:self-auto">-- results</span>
+          </div>
+          
+          <div class="grid grid-cols-1 gap-4 lg:grid-cols-12 lg:gap-4">
+            <!-- Search Input -->
+            <div class="lg:col-span-8">
+              <label for="search-archives" class="block text-sm font-medium text-gray-700 mb-2">Search</label>
+              <div class="relative group">
+                <div class="absolute inset-y-0 left-0 flex items-center pl-4 pointer-events-none">
+                  <i class="fas fa-search text-gray-400 group-focus-within:text-primary-500 transition-colors duration-200"></i>
+                </div>
+                <input type="text" id="search-archives" placeholder="Search by name, number, or email..." 
+                       class="block w-full pl-11 pr-4 py-3 text-sm border border-gray-200 rounded-xl bg-gray-50 text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent focus:bg-white transition-all duration-200 min-h-[44px]" 
+                       autocomplete="off">
+              </div>
+            </div>
+            
+            <!-- Filter and Reset Row -->
+            <div class="lg:col-span-4 grid grid-cols-3 gap-3 lg:gap-4">
+              <!-- Type Filter -->
+              <div class="col-span-2">
+                <label for="type-filter" class="block text-sm font-medium text-gray-700 mb-2">Archive Type</label>
+                <div class="relative">
+                  <select id="type-filter" class="block w-full px-4 py-3 text-sm border border-gray-200 rounded-xl bg-gray-50 text-gray-900 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent focus:bg-white transition-all duration-200 appearance-none cursor-pointer min-h-[44px]">
+                    <option value="all">All Types</option>
+                    <option value="faculty">Faculty</option>
+                    <option value="students">Students</option>
+                    <option value="evaluation_periods">Evaluation Periods</option>
+                  </select>
+                  <div class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
+                    <i class="fas fa-chevron-down text-gray-400 text-xs"></i>
+                  </div>
+                </div>
+              </div>
+              
+              <!-- Reset Button -->
+              <div class="col-span-1">
+                <label class="block text-sm font-medium text-transparent mb-2">Reset</label>
+                <button type="button" id="reset-filters" class="w-full inline-flex items-center justify-center px-3 py-3 text-sm font-medium text-gray-600 bg-gray-100 border border-gray-200 rounded-xl hover:bg-gray-200 hover:text-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:bg-gray-200 transition-all duration-200 group min-h-[44px]">
+                  <i class="fas fa-sync-alt group-hover:rotate-180 transition-transform duration-300"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Tabs -->
+        <div class="bg-white rounded-t-xl shadow-sm border border-gray-100 border-b-0">
+          <div class="flex border-b border-gray-200 px-3 sm:px-6 overflow-x-auto scrollbar-hide">
+            <button type="button" class="tab-button px-3 sm:px-4 py-3 sm:py-4 text-xs sm:text-sm font-medium text-gray-600 hover:text-gray-900 transition-colors active whitespace-nowrap flex-shrink-0 min-h-[44px] flex items-center" data-tab="all">
+              <i class="fas fa-list mr-1 sm:mr-2"></i>
+              <span class="hidden xs:inline">All Archives</span>
+              <span class="xs:hidden">All</span>
+            </button>
+            <button type="button" class="tab-button px-3 sm:px-4 py-3 sm:py-4 text-xs sm:text-sm font-medium text-gray-600 hover:text-gray-900 transition-colors whitespace-nowrap flex-shrink-0 min-h-[44px] flex items-center" data-tab="faculty">
+              <i class="fas fa-user-tie mr-1 sm:mr-2"></i>
+              <span class="hidden xs:inline">Faculty</span>
+              <span class="xs:hidden">Faculty</span>
+            </button>
+            <button type="button" class="tab-button px-3 sm:px-4 py-3 sm:py-4 text-xs sm:text-sm font-medium text-gray-600 hover:text-gray-900 transition-colors whitespace-nowrap flex-shrink-0 min-h-[44px] flex items-center" data-tab="students">
+              <i class="fas fa-user-graduate mr-1 sm:mr-2"></i>
+              <span class="hidden xs:inline">Students</span>
+              <span class="xs:hidden">Students</span>
+            </button>
+            <button type="button" class="tab-button px-3 sm:px-4 py-3 sm:py-4 text-xs sm:text-sm font-medium text-gray-600 hover:text-gray-900 transition-colors whitespace-nowrap flex-shrink-0 min-h-[44px] flex items-center" data-tab="evaluation_periods">
+              <i class="fas fa-calendar-check mr-1 sm:mr-2"></i>
+              <span class="hidden xs:inline">Periods</span>
+              <span class="xs:hidden">Periods</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Archives table -->
+        <div class="bg-white rounded-b-xl shadow-sm overflow-hidden mb-4 sm:mb-6">
+          <!-- Mobile Card View (visible on small screens) -->
+          <div id="mobile-cards" class="block sm:hidden">
+            <div id="mobile-cards-container" class="divide-y divide-gray-200">
+              <!-- Mobile cards will be inserted here -->
+            </div>
+          </div>
+          
+          <!-- Desktop Table View (hidden on small screens) -->
+          <div class="hidden sm:block overflow-x-auto">
+            <table id="archives-table" class="min-w-full divide-y divide-gray-200">
+              <thead class="bg-gray-50">
+                <tr>
+                  <th scope="col" class="px-4 sm:px-6 py-3 text-left">
+                    <input type="checkbox" id="select-all" class="rounded border-gray-300 text-primary-600 focus:ring-primary-500">
+                  </th>
+                  <th scope="col" class="px-4 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Type
+                  </th>
+                  <th scope="col" class="px-4 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Name / Number
+                  </th>
+                  <th scope="col" class="px-4 sm:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Details
+                  </th>
+                  <th scope="col" class="px-4 sm:px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Actions
+                  </th>
+                </tr>
+              </thead>
+              <tbody id="archives-table-body" class="bg-white divide-y divide-gray-200">
+                <!-- Data will be loaded dynamically -->
+                <tr id="loading-row">
+                  <td colspan="5" class="px-4 sm:px-6 py-8 text-center">
+                    <div class="flex justify-center items-center">
+                      <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-500"></div>
+                      <span class="ml-3 text-gray-500">Loading archives...</span>
+                    </div>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          
+          <!-- Pagination -->
+          <div class="bg-white px-3 sm:px-4 py-3 border-t border-gray-200 sm:px-6">
+            <div class="flex items-center justify-between">
+              <div class="flex-1 flex justify-between sm:hidden">
+                <button class="relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 min-h-[44px]" id="prev-mobile">
+                  Previous
+                </button>
+                <button class="ml-3 relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 min-h-[44px]" id="next-mobile">
+                  Next
+                </button>
+              </div>
+              <div class="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
+                <div>
+                  <p id="pagination-info" class="text-sm text-gray-700">
+                    Loading...
+                  </p>
+                </div>
+                <div id="pagination-controls">
+                  <!-- Pagination buttons will be generated dynamically -->
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </main>
+    </div>
+  </div>
+
+  <!-- Page-specific JavaScript -->
+  <script>
+    let archivesData = {
+      faculty: [],
+      students: [],
+      evaluation_periods: []
+    };
+    let filteredData = [];
+    let currentTab = 'all';
+    let currentPage = 1;
+    const itemsPerPage = 15;
+    
+    document.addEventListener('DOMContentLoaded', function() {
+      loadArchivesData();
+      setupEventListeners();
+    });
+    
+    // Load all archives data
+    async function loadArchivesData() {
+      try {
+        // Load faculty archives
+        const facultyResponse = await fetch('/api/faculty?include_archived=true');
+        const facultyResult = await facultyResponse.json();
+        
+        if (facultyResult.success) {
+          archivesData.faculty = facultyResult.data.filter(f => f.is_archived === 1 || f.is_archived === true).map(f => ({
+            ...f,
+            type: 'faculty',
+            typeName: 'Faculty',
+            typeIcon: 'fa-user-tie',
+            typeColor: 'blue'
+          }));
+        }
+        console.log('Faculty archives loaded:', archivesData.faculty.length);
+        
+        // Load student archives
+        const studentResponse = await fetch('/api/students?include_archived=true');
+        const studentResult = await studentResponse.json();
+        
+        if (studentResult.success) {
+          archivesData.students = studentResult.data.filter(s => s.is_archived === 1 || s.is_archived === true).map(s => ({
+            ...s,
+            type: 'students',
+            typeName: 'Student',
+            typeIcon: 'fa-user-graduate',
+            typeColor: 'purple'
+          }));
+        }
+        console.log('Student archives loaded:', archivesData.students.length);
+        
+        // Load evaluation period archives
+        const periodsResponse = await fetch('/api/evaluation-periods-archived');
+        const periodsResult = await periodsResponse.json();
+        console.log('Evaluation periods API response:', periodsResult);
+        
+        if (periodsResult.success) {
+          archivesData.evaluation_periods = periodsResult.data.map(p => ({
+            ...p,
+            type: 'evaluation_periods',
+            typeName: 'Evaluation Period',
+            typeIcon: 'fa-calendar-check',
+            typeColor: 'red'
+          }));
+        }
+        console.log('Evaluation period archives loaded:', archivesData.evaluation_periods.length);
+        
+        // Apply current tab filter
+        applyFilters();
+        
+      } catch (error) {
+        console.error('Error loading archives:', error);
+        showError('Error loading archives data: ' + error.message);
+      }
+    }
+    
+    // Setup event listeners
+    function setupEventListeners() {
+      // Tab switching
+      document.querySelectorAll('.tab-button').forEach(button => {
+        button.addEventListener('click', function() {
+          const tab = this.dataset.tab;
+          switchTab(tab);
+        });
+      });
+      
+      // Search
+      document.getElementById('search-archives').addEventListener('input', applyFilters);
+      
+      // Type filter
+      document.getElementById('type-filter').addEventListener('change', applyFilters);
+      
+      // Reset filters
+      document.getElementById('reset-filters').addEventListener('click', function() {
+        const icon = this.querySelector('i');
+        icon.classList.add('fa-spin');
+        
+        setTimeout(() => {
+          document.getElementById('search-archives').value = '';
+          document.getElementById('type-filter').value = 'all';
+          applyFilters();
+          icon.classList.remove('fa-spin');
+        }, 300);
+      });
+      
+      // Select all checkbox
+      document.getElementById('select-all').addEventListener('change', function() {
+        const checkboxes = document.querySelectorAll('.archive-checkbox');
+        checkboxes.forEach(cb => cb.checked = this.checked);
+        updateBulkRestoreButton();
+      });
+      
+      // Individual checkboxes (using event delegation for both desktop and mobile)
+      document.addEventListener('change', function(e) {
+        if (e.target.classList.contains('archive-checkbox')) {
+          updateBulkRestoreButton();
+          
+          // Update select-all checkbox state
+          const allCheckboxes = document.querySelectorAll('.archive-checkbox');
+          const checkedCheckboxes = document.querySelectorAll('.archive-checkbox:checked');
+          const selectAllCheckbox = document.getElementById('select-all');
+          
+          if (checkedCheckboxes.length === 0) {
+            selectAllCheckbox.indeterminate = false;
+            selectAllCheckbox.checked = false;
+          } else if (checkedCheckboxes.length === allCheckboxes.length) {
+            selectAllCheckbox.indeterminate = false;
+            selectAllCheckbox.checked = true;
+          } else {
+            selectAllCheckbox.indeterminate = true;
+            selectAllCheckbox.checked = false;
+          }
+        }
+      });
+      
+      // Bulk restore
+      document.getElementById('bulk-restore-btn').addEventListener('click', bulkRestore);
+      
+      // Mobile pagination
+      document.getElementById('prev-mobile').addEventListener('click', function() {
+        if (currentPage > 1) {
+          changePage(currentPage - 1);
+        }
+      });
+      
+      document.getElementById('next-mobile').addEventListener('click', function() {
+        const totalPages = Math.ceil(filteredData.length / itemsPerPage);
+        if (currentPage < totalPages) {
+          changePage(currentPage + 1);
+        }
+      });
+      
+      // Action buttons (delegated)
+      document.addEventListener('click', function(e) {
+        if (e.target.closest('.restore-btn')) {
+          const type = e.target.closest('.restore-btn').dataset.type;
+          const id = e.target.closest('.restore-btn').dataset.id;
+          restoreItem(type, id);
+        }
+      });
+    }
+    
+    // Switch tab
+    function switchTab(tab) {
+      currentTab = tab;
+      currentPage = 1;
+      
+      // Update tab UI
+      document.querySelectorAll('.tab-button').forEach(btn => {
+        btn.classList.remove('active');
+      });
+      document.querySelector(`[data-tab="${tab}"]`).classList.add('active');
+      
+      // Update type filter
+      if (tab === 'all') {
+        document.getElementById('type-filter').value = 'all';
+      } else {
+        document.getElementById('type-filter').value = tab;
+      }
+      
+      applyFilters();
+    }
+    
+    // Apply filters
+    function applyFilters() {
+      const searchTerm = document.getElementById('search-archives').value.toLowerCase();
+      const typeFilter = document.getElementById('type-filter').value;
+      
+      // Combine all data
+      let allData = [];
+      if (typeFilter === 'all' || typeFilter === 'faculty') {
+        allData = allData.concat(archivesData.faculty);
+      }
+      if (typeFilter === 'all' || typeFilter === 'students') {
+        allData = allData.concat(archivesData.students);
+      }
+      if (typeFilter === 'all' || typeFilter === 'evaluation_periods') {
+        allData = allData.concat(archivesData.evaluation_periods);
+      }
+      
+      // Apply search filter
+      filteredData = allData.filter(item => {
+        if (!searchTerm) return true;
+        
+        // For faculty and students
+        if (item.type === 'faculty' || item.type === 'students') {
+          const name = `${item.first_name} ${item.last_name}`.toLowerCase();
+          const number = item.type === 'faculty' 
+            ? (item.faculty_number || '').toLowerCase()
+            : (item.student_number || '').toLowerCase();
+          const email = (item.email || '').toLowerCase();
+          return name.includes(searchTerm) || number.includes(searchTerm) || email.includes(searchTerm);
+        }
+        
+        // For evaluation periods
+        if (item.type === 'evaluation_periods') {
+          const title = (item.period_title || '').toLowerCase();
+          const term = (item.term_title || '').toLowerCase();
+          const semester = (item.semester || '').toLowerCase();
+          return title.includes(searchTerm) || term.includes(searchTerm) || semester.includes(searchTerm);
+        }
+        
+        return false;
+      });
+      
+      // Sort by archived date (most recent first) - use archived_at, updated_at, or created_at
+      filteredData.sort((a, b) => {
+        const dateA = a.archived_at ? new Date(a.archived_at) : (a.updated_at ? new Date(a.updated_at) : (a.created_at ? new Date(a.created_at) : new Date(0)));
+        const dateB = b.archived_at ? new Date(b.archived_at) : (b.updated_at ? new Date(b.updated_at) : (b.created_at ? new Date(b.created_at) : new Date(0)));
+        return dateB - dateA;
+      });
+      
+      currentPage = 1;
+      renderTable();
+      updatePaginationInfo();
+    }
+    
+    // Render table
+    function renderTable() {
+      const tableBody = document.getElementById('archives-table-body');
+      const mobileCardsContainer = document.getElementById('mobile-cards-container');
+      
+      if (filteredData.length === 0) {
+        // Show empty state for both desktop and mobile
+        const emptyStateHTML = `
+          <div class="flex flex-col items-center justify-center text-gray-500 py-12 px-4">
+            <i class="fas fa-inbox text-4xl sm:text-5xl mb-4 text-gray-300"></i>
+            <p class="text-base sm:text-lg font-medium">No archived records found</p>
+            <p class="text-sm mt-1 text-center">Try adjusting your search filters</p>
+          </div>
+        `;
+        
+        // Desktop table empty state
+        tableBody.innerHTML = `
+          <tr>
+            <td colspan="5" class="px-4 sm:px-6 py-12 text-center">
+              ${emptyStateHTML}
+            </td>
+          </tr>
+        `;
+        
+        // Mobile cards empty state
+        mobileCardsContainer.innerHTML = `
+          <div class="p-4">
+            ${emptyStateHTML}
+          </div>
+        `;
+        return;
+      }
+      
+      // Pagination
+      const startIndex = (currentPage - 1) * itemsPerPage;
+      const endIndex = startIndex + itemsPerPage;
+      const paginatedData = filteredData.slice(startIndex, endIndex);
+      
+      // Render desktop table
+      const tableRows = paginatedData.map(item => createTableRow(item)).join('');
+      tableBody.innerHTML = tableRows;
+      
+      // Render mobile cards
+      const mobileCards = paginatedData.map(item => createMobileCard(item)).join('');
+      mobileCardsContainer.innerHTML = mobileCards;
+    }
+    
+    // Create table row
+    function createTableRow(item) {
+      const typeColors = {
+        'blue': 'bg-blue-100 text-blue-800',
+        'purple': 'bg-purple-100 text-purple-800',
+        'green': 'bg-green-100 text-green-800',
+        'red': 'bg-red-100 text-red-800'
+      };
+      
+      const typeColor = typeColors[item.typeColor] || 'bg-gray-100 text-gray-800';
+      
+      let name, number, details, id;
+      
+      // Handle different types
+      if (item.type === 'faculty') {
+        name = `${item.first_name} ${item.last_name}`;
+        number = item.faculty_number;
+        details = `${item.department_name || 'No Department'} • ${item.email || 'No email'}`;
+        id = item.faculty_id;
+      } else if (item.type === 'students') {
+        name = `${item.first_name} ${item.last_name}`;
+        number = item.student_number;
+        details = `${item.program || 'No Program'} • ${item.year_level || 'N/A'}`;
+        id = item.id;
+      } else if (item.type === 'evaluation_periods') {
+        name = item.period_title || 'Evaluation Period';
+        number = item.semester ? `${item.semester} ${item.academic_year || ''}` : 'N/A';
+        details = `${item.term_title || 'No Term'} • ${item.total_evaluations || 0} evaluations`;
+        id = item.period_id;
+      }
+      
+      return `
+        <tr class="hover:bg-gray-50 transition-colors">
+          <td class="px-4 sm:px-6 py-4 whitespace-nowrap">
+            <input type="checkbox" class="archive-checkbox rounded border-gray-300 text-primary-600 focus:ring-primary-500" data-type="${item.type}" data-id="${id}">
+          </td>
+          <td class="px-4 sm:px-6 py-4 whitespace-nowrap">
+            <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium ${typeColor}">
+              <i class="fas ${item.typeIcon} mr-1"></i>
+              ${item.typeName}
+            </span>
+          </td>
+          <td class="px-4 sm:px-6 py-4 whitespace-nowrap">
+            <div class="text-sm font-medium text-gray-900">${name}</div>
+            <div class="text-sm text-gray-500">${number}</div>
+          </td>
+          <td class="px-4 sm:px-6 py-4">
+            <div class="text-sm text-gray-700">${details}</div>
+          </td>
+          <td class="px-4 sm:px-6 py-4 whitespace-nowrap text-right text-sm">
+            <button type="button" class="restore-btn inline-flex items-center px-3 py-1.5 bg-green-600 hover:bg-green-700 text-white text-xs font-medium rounded transition-colors min-h-[32px]" data-type="${item.type}" data-id="${id}">
+              <i class="fas fa-undo mr-1"></i>
+              Restore
+            </button>
+          </td>
+        </tr>
+      `;
+    }
+    
+    // Create mobile card
+    function createMobileCard(item) {
+      const typeColors = {
+        'blue': 'bg-blue-100 text-blue-800',
+        'purple': 'bg-purple-100 text-purple-800',
+        'green': 'bg-green-100 text-green-800',
+        'red': 'bg-red-100 text-red-800'
+      };
+      
+      const typeColor = typeColors[item.typeColor] || 'bg-gray-100 text-gray-800';
+      
+      let name, number, details, id;
+      
+      // Handle different types
+      if (item.type === 'faculty') {
+        name = `${item.first_name} ${item.last_name}`;
+        number = item.faculty_number;
+        details = `${item.department_name || 'No Department'} • ${item.email || 'No email'}`;
+        id = item.faculty_id;
+      } else if (item.type === 'students') {
+        name = `${item.first_name} ${item.last_name}`;
+        number = item.student_number;
+        details = `${item.program || 'No Program'} • ${item.year_level || 'N/A'}`;
+        id = item.id;
+      } else if (item.type === 'evaluation_periods') {
+        name = item.period_title || 'Evaluation Period';
+        number = item.semester ? `${item.semester} ${item.academic_year || ''}` : 'N/A';
+        details = `${item.term_title || 'No Term'} • ${item.total_evaluations || 0} evaluations`;
+        id = item.period_id;
+      }
+      
+      return `
+        <div class="mobile-card p-4 border-b border-gray-200 last:border-b-0">
+          <div class="flex items-start justify-between mb-3">
+            <div class="flex items-center space-x-3">
+              <input type="checkbox" class="archive-checkbox rounded border-gray-300 text-primary-600 focus:ring-primary-500 mt-1" data-type="${item.type}" data-id="${id}">
+              <div class="flex-1 min-w-0">
+                <div class="flex items-center space-x-2 mb-1">
+                  <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${typeColor}">
+                    <i class="fas ${item.typeIcon} mr-1"></i>
+                    ${item.typeName}
+                  </span>
+                </div>
+                <p class="text-sm font-medium text-gray-900 truncate">${name}</p>
+                <p class="text-xs text-gray-500">${number}</p>
+              </div>
+            </div>
+            <button type="button" class="restore-btn mobile-card-action inline-flex items-center px-3 py-2 bg-green-600 hover:bg-green-700 text-white text-xs font-medium rounded transition-colors min-h-[44px] flex-shrink-0" data-type="${item.type}" data-id="${id}">
+              <i class="fas fa-undo mr-1"></i>
+              Restore
+            </button>
+          </div>
+          <div class="text-xs text-gray-600 pl-8">
+            ${details}
+          </div>
+        </div>
+      `;
+    }
+    
+    // Update pagination info
+    function updatePaginationInfo() {
+      const total = filteredData.length;
+      const startIndex = (currentPage - 1) * itemsPerPage + 1;
+      const endIndex = Math.min(currentPage * itemsPerPage, total);
+      
+      document.getElementById('results-count').textContent = `${total} result${total !== 1 ? 's' : ''}`;
+      
+      const paginationInfo = document.getElementById('pagination-info');
+      if (total === 0) {
+        paginationInfo.innerHTML = 'Showing <span class="font-medium">0</span> results';
+      } else {
+        paginationInfo.innerHTML = `
+          Showing <span class="font-medium">${startIndex}</span> to <span class="font-medium">${endIndex}</span> of <span class="font-medium">${total}</span> results
+        `;
+      }
+      
+      renderPagination();
+    }
+    
+    // Render pagination
+    function renderPagination() {
+      const totalPages = Math.ceil(filteredData.length / itemsPerPage);
+      const paginationControls = document.getElementById('pagination-controls');
+      
+      // Update mobile pagination buttons
+      const prevMobileBtn = document.getElementById('prev-mobile');
+      const nextMobileBtn = document.getElementById('next-mobile');
+      
+      if (prevMobileBtn && nextMobileBtn) {
+        prevMobileBtn.disabled = currentPage === 1;
+        nextMobileBtn.disabled = currentPage === totalPages || totalPages === 0;
+        
+        prevMobileBtn.className = `relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md transition-colors min-h-[44px] ${
+          currentPage === 1 
+            ? 'text-gray-300 bg-gray-50 cursor-not-allowed' 
+            : 'text-gray-700 bg-white hover:bg-gray-50'
+        }`;
+        
+        nextMobileBtn.className = `ml-3 relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md transition-colors min-h-[44px] ${
+          currentPage === totalPages || totalPages === 0
+            ? 'text-gray-300 bg-gray-50 cursor-not-allowed' 
+            : 'text-gray-700 bg-white hover:bg-gray-50'
+        }`;
+      }
+      
+      if (totalPages <= 1) {
+        paginationControls.innerHTML = '';
+        return;
+      }
+      
+      let html = '<nav class="relative z-0 inline-flex rounded-md shadow-sm -space-x-px" aria-label="Pagination">';
+      
+      // Previous button
+      html += `
+        <button ${currentPage === 1 ? 'disabled' : ''} 
+                onclick="changePage(${currentPage - 1})" 
+                class="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium transition-colors ${currentPage === 1 ? 'text-gray-300 cursor-not-allowed' : 'text-gray-500 hover:bg-gray-50'} min-h-[32px]">
+          <i class="fas fa-chevron-left"></i>
+        </button>
+      `;
+      
+      // Page numbers
+      for (let i = 1; i <= totalPages; i++) {
+        if (i === 1 || i === totalPages || (i >= currentPage - 1 && i <= currentPage + 1)) {
+          html += `
+            <button onclick="changePage(${i})" 
+                    class="${i === currentPage ? 'z-10 bg-primary-50 border-primary-500 text-primary-600' : 'bg-white border-gray-300 text-gray-500 hover:bg-gray-50'} relative inline-flex items-center px-4 py-2 border text-sm font-medium transition-colors min-h-[32px]">
+              ${i}
+            </button>
+          `;
+        } else if (i === currentPage - 2 || i === currentPage + 2) {
+          html += `
+            <span class="relative inline-flex items-center px-4 py-2 border border-gray-300 bg-white text-sm font-medium text-gray-700 min-h-[32px]">
+              ...
+            </span>
+          `;
+        }
+      }
+      
+      // Next button
+      html += `
+        <button ${currentPage === totalPages ? 'disabled' : ''} 
+                onclick="changePage(${currentPage + 1})" 
+                class="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium transition-colors ${currentPage === totalPages ? 'text-gray-300 cursor-not-allowed' : 'text-gray-500 hover:bg-gray-50'} min-h-[32px]">
+          <i class="fas fa-chevron-right"></i>
+        </button>
+      `;
+      
+      html += '</nav>';
+      paginationControls.innerHTML = html;
+    }
+    
+    // Change page
+    function changePage(page) {
+      const totalPages = Math.ceil(filteredData.length / itemsPerPage);
+      if (page < 1 || page > totalPages) return;
+      
+      currentPage = page;
+      renderTable();
+      updatePaginationInfo();
+      
+      // Scroll to appropriate element based on screen size
+      const isMobile = window.innerWidth < 640; // sm breakpoint
+      const targetElement = isMobile 
+        ? document.getElementById('mobile-cards')
+        : document.getElementById('archives-table');
+      
+      if (targetElement) {
+        targetElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+    }
+    
+    // Update bulk restore button
+    function updateBulkRestoreButton() {
+      const checkedBoxes = document.querySelectorAll('.archive-checkbox:checked');
+      const bulkRestoreBtn = document.getElementById('bulk-restore-btn');
+      
+      if (checkedBoxes.length > 0) {
+        bulkRestoreBtn.classList.remove('hidden');
+        bulkRestoreBtn.querySelector('span')?.remove();
+        const countSpan = document.createElement('span');
+        countSpan.className = 'ml-1';
+        countSpan.textContent = `(${checkedBoxes.length})`;
+        bulkRestoreBtn.appendChild(countSpan);
+      } else {
+        bulkRestoreBtn.classList.add('hidden');
+      }
+    }
+    
+    // Restore single item
+    async function restoreItem(type, id) {
+      const item = filteredData.find(i => {
+        if (type === 'faculty') return i.type === type && i.faculty_id == id;
+        if (type === 'students') return i.type === type && i.id == id;
+        if (type === 'sections') return i.type === type && i.section_id == id;
+        if (type === 'evaluation_periods') return i.type === type && i.period_id == id;
+        return false;
+      });
+      
+      if (!item) return;
+      
+      let displayName;
+      if (type === 'faculty' || type === 'students') {
+        displayName = `${item.first_name} ${item.last_name}`;
+      } else if (type === 'evaluation_periods') {
+        displayName = item.period_title || 'Evaluation Period';
+      }
+      
+      const result = await Swal.fire({
+        title: 'Restore ' + item.typeName + '?',
+        html: `
+          <div class="text-left">
+            <p class="mb-2">Are you sure you want to restore:</p>
+            <p class="font-semibold text-lg">${displayName}</p>
+            <p class="text-sm text-gray-600 mt-1">${type === 'faculty' ? item.faculty_number : type === 'students' ? item.student_number : item.semester || 'N/A'}</p>
+            <p class="mt-4 text-sm text-gray-500">
+              <i class="fas fa-info-circle mr-1"></i>
+              This will restore the ${item.typeName.toLowerCase()} to the active list.
+            </p>
+          </div>
+        `,
+        icon: 'question',
+        showCancelButton: true,
+        confirmButtonColor: '#10b981',
+        cancelButtonColor: '#6b7280',
+        confirmButtonText: '<i class="fas fa-undo mr-2"></i>Yes, Restore',
+        cancelButtonText: 'Cancel',
+        reverseButtons: true
+      });
+      
+      if (result.isConfirmed) {
+        try {
+          let endpoint, method;
+          
+          if (type === 'faculty') {
+            endpoint = `/api/faculty/${id}/unarchive`;
+            method = 'POST';
+          } else if (type === 'students') {
+            endpoint = `/api/students/${id}/unarchive`;
+            method = 'PUT';
+          } else if (type === 'evaluation_periods') {
+            endpoint = `/api/evaluation-periods-admin/${id}/unarchive`;
+            method = 'PUT';
+          }
+          
+          const response = await fetch(endpoint, {
+            method: method,
+            headers: { 'Content-Type': 'application/json' }
+          });
+          
+          const data = await response.json();
+          
+          if (data.success) {
+            Swal.fire({
+              icon: 'success',
+              title: 'Restored!',
+              text: data.message || `${item.typeName} has been restored successfully.`,
+              toast: true,
+              position: 'top-end',
+              showConfirmButton: false,
+              timer: 3000,
+              timerProgressBar: true
+            });
+            
+            // Reload archives data
+            loadArchivesData();
+          } else {
+            throw new Error(data.error || 'Failed to restore');
+          }
+        } catch (error) {
+          Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: error.message || 'An error occurred while restoring',
+            confirmButtonColor: '#0059cc'
+          });
+          console.error('Error restoring:', error);
+        }
+      }
+    }
+    
+    // Bulk restore
+    async function bulkRestore() {
+      const checkedBoxes = document.querySelectorAll('.archive-checkbox:checked');
+      if (checkedBoxes.length === 0) return;
+      
+      const result = await Swal.fire({
+        title: 'Restore Multiple Records?',
+        html: `
+          <p>Are you sure you want to restore <strong>${checkedBoxes.length}</strong> archived record${checkedBoxes.length !== 1 ? 's' : ''}?</p>
+          <p class="text-sm text-gray-500 mt-3">This action will restore all selected records to their active lists.</p>
+        `,
+        icon: 'question',
+        showCancelButton: true,
+        confirmButtonColor: '#10b981',
+        cancelButtonColor: '#6b7280',
+        confirmButtonText: '<i class="fas fa-undo mr-2"></i>Yes, Restore All',
+        cancelButtonText: 'Cancel',
+        reverseButtons: true
+      });
+      
+      if (result.isConfirmed) {
+        let successCount = 0;
+        let errorCount = 0;
+        
+        for (const checkbox of checkedBoxes) {
+          const type = checkbox.dataset.type;
+          const id = checkbox.dataset.id;
+          
+          try {
+            let endpoint, method;
+            
+            if (type === 'faculty') {
+              endpoint = `/api/faculty/${id}/unarchive`;
+              method = 'POST';
+            } else if (type === 'students') {
+              endpoint = `/api/students/${id}/unarchive`;
+              method = 'PUT';
+            } else if (type === 'evaluation_periods') {
+              endpoint = `/api/evaluation-periods-admin/${id}/unarchive`;
+              method = 'PUT';
+            }
+            
+            const response = await fetch(endpoint, {
+              method: method,
+              headers: { 'Content-Type': 'application/json' }
+            });
+            
+            const data = await response.json();
+            
+            if (data.success) {
+              successCount++;
+            } else {
+              errorCount++;
+            }
+          } catch (error) {
+            errorCount++;
+            console.error('Error restoring:', error);
+          }
+        }
+        
+        // Show result
+        if (errorCount === 0) {
+          Swal.fire({
+            icon: 'success',
+            title: 'All Restored!',
+            text: `Successfully restored ${successCount} record${successCount !== 1 ? 's' : ''}.`,
+            toast: true,
+            position: 'top-end',
+            showConfirmButton: false,
+            timer: 3000,
+            timerProgressBar: true
+          });
+        } else {
+          Swal.fire({
+            icon: 'warning',
+            title: 'Partially Completed',
+            html: `
+              <p>Successfully restored: <strong>${successCount}</strong></p>
+              <p>Failed: <strong>${errorCount}</strong></p>
+            `,
+            confirmButtonColor: '#0059cc'
+          });
+        }
+        
+        // Reload archives data
+        loadArchivesData();
+      }
+    }
+    
+    // Show error
+    function showError(message) {
+      const tableBody = document.getElementById('archives-table-body');
+      tableBody.innerHTML = `
+        <tr>
+          <td colspan="5" class="px-6 py-8 text-center">
+            <div class="text-red-500">
+              <i class="fas fa-exclamation-triangle text-2xl mb-2"></i>
+              <p>${message}</p>
+              <button onclick="loadArchivesData()" class="mt-2 text-blue-600 hover:text-blue-800">
+                <i class="fas fa-retry mr-1"></i> Retry
+              </button>
+            </div>
+          </td>
+        </tr>
+      `;
+      
+      Swal.fire({
+        icon: 'error',
+        title: 'Error',
+        text: message,
+        toast: true,
+        position: 'top-end',
+        showConfirmButton: false,
+        timer: 5000
+      });
+    }
+  </script>
+
+  <!-- Include admin navigation script -->
+  <script src="{{ url_for('static', filename='js/admin-navigation.js') }}"></script>
+  
+  <!-- Include loading animation script -->
+  <script src="{{ url_for('static', filename='js/loading-animation.js') }}"></script>
+
+  <!-- Prevent logout on browser back button -->
+  <script src="{{ url_for('static', filename='js/prevent-back-logout.js') }}"></script>
+
+  <!-- Session Timeout Monitor -->
+  <script src="{{ url_for('static', filename='js/session-timeout.js') }}"></script>
+
+  <script>
+    // Initialize navigation with 'archives' as active page
+    document.addEventListener('DOMContentLoaded', function() {
+      loadAdminNavigation('archives');
+    });
+  </script>
+
+</body>
+</html>

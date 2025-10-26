@@ -1,0 +1,1498 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Faculty List | IntellEvalPro</title>
+  
+  <!-- Favicon -->
+  <link rel="icon" type="image/png" href="{{ url_for('static', filename='images/nclogo.png') }}">
+  <link rel="shortcut icon" type="image/png" href="{{ url_for('static', filename='images/nclogo.png') }}">
+  <link rel="apple-touch-icon" href="{{ url_for('static', filename='images/nclogo.png') }}">
+  
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  
+  <!-- Font Awesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" integrity="sha512-SnH5WK+bZxgPHs44uWIX+LLJAJ9/2PkPKZ5QiAj6Ta86w+fsb2TkcmfRyVX3pBnMFcV7oQPJkl9QevSCWr3W6A==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+  
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  
+  <!-- jQuery -->
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  
+  <!-- SweetAlert2 -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11.7.12/dist/sweetalert2.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.7.12/dist/sweetalert2.all.min.js"></script>
+  
+  <script>
+    tailwind.config = {
+      theme: {
+        fontFamily: {
+          'sans': ['Inter', 'system-ui', 'sans-serif'],
+        },
+        extend: {
+          colors: {
+            primary: {
+              50: '#e6f0ff',
+              100: '#b3d1ff',
+              200: '#80b3ff',
+              300: '#4d94ff', 
+              400: '#1a75ff',
+              500: '#0059cc', // Primary color
+              600: '#004db3',
+              700: '#004099',
+              800: '#003380',
+              900: '#002766',
+            }
+          }
+        }
+      }
+    }
+  </script>
+  
+  <style>
+    /* Custom scrollbar */
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    
+    ::-webkit-scrollbar-track {
+      background: #f1f1f1;
+      border-radius: 10px;
+    }
+    
+    ::-webkit-scrollbar-thumb {
+      background: #c1c1c1;
+      border-radius: 10px;
+    }
+    
+    ::-webkit-scrollbar-thumb:hover {
+      background: #a8a8a8;
+    }
+    
+    /* Active nav link */
+    .nav-link.active {
+      position: relative;
+    }
+    
+    .nav-link.active::after {
+      content: '';
+      position: absolute;
+      left: 0;
+      width: 4px;
+      height: 100%;
+      background-color: #0059cc;
+      border-radius: 0 2px 2px 0;
+    }
+    
+    /* Ensure Font Awesome icons render properly */
+    .fas, .far, .fab {
+      font-family: "Font Awesome 6 Free", "Font Awesome 6 Pro", "Font Awesome 6 Brands", sans-serif !important;
+      font-weight: 900;
+      -webkit-font-smoothing: antialiased;
+      display: inline-block;
+    }
+    
+    /* Custom select arrow hide */
+    select {
+      -webkit-appearance: none;
+      -moz-appearance: none;
+      appearance: none;
+    }
+    
+    /* Custom scrollbar */
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    
+    ::-webkit-scrollbar-track {
+      background: #f1f1f1;
+      border-radius: 10px;
+    }
+    
+    ::-webkit-scrollbar-thumb {
+      background: #c1c1c1;
+      border-radius: 10px;
+    }
+    
+    ::-webkit-scrollbar-thumb:hover {
+      background: #a8a8a8;
+    }
+    
+    /* Smooth transitions for filter animations */
+    .filter-tag-enter {
+      opacity: 0;
+      transform: scale(0.8);
+    }
+    
+    .filter-tag-enter-active {
+      opacity: 1;
+      transform: scale(1);
+      transition: opacity 0.2s ease, transform 0.2s ease;
+    }
+    
+    /* SweetAlert2 custom styling for form inputs */
+    .swal2-input, .swal2-select {
+      margin: 0 !important;
+      padding: 0.5rem 0.75rem !important;
+      font-size: 0.875rem !important;
+      border: 1px solid #d1d5db !important;
+      border-radius: 0.5rem !important;
+    }
+    
+    .swal2-input:focus, .swal2-select:focus {
+      border-color: #0059cc !important;
+      box-shadow: 0 0 0 3px rgba(0, 89, 204, 0.1) !important;
+    }
+    
+    /* Responsive table optimizations */
+    @media (max-width: 640px) {
+      /* Reduce table cell padding on mobile */
+      #faculty-table td {
+        padding-top: 0.75rem !important;
+        padding-bottom: 0.75rem !important;
+      }
+      
+      /* Ensure action buttons are touch-friendly */
+      .view-faculty-btn, .edit-faculty-btn, .archive-faculty-btn {
+        min-width: 44px;
+        min-height: 44px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+      }
+    }
+    
+    /* Smooth scrolling for table on mobile */
+    .overflow-x-auto {
+      -webkit-overflow-scrolling: touch;
+      scrollbar-width: thin;
+    }
+    
+    /* Responsive modal adjustments */
+    @media (max-width: 640px) {
+      .swal2-popup {
+        font-size: 0.875rem !important;
+        padding: 1rem !important;
+      }
+      
+      .swal2-title {
+        font-size: 1.125rem !important;
+        padding: 0.5rem 0 !important;
+      }
+      
+      .swal2-html-container {
+        font-size: 0.875rem !important;
+        margin: 0.5rem 0 !important;
+      }
+      
+      .swal2-actions {
+        margin: 0.75rem auto 0 !important;
+      }
+      
+      .swal2-styled {
+        padding: 0.5rem 1rem !important;
+        font-size: 0.875rem !important;
+      }
+    }
+    
+    /* Prevent horizontal scroll on entire page */
+    body {
+      overflow-x: hidden;
+    }
+    
+    /* Ensure main content doesn't cause overflow */
+    #main-content {
+      max-width: 100vw;
+      overflow-x: hidden;
+    }
+  </style>
+</head>
+<body class="bg-gray-50 font-sans overflow-x-hidden">
+  <!-- Loading overlay -->
+  <div id="loader-overlay" class="fixed inset-0 z-50 flex flex-col items-center justify-center bg-white bg-opacity-90 backdrop-blur-sm transition-opacity duration-300">
+    <img src="{{ url_for('static', filename='images/nclogo.png') }}" alt="Logo" class="w-32 h-auto mb-6 animate-bounce">
+    <div class="flex items-center space-x-2">
+      <div class="w-3 h-3 rounded-full bg-primary-500 animate-pulse"></div>
+      <div class="w-3 h-3 rounded-full bg-primary-500 animate-pulse" style="animation-delay: 0.2s"></div>
+      <div class="w-3 h-3 rounded-full bg-primary-500 animate-pulse" style="animation-delay: 0.4s"></div>
+    </div>
+  </div>
+
+  <div class="flex h-screen bg-gray-50">
+    <!-- Sidebar (will be loaded dynamically) -->
+    <div id="admin-sidebar"></div>
+    
+    <!-- Main content -->
+    <div class="lg:ml-64 flex flex-col flex-1 min-h-screen">
+      <!-- Top Navigation (will be loaded dynamically) -->
+      <div id="admin-header"></div>
+
+      <!-- Main content area -->
+      <main id="main-content" class="flex-1 overflow-auto p-4 md:p-6 bg-gray-50">
+
+    <!-- Page header -->
+    <div class="mb-4 md:mb-6">
+      <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+        <div>
+          <h1 class="text-xl sm:text-2xl lg:text-3xl font-bold text-gray-800">Faculty List</h1>
+          <p class="text-sm sm:text-base text-gray-500 mt-1">View faculty members and their information</p>
+        </div>
+        <div class="sm:mt-0">
+          <button type="button" id="add-faculty-btn" class="w-full sm:w-auto inline-flex items-center justify-center px-4 py-2.5 bg-primary-600 hover:bg-primary-700 text-white text-sm font-medium rounded-lg shadow-sm transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500">
+            <i class="fas fa-plus mr-2"></i>
+            Add Faculty
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Faculty Statistics Cards -->
+    <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 mb-4 md:mb-6">
+      <div class="bg-white rounded-lg shadow-sm p-3 sm:p-4 hover:shadow-md transition-all">
+        <div class="flex flex-col sm:flex-row sm:items-center">
+          <div class="flex-shrink-0 h-10 w-10 sm:h-12 sm:w-12 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 mb-2 sm:mb-0">
+            <i class="fas fa-user-tie text-lg sm:text-xl"></i>
+          </div>
+          <div class="sm:ml-4">
+            <h2 id="total-faculty" class="text-lg sm:text-xl font-bold text-gray-800">--</h2>
+            <p class="text-xs sm:text-sm text-gray-500">Total Faculty</p>
+          </div>
+        </div>
+      </div>
+      <div class="bg-white rounded-lg shadow-sm p-3 sm:p-4 hover:shadow-md transition-all">
+        <div class="flex flex-col sm:flex-row sm:items-center">
+          <div class="flex-shrink-0 h-10 w-10 sm:h-12 sm:w-12 rounded-full bg-green-100 flex items-center justify-center text-green-600 mb-2 sm:mb-0">
+            <i class="fas fa-book-open text-lg sm:text-xl"></i>
+          </div>
+          <div class="sm:ml-4">
+            <h2 id="total-classes" class="text-lg sm:text-xl font-bold text-gray-800">--</h2>
+            <p class="text-xs sm:text-sm text-gray-500">Total Workloads</p>
+          </div>
+        </div>
+      </div>
+      <div class="bg-white rounded-lg shadow-sm p-3 sm:p-4 hover:shadow-md transition-all">
+        <div class="flex flex-col sm:flex-row sm:items-center">
+          <div class="flex-shrink-0 h-10 w-10 sm:h-12 sm:w-12 rounded-full bg-yellow-100 flex items-center justify-center text-yellow-600 mb-2 sm:mb-0">
+            <i class="fas fa-chart-line text-lg sm:text-xl"></i>
+          </div>
+          <div class="sm:ml-4">
+            <h2 id="avg-rating" class="text-lg sm:text-xl font-bold text-gray-800">--</h2>
+            <p class="text-xs sm:text-sm text-gray-500">Average Rating</p>
+          </div>
+        </div>
+      </div>
+      <div class="bg-white rounded-lg shadow-sm p-3 sm:p-4 hover:shadow-md transition-all">
+        <div class="flex flex-col sm:flex-row sm:items-center">
+          <div class="flex-shrink-0 h-10 w-10 sm:h-12 sm:w-12 rounded-full bg-red-100 flex items-center justify-center text-red-600 mb-2 sm:mb-0">
+            <i class="fas fa-clipboard-check text-lg sm:text-xl"></i>
+          </div>
+          <div class="sm:ml-4">
+            <h2 id="total-evaluations" class="text-lg sm:text-xl font-bold text-gray-800">--</h2>
+            <p class="text-xs sm:text-sm text-gray-500">Completed Evaluations</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modern Filters and search section -->
+    <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-4 sm:p-5 md:p-6 mb-4 md:mb-6">
+      <!-- Filter Header -->
+      <div class="flex items-center justify-between mb-4 gap-2">
+        <div class="flex items-center space-x-2">
+          <div class="w-2 h-2 bg-primary-500 rounded-full"></div>
+          <h3 class="text-base sm:text-lg font-semibold text-gray-800">Filter Faculty</h3>
+        </div>
+        <span id="results-count" class="text-xs sm:text-sm text-gray-500 bg-gray-50 px-2 sm:px-3 py-1 rounded-full whitespace-nowrap">-- results</span>
+      </div>
+      
+      <!-- Search and Filters Grid -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-12 gap-3 sm:gap-4">
+        <!-- Search Input -->
+        <div class="sm:col-span-2 lg:col-span-6">
+          <label for="search-faculty" class="block text-xs sm:text-sm font-medium text-gray-700 mb-2">Search Faculty</label>
+          <div class="relative group">
+            <div class="absolute inset-y-0 left-0 flex items-center pl-3 sm:pl-4 pointer-events-none">
+              <i class="fas fa-search text-gray-400 group-focus-within:text-primary-500 transition-colors duration-200 text-sm" aria-hidden="true"></i>
+            </div>
+            <input type="text" id="search-faculty" placeholder="Search by name or number..." 
+                   class="block w-full pl-9 sm:pl-11 pr-3 sm:pr-4 py-2.5 sm:py-3 text-sm border border-gray-200 rounded-xl bg-gray-50 text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent focus:bg-white transition-all duration-200" 
+                   autocomplete="off">
+          </div>
+        </div>
+        
+        <!-- Department Filter -->
+        <div class="lg:col-span-4">
+          <label for="department-filter" class="block text-xs sm:text-sm font-medium text-gray-700 mb-2">Department</label>
+          <div class="relative">
+            <select id="department-filter" class="block w-full px-3 sm:px-4 py-2.5 sm:py-3 text-sm border border-gray-200 rounded-xl bg-gray-50 text-gray-900 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent focus:bg-white transition-all duration-200 appearance-none cursor-pointer">
+              <option value="">All Departments</option>
+              <!-- Department options will be loaded dynamically -->
+            </select>
+            <div class="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
+              <i class="fas fa-chevron-down text-gray-400 text-xs"></i>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Reset Button -->
+        <div class="lg:col-span-2">
+          <label class="hidden lg:block text-sm font-medium text-transparent mb-2">Reset</label>
+          <button type="button" id="reset-filters" class="w-full inline-flex items-center justify-center px-4 py-2.5 sm:py-3 text-sm font-medium text-gray-600 bg-gray-100 border border-gray-200 rounded-xl hover:bg-gray-200 hover:text-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:bg-gray-200 transition-all duration-200 group">
+            <i class="fas fa-sync-alt group-hover:rotate-180 transition-transform duration-300 mr-2 lg:mr-0"></i>
+            <span class="lg:hidden">Reset Filters</span>
+          </button>
+        </div>
+      </div>
+      
+      <!-- Active Filters Display -->
+      <div id="active-filters" class="mt-3 sm:mt-4 pt-3 sm:pt-4 border-t border-gray-100 hidden">
+        <div class="flex flex-col sm:flex-row sm:items-center gap-2">
+          <span class="text-xs sm:text-sm font-medium text-gray-600 whitespace-nowrap">Active filters:</span>
+          <div id="filter-tags" class="flex flex-wrap gap-2"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Faculty table -->
+    <div class="bg-white rounded-lg shadow-sm overflow-hidden mb-4 md:mb-6">
+      <div class="overflow-x-auto">
+        <table id="faculty-table" class="min-w-full divide-y divide-gray-200">
+          <thead class="bg-gray-50">
+            <tr>
+              <th scope="col" class="px-3 sm:px-4 md:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                Faculty Member
+              </th>
+              <th scope="col" class="hidden lg:table-cell px-3 sm:px-4 md:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                Email
+              </th>
+              <th scope="col" class="hidden md:table-cell px-3 sm:px-4 md:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                Department
+              </th>
+              <th scope="col" class="hidden xl:table-cell px-3 sm:px-4 md:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                Workloads
+              </th>
+              <th scope="col" class="px-3 sm:px-4 md:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                Rating
+              </th>
+              <th scope="col" class="px-3 sm:px-4 md:px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">
+                Actions
+              </th>
+            </tr>
+          </thead>
+          <tbody id="faculty-table-body" class="bg-white divide-y divide-gray-200">
+            <!-- Faculty data will be loaded dynamically -->
+            <tr id="loading-row">
+              <td colspan="6" class="px-3 sm:px-4 md:px-6 py-8 text-center">
+                <div class="flex justify-center items-center">
+                  <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-500"></div>
+                  <span class="ml-3 text-sm text-gray-500">Loading faculty...</span>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      
+      <!-- Pagination -->
+      <div class="bg-white px-3 sm:px-4 md:px-6 py-3 border-t border-gray-200">
+        <div class="flex items-center justify-between">
+          <div class="flex-1 flex justify-between sm:hidden">
+            <a href="#" class="relative inline-flex items-center px-3 py-2 border border-gray-300 text-xs font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">
+              Previous
+            </a>
+            <a href="#" class="ml-3 relative inline-flex items-center px-3 py-2 border border-gray-300 text-xs font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">
+              Next
+            </a>
+          </div>
+          <div class="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
+            <div>
+              <p id="pagination-info" class="text-xs sm:text-sm text-gray-700">
+                Loading...
+              </p>
+            </div>
+            <div id="pagination-controls" class="hidden">
+              <nav class="relative z-0 inline-flex rounded-md shadow-sm -space-x-px" aria-label="Pagination">
+                <a href="#" class="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50">
+                  <span class="sr-only">Previous</span>
+                  <i class="fas fa-chevron-left"></i>
+                </a>
+                <a href="#" aria-current="page" class="z-10 bg-primary-50 border-primary-500 text-primary-600 relative inline-flex items-center px-4 py-2 border text-sm font-medium">
+                  1
+                </a>
+                <a href="#" class="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50">
+                  <span class="sr-only">Next</span>
+                  <i class="fas fa-chevron-right"></i>
+                </a>
+              </nav>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Page-specific JavaScript -->
+  <script>
+    let facultyData = [];
+    let filteredData = [];
+    let currentPage = 1;
+    const itemsPerPage = 10;
+    
+    document.addEventListener('DOMContentLoaded', function() {
+      loadFacultyData();
+      setupEventListeners();
+    });
+    
+    // Load faculty data from API
+    async function loadFacultyData() {
+      try {
+        const response = await fetch('/api/faculty');
+        const result = await response.json();
+        
+        if (result.success) {
+          facultyData = result.data;
+          filteredData = [...facultyData];
+          
+          // Update statistics
+          updateStatistics(result.stats);
+          
+          // Populate department filter
+          populateDepartmentFilter();
+          
+          // Render faculty table
+          renderFacultyTable();
+          
+          // Update pagination info
+          updatePaginationInfo();
+        } else {
+          showError('Failed to load faculty data: ' + result.error);
+        }
+      } catch (error) {
+        showError('Error loading faculty data: ' + error.message);
+        console.error('Error:', error);
+      }
+    }
+    
+    // Update statistics cards
+    function updateStatistics(stats) {
+      document.getElementById('total-faculty').textContent = stats.total_faculty;
+      document.getElementById('total-classes').textContent = stats.total_classes;
+      
+      // Update average rating with proper formatting
+      const avgRatingElement = document.getElementById('avg-rating');
+      if (stats.avg_rating && stats.avg_rating > 0) {
+        avgRatingElement.textContent = stats.avg_rating.toFixed(2);
+        avgRatingElement.classList.remove('text-gray-800');
+        
+        // Color code based on rating
+        if (stats.avg_rating >= 4.5) {
+          avgRatingElement.classList.add('text-green-600');
+        } else if (stats.avg_rating >= 4.0) {
+          avgRatingElement.classList.add('text-green-500');
+        } else if (stats.avg_rating >= 3.5) {
+          avgRatingElement.classList.add('text-yellow-600');
+        } else if (stats.avg_rating >= 3.0) {
+          avgRatingElement.classList.add('text-orange-600');
+        } else {
+          avgRatingElement.classList.add('text-red-600');
+        }
+      } else {
+        avgRatingElement.textContent = 'N/A';
+        avgRatingElement.classList.add('text-gray-400');
+      }
+      
+      document.getElementById('total-evaluations').textContent = stats.total_evaluations;
+    }
+    
+    // Populate department filter with unique departments
+    function populateDepartmentFilter() {
+      const departmentSelect = document.getElementById('department-filter');
+      const departments = [...new Set(facultyData.map(f => f.department_name).filter(d => d))];
+      
+      // Clear existing options except "All Departments"
+      departmentSelect.innerHTML = '<option value="">All Departments</option>';
+      
+      departments.sort().forEach(dept => {
+        const option = document.createElement('option');
+        option.value = dept;
+        option.textContent = dept;
+        departmentSelect.appendChild(option);
+      });
+    }
+    
+    // Render faculty table
+    function renderFacultyTable() {
+      const tableBody = document.getElementById('faculty-table-body');
+      
+      if (filteredData.length === 0) {
+        tableBody.innerHTML = `
+          <tr>
+            <td colspan="6" class="px-6 py-8 text-center text-gray-500">
+              No faculty members found matching your criteria.
+            </td>
+          </tr>
+        `;
+        return;
+      }
+      
+      // Calculate pagination
+      const startIndex = (currentPage - 1) * itemsPerPage;
+      const endIndex = startIndex + itemsPerPage;
+      const paginatedData = filteredData.slice(startIndex, endIndex);
+      
+      const rows = paginatedData.map(faculty => createFacultyRow(faculty)).join('');
+      tableBody.innerHTML = rows;
+    }
+    
+    // Create a single faculty row
+    function createFacultyRow(faculty) {
+      const initials = getInitials(faculty.first_name, faculty.last_name);
+      const fullName = `${faculty.first_name} ${faculty.last_name}`;
+      const avatarColor = getAvatarColor(faculty.faculty_id);
+      const departmentBadge = getDepartmentBadge(faculty.department_name);
+      const ratingDisplay = getRatingDisplay(faculty.avg_rating, faculty.total_evaluations);
+      
+      return `
+        <tr class="hover:bg-gray-50 faculty-row" data-faculty-id="${faculty.faculty_id}">
+          <td class="px-3 sm:px-4 md:px-6 py-3 sm:py-4 whitespace-nowrap">
+            <div class="flex items-center">
+              <div class="flex-shrink-0 h-8 w-8 sm:h-10 sm:w-10 ${avatarColor} rounded-full flex items-center justify-center text-xs sm:text-base">
+                ${initials}
+              </div>
+              <div class="ml-2 sm:ml-4">
+                <div class="text-xs sm:text-sm font-medium text-gray-900">${fullName}</div>
+                <div class="text-xs text-gray-500">${faculty.faculty_number}</div>
+                <!-- Show email and department on mobile (below name) -->
+                <div class="lg:hidden mt-1">
+                  <div class="text-xs text-gray-500">${faculty.email || 'No email'}</div>
+                </div>
+                <div class="md:hidden mt-1">
+                  ${departmentBadge}
+                </div>
+              </div>
+            </div>
+          </td>
+          <td class="hidden lg:table-cell px-3 sm:px-4 md:px-6 py-3 sm:py-4 whitespace-nowrap text-sm text-gray-500">
+            ${faculty.email || 'No email'}
+          </td>
+          <td class="hidden md:table-cell px-3 sm:px-4 md:px-6 py-3 sm:py-4 whitespace-nowrap">
+            ${departmentBadge}
+          </td>
+          <td class="hidden xl:table-cell px-3 sm:px-4 md:px-6 py-3 sm:py-4">
+            <div class="flex flex-wrap gap-1 max-w-xs">
+              ${getWorkloadBadges(faculty.workload_codes || '', faculty.total_classes)}
+            </div>
+          </td>
+          <td class="px-3 sm:px-4 md:px-6 py-3 sm:py-4 whitespace-nowrap">
+            ${ratingDisplay}
+          </td>
+          <td class="px-3 sm:px-4 md:px-6 py-3 sm:py-4 whitespace-nowrap text-right text-sm">
+            <div class="flex justify-end space-x-1 sm:space-x-2">
+              <button type="button" class="text-blue-600 hover:text-blue-900 view-faculty-btn p-1 sm:p-0" 
+                      data-faculty-id="${faculty.faculty_id}" title="View Details">
+                <i class="fas fa-eye text-sm"></i>
+              </button>
+              <button type="button" class="text-green-600 hover:text-green-900 edit-faculty-btn p-1 sm:p-0" 
+                      data-faculty-id="${faculty.faculty_id}" title="Edit Faculty">
+                <i class="fas fa-edit text-sm"></i>
+              </button>
+              <button type="button" class="text-orange-600 hover:text-orange-900 archive-faculty-btn p-1 sm:p-0" 
+                      data-faculty-id="${faculty.faculty_id}" title="Archive Faculty">
+                <i class="fas fa-archive text-sm"></i>
+              </button>
+            </div>
+          </td>
+        </tr>
+      `;
+    }
+    
+    // Helper functions
+    function getInitials(firstName, lastName) {
+      return (firstName.charAt(0) + lastName.charAt(0)).toUpperCase();
+    }
+    
+    function getWorkloadBadges(workloadCodes, totalClasses) {
+      if (!workloadCodes || workloadCodes.trim() === '') {
+        return `<span class="text-xs text-gray-400 italic">No workloads</span>`;
+      }
+      
+      const codes = workloadCodes.split(',').map(c => c.trim()).filter(c => c !== '');
+      if (codes.length === 0) {
+        return `<span class="text-xs text-gray-400 italic">No workloads</span>`;
+      }
+      
+      // Show first 3 codes as badges
+      const visibleCodes = codes.slice(0, 3);
+      const remainingCount = codes.length - 3;
+      
+      let html = visibleCodes.map(code => 
+        `<span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-indigo-100 text-indigo-800 border border-indigo-200">${code}</span>`
+      ).join('');
+      
+      // Add "+X more" badge if there are more
+      if (remainingCount > 0) {
+        html += `<span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-gray-100 text-gray-600 border border-gray-300" title="${codes.slice(3).join(', ')}">+${remainingCount} more</span>`;
+      }
+      
+      return html;
+    }
+    
+    function getAvatarColor(facultyId) {
+      const colors = [
+        'bg-blue-100 text-blue-700',
+        'bg-purple-100 text-purple-700',
+        'bg-green-100 text-green-700',
+        'bg-red-100 text-red-700',
+        'bg-yellow-100 text-yellow-700',
+        'bg-indigo-100 text-indigo-700',
+        'bg-pink-100 text-pink-700',
+        'bg-teal-100 text-teal-700'
+      ];
+      return colors[facultyId % colors.length];
+    }
+    
+    function getDepartmentBadge(department) {
+      if (!department) return '<span class="text-sm text-gray-500">No Department</span>';
+      
+      const colors = [
+        'bg-blue-100 text-blue-800',
+        'bg-purple-100 text-purple-800',
+        'bg-green-100 text-green-800',
+        'bg-red-100 text-red-800',
+        'bg-yellow-100 text-yellow-800'
+      ];
+      const hash = department.split('').reduce((a, b) => { a = ((a << 5) - a) + b.charCodeAt(0); return a & a; }, 0);
+      const colorClass = colors[Math.abs(hash) % colors.length];
+      
+      return `<span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${colorClass}">${department}</span>`;
+    }
+    
+    // Generate star rating display based on average rating
+    function getRatingDisplay(avgRating, totalEvaluations) {
+      // If no evaluations, show N/A
+      if (!avgRating || !totalEvaluations || totalEvaluations === 0) {
+        return `
+          <div class="flex flex-col sm:flex-row sm:items-center">
+            <span class="text-xs sm:text-sm font-medium text-gray-400 sm:mr-2">N/A</span>
+            <div class="text-gray-300 text-xs sm:text-base mt-1 sm:mt-0">
+              <i class="far fa-star"></i>
+              <i class="far fa-star"></i>
+              <i class="far fa-star"></i>
+              <i class="far fa-star"></i>
+              <i class="far fa-star"></i>
+            </div>
+          </div>
+        `;
+      }
+      
+      // Calculate rating (assuming rating is out of 5)
+      const rating = parseFloat(avgRating);
+      const fullStars = Math.floor(rating);
+      const hasHalfStar = (rating % 1) >= 0.5;
+      const emptyStars = 5 - fullStars - (hasHalfStar ? 1 : 0);
+      
+      // Determine color based on rating
+      let ratingColor = 'text-gray-400';
+      let textColor = 'text-gray-900';
+      if (rating >= 4.5) {
+        ratingColor = 'text-green-500';
+        textColor = 'text-green-700';
+      } else if (rating >= 4.0) {
+        ratingColor = 'text-green-400';
+        textColor = 'text-green-600';
+      } else if (rating >= 3.5) {
+        ratingColor = 'text-yellow-400';
+        textColor = 'text-yellow-700';
+      } else if (rating >= 3.0) {
+        ratingColor = 'text-orange-400';
+        textColor = 'text-orange-700';
+      } else {
+        ratingColor = 'text-red-400';
+        textColor = 'text-red-700';
+      }
+      
+      // Build stars HTML
+      let starsHTML = '';
+      for (let i = 0; i < fullStars; i++) {
+        starsHTML += '<i class="fas fa-star"></i>';
+      }
+      if (hasHalfStar) {
+        starsHTML += '<i class="fas fa-star-half-alt"></i>';
+      }
+      for (let i = 0; i < emptyStars; i++) {
+        starsHTML += '<i class="far fa-star"></i>';
+      }
+      
+      return `
+        <div class="flex flex-col sm:flex-row sm:items-center">
+          <span class="text-xs sm:text-sm font-medium ${textColor} sm:mr-2" title="${totalEvaluations} evaluation${totalEvaluations !== 1 ? 's' : ''}">${rating.toFixed(1)}</span>
+          <div class="${ratingColor} text-xs sm:text-base mt-1 sm:mt-0">
+            ${starsHTML}
+          </div>
+        </div>
+      `;
+    }
+    
+    // Setup event listeners
+    function setupEventListeners() {
+      // Search functionality
+      const searchInput = document.getElementById('search-faculty');
+      searchInput.addEventListener('input', function() {
+        applyFilters();
+      });
+      
+      // Department filter
+      const departmentFilter = document.getElementById('department-filter');
+      departmentFilter.addEventListener('change', function() {
+        applyFilters();
+      });
+      
+      // Reset filters with animation
+      const resetFiltersBtn = document.getElementById('reset-filters');
+      resetFiltersBtn.addEventListener('click', function() {
+        // Add loading state
+        const icon = this.querySelector('i');
+        icon.classList.add('fa-spin');
+        
+        // Reset after brief delay for visual feedback
+        setTimeout(() => {
+          searchInput.value = '';
+          departmentFilter.selectedIndex = 0;
+          applyFilters();
+          icon.classList.remove('fa-spin');
+        }, 300);
+      });
+      
+      // Faculty view buttons (delegated event listener)
+      document.addEventListener('click', function(e) {
+        if (e.target.closest('.view-faculty-btn')) {
+          const facultyId = e.target.closest('.view-faculty-btn').dataset.facultyId;
+          const faculty = facultyData.find(f => f.faculty_id == facultyId);
+          if (faculty) {
+            viewFacultyDetails(faculty);
+          }
+        }
+        
+        if (e.target.closest('.edit-faculty-btn')) {
+          const facultyId = e.target.closest('.edit-faculty-btn').dataset.facultyId;
+          const faculty = facultyData.find(f => f.faculty_id == facultyId);
+          if (faculty) {
+            editFacultyDetails(faculty);
+          }
+        }
+        
+        if (e.target.closest('.archive-faculty-btn')) {
+          const facultyId = e.target.closest('.archive-faculty-btn').dataset.facultyId;
+          const faculty = facultyData.find(f => f.faculty_id == facultyId);
+          if (faculty) {
+            archiveFaculty(faculty);
+          }
+        }
+      });
+      
+      // Add faculty button
+      const addFacultyBtn = document.getElementById('add-faculty-btn');
+      if (addFacultyBtn) {
+        addFacultyBtn.addEventListener('click', function() {
+          addNewFaculty();
+        });
+      }
+      
+    }
+    
+    // Apply all filters
+    function applyFilters() {
+      const searchTerm = document.getElementById('search-faculty').value.toLowerCase();
+      const departmentFilter = document.getElementById('department-filter').value;
+      
+      filteredData = facultyData.filter(faculty => {
+        const fullName = `${faculty.first_name} ${faculty.last_name}`.toLowerCase();
+        const facultyNumber = faculty.faculty_number.toLowerCase();
+        
+        const matchesSearch = !searchTerm || 
+          fullName.includes(searchTerm) || 
+          facultyNumber.includes(searchTerm);
+        
+        const matchesDepartment = !departmentFilter || 
+          faculty.department_name === departmentFilter;
+        
+        return matchesSearch && matchesDepartment;
+      });
+      
+      // Reset to first page when filters change
+      currentPage = 1;
+      renderFacultyTable();
+      updatePaginationInfo();
+    }
+    
+    // Update pagination info and results count
+    function updatePaginationInfo() {
+      const totalResults = filteredData.length;
+      const totalPages = Math.ceil(totalResults / itemsPerPage);
+      
+      // Update results count badge
+      const resultsCount = document.getElementById('results-count');
+      if (resultsCount) {
+        resultsCount.textContent = `${totalResults} result${totalResults !== 1 ? 's' : ''}`;
+      }
+      
+      // Update pagination text
+      const paginationText = document.querySelector('#pagination-info');
+      if (paginationText) {
+        if (totalResults === 0) {
+          paginationText.innerHTML = `Showing <span class="font-medium">0</span> results`;
+        } else {
+          const startIndex = (currentPage - 1) * itemsPerPage + 1;
+          const endIndex = Math.min(currentPage * itemsPerPage, totalResults);
+          paginationText.innerHTML = `
+            Showing <span class="font-medium">${startIndex}</span> to <span class="font-medium">${endIndex}</span> of <span class="font-medium">${totalResults}</span> results
+          `;
+        }
+      }
+      
+      // Update pagination controls
+      const paginationControls = document.getElementById('pagination-controls');
+      if (totalResults > itemsPerPage) {
+        paginationControls.classList.remove('hidden');
+        renderPaginationControls(totalPages);
+      } else {
+        paginationControls.classList.add('hidden');
+      }
+      
+      // Update active filters display
+      updateActiveFilters();
+    }
+    
+    // Render pagination controls
+    function renderPaginationControls(totalPages) {
+      const paginationControls = document.getElementById('pagination-controls');
+      
+      let paginationHTML = '<nav class="relative z-0 inline-flex rounded-md shadow-sm -space-x-px" aria-label="Pagination">';
+      
+      // Previous button
+      paginationHTML += `
+        <button ${currentPage === 1 ? 'disabled' : ''} 
+                onclick="changePage(${currentPage - 1})" 
+                class="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium ${currentPage === 1 ? 'text-gray-300 cursor-not-allowed' : 'text-gray-500 hover:bg-gray-50 cursor-pointer'}">
+          <span class="sr-only">Previous</span>
+          <i class="fas fa-chevron-left"></i>
+        </button>
+      `;
+      
+      // Page numbers
+      for (let i = 1; i <= totalPages; i++) {
+        if (i === currentPage) {
+          paginationHTML += `
+            <button aria-current="page" 
+                    class="z-10 bg-primary-50 border-primary-500 text-primary-600 relative inline-flex items-center px-4 py-2 border text-sm font-medium">
+              ${i}
+            </button>
+          `;
+        } else if (i === 1 || i === totalPages || (i >= currentPage - 1 && i <= currentPage + 1)) {
+          paginationHTML += `
+            <button onclick="changePage(${i})" 
+                    class="bg-white border-gray-300 text-gray-500 hover:bg-gray-50 relative inline-flex items-center px-4 py-2 border text-sm font-medium cursor-pointer">
+              ${i}
+            </button>
+          `;
+        } else if (i === currentPage - 2 || i === currentPage + 2) {
+          paginationHTML += `
+            <span class="relative inline-flex items-center px-4 py-2 border border-gray-300 bg-white text-sm font-medium text-gray-700">
+              ...
+            </span>
+          `;
+        }
+      }
+      
+      // Next button
+      paginationHTML += `
+        <button ${currentPage === totalPages ? 'disabled' : ''} 
+                onclick="changePage(${currentPage + 1})" 
+                class="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium ${currentPage === totalPages ? 'text-gray-300 cursor-not-allowed' : 'text-gray-500 hover:bg-gray-50 cursor-pointer'}">
+          <span class="sr-only">Next</span>
+          <i class="fas fa-chevron-right"></i>
+        </button>
+      `;
+      
+      paginationHTML += '</nav>';
+      paginationControls.innerHTML = paginationHTML;
+    }
+    
+    // Change page
+    function changePage(pageNumber) {
+      const totalPages = Math.ceil(filteredData.length / itemsPerPage);
+      if (pageNumber >= 1 && pageNumber <= totalPages) {
+        currentPage = pageNumber;
+        renderFacultyTable();
+        updatePaginationInfo();
+        
+        // Scroll to top of table
+        document.getElementById('faculty-table').scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+    }
+    
+    // Update active filters display
+    function updateActiveFilters() {
+      const searchTerm = document.getElementById('search-faculty').value;
+      const departmentFilter = document.getElementById('department-filter').value;
+      
+      const activeFiltersContainer = document.getElementById('active-filters');
+      const filterTagsContainer = document.getElementById('filter-tags');
+      
+      const tags = [];
+      
+      if (searchTerm) {
+        tags.push({
+          type: 'search',
+          label: `Search: "${searchTerm}"`,
+          value: searchTerm
+        });
+      }
+      
+      if (departmentFilter) {
+        tags.push({
+          type: 'department',
+          label: `Department: ${departmentFilter}`,
+          value: departmentFilter
+        });
+      }
+      
+      if (tags.length > 0) {
+        activeFiltersContainer.classList.remove('hidden');
+        filterTagsContainer.innerHTML = tags.map(tag => `
+          <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-primary-100 text-primary-800 border border-primary-200">
+            ${tag.label}
+            <button type="button" class="ml-2 inline-flex items-center justify-center w-4 h-4 rounded-full bg-primary-200 hover:bg-primary-300 transition-colors" onclick="removeFilter('${tag.type}', '${tag.value}')">
+              <i class="fas fa-times text-xs"></i>
+            </button>
+          </span>
+        `).join('');
+      } else {
+        activeFiltersContainer.classList.add('hidden');
+      }
+    }
+    
+    // Remove individual filter
+    function removeFilter(type, value) {
+      switch(type) {
+        case 'search':
+          document.getElementById('search-faculty').value = '';
+          break;
+        case 'department':
+          document.getElementById('department-filter').value = '';
+          break;
+      }
+      applyFilters();
+    }
+    
+    // View faculty details
+    function viewFacultyDetails(faculty) {
+      // Generate rating display
+      let ratingHTML = '';
+      if (faculty.avg_rating && faculty.total_evaluations > 0) {
+        const rating = parseFloat(faculty.avg_rating);
+        const fullStars = Math.floor(rating);
+        const hasHalfStar = (rating % 1) >= 0.5;
+        const emptyStars = 5 - fullStars - (hasHalfStar ? 1 : 0);
+        
+        let starsHTML = '';
+        for (let i = 0; i < fullStars; i++) {
+          starsHTML += '<i class="fas fa-star text-yellow-400"></i> ';
+        }
+        if (hasHalfStar) {
+          starsHTML += '<i class="fas fa-star-half-alt text-yellow-400"></i> ';
+        }
+        for (let i = 0; i < emptyStars; i++) {
+          starsHTML += '<i class="far fa-star text-yellow-400"></i> ';
+        }
+        
+        ratingHTML = `<p><strong>Average Rating:</strong> ${rating.toFixed(2)} / 5.0 ${starsHTML}(${faculty.total_evaluations} evaluation${faculty.total_evaluations !== 1 ? 's' : ''})</p>`;
+      } else {
+        ratingHTML = '<p><strong>Average Rating:</strong> No evaluations yet</p>';
+      }
+      
+      // Format workload display
+      let workloadDisplay = '';
+      if (faculty.workload_codes && faculty.workload_codes.trim() !== '') {
+        const workloads = faculty.workload_codes.split(',').map(c => c.trim()).filter(c => c !== '');
+        if (workloads.length > 0) {
+          workloadDisplay = `
+            <p><strong>Workloads (${workloads.length}):</strong></p>
+            <div class="ml-4 mt-1 flex flex-wrap gap-1">
+              ${workloads.map(code => 
+                `<span class="inline-flex items-center px-2 py-1 rounded text-xs font-medium bg-indigo-100 text-indigo-800 border border-indigo-200">${code}</span>`
+              ).join('')}
+            </div>
+          `;
+        } else {
+          workloadDisplay = '<p><strong>Workloads:</strong> No workloads assigned</p>';
+        }
+      } else {
+        workloadDisplay = '<p><strong>Workloads:</strong> No workloads assigned</p>';
+      }
+      
+      const details = `
+        <div class="text-left">
+          <p><strong>Name:</strong> ${faculty.first_name} ${faculty.last_name}</p>
+          <p><strong>Faculty Number:</strong> ${faculty.faculty_number}</p>
+          <p><strong>Email:</strong> ${faculty.email || 'Not provided'}</p>
+          <p><strong>Department:</strong> ${faculty.department_name || 'Not assigned'}</p>
+          <p><strong>Specialization:</strong> ${faculty.specialization || 'Not specified'}</p>
+          ${workloadDisplay}
+          ${ratingHTML}
+          ${faculty.hire_date ? `<p><strong>Hire Date:</strong> ${new Date(faculty.hire_date).toLocaleDateString()}</p>` : ''}
+        </div>
+      `;
+      
+      if (typeof Swal !== 'undefined') {
+        Swal.fire({
+          title: 'Faculty Details',
+          html: details,
+          icon: 'info',
+          confirmButtonText: 'Close',
+          width: window.innerWidth < 640 ? '95%' : '500px',
+          customClass: {
+            container: 'swal-responsive',
+            popup: 'swal-responsive-popup',
+            title: 'text-base sm:text-lg',
+            htmlContainer: 'text-xs sm:text-sm',
+            confirmButton: 'text-sm sm:text-base'
+          }
+        });
+      } else {
+        alert(`Faculty Details:\n${faculty.first_name} ${faculty.last_name}\nFaculty Number: ${faculty.faculty_number}`);
+      }
+    }
+    
+    // Generate faculty number (NC-FAC-00 with increment)
+    async function generateFacultyNumber() {
+      try {
+        // Fetch the latest faculty number from the API
+        const response = await fetch('/api/faculty/next-number');
+        const result = await response.json();
+        
+        if (result.success && result.next_number) {
+          return result.next_number;
+        } else {
+          // Fallback: Generate based on current faculty count
+          const nextNum = (facultyData.length + 1).toString().padStart(2, '0');
+          return `NC-FAC-${nextNum}`;
+        }
+      } catch (error) {
+        console.error('Error generating faculty number:', error);
+        // Fallback: Generate based on current faculty count
+        const nextNum = (facultyData.length + 1).toString().padStart(2, '0');
+        return `NC-FAC-${nextNum}`;
+      }
+    }
+    
+    // Add new faculty
+    async function addNewFaculty() {
+      // Get programs/departments from API for dropdown
+      let departmentOptions = '';
+      try {
+        const deptResponse = await fetch('/api/programs');
+        const deptResult = await deptResponse.json();
+        if (deptResult.success) {
+          departmentOptions = deptResult.data.map(dept => 
+            `<option value="${dept.name}">${dept.program_code} - ${dept.name}</option>`
+          ).join('');
+        }
+      } catch (error) {
+        console.error('Error loading departments:', error);
+        Swal.fire({
+          icon: 'error',
+          title: 'Error',
+          text: 'Failed to load departments. Please try again.',
+          confirmButtonColor: '#0059cc'
+        });
+        return;
+      }
+      
+      const { value: formValues } = await Swal.fire({
+        title: 'Add New Faculty',
+        html: `
+          <div class="space-y-3 sm:space-y-4 text-left">
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
+              <div>
+                <label class="block text-xs sm:text-sm font-medium text-gray-700 mb-1">First Name <span class="text-red-500">*</span></label>
+                <input id="add-first-name" class="swal2-input w-full text-sm" placeholder="First Name">
+              </div>
+              <div>
+                <label class="block text-xs sm:text-sm font-medium text-gray-700 mb-1">Last Name <span class="text-red-500">*</span></label>
+                <input id="add-last-name" class="swal2-input w-full text-sm" placeholder="Last Name">
+              </div>
+            </div>
+            <div>
+              <label class="block text-xs sm:text-sm font-medium text-gray-700 mb-1">Faculty Number <span class="text-gray-400 text-xs">(Auto-generated)</span></label>
+              <input id="add-faculty-number" class="swal2-input w-full text-sm bg-gray-50" placeholder="Auto-generated" readonly>
+            </div>
+            <div>
+              <label class="block text-xs sm:text-sm font-medium text-gray-700 mb-1">Email</label>
+              <input id="add-email" type="email" class="swal2-input w-full text-sm" placeholder="faculty@example.com">
+            </div>
+            <div>
+              <label class="block text-xs sm:text-sm font-medium text-gray-700 mb-1">Department</label>
+              <select id="add-department" class="swal2-input w-full text-sm">
+                <option value="">Select Department</option>
+                ${departmentOptions}
+              </select>
+            </div>
+            <div>
+              <label class="block text-xs sm:text-sm font-medium text-gray-700 mb-1">Specialization</label>
+              <input id="add-specialization" class="swal2-input w-full text-sm" placeholder="e.g., Computer Science, Mathematics (leave empty for N/A)">
+            </div>
+          </div>
+        `,
+        focusConfirm: false,
+        showCancelButton: true,
+        confirmButtonText: 'Add Faculty',
+        cancelButtonText: 'Cancel',
+        confirmButtonColor: '#0059cc',
+        width: window.innerWidth < 640 ? '95%' : '600px',
+        customClass: {
+          container: 'swal-responsive',
+          popup: 'swal-responsive-popup',
+          title: 'text-base sm:text-lg',
+          confirmButton: 'text-sm sm:text-base',
+          cancelButton: 'text-sm sm:text-base'
+        },
+        didOpen: () => {
+          // Auto-generate faculty number on dialog open
+          generateFacultyNumber().then(facultyNumber => {
+            document.getElementById('add-faculty-number').value = facultyNumber;
+          });
+        },
+        preConfirm: () => {
+          const specialization = document.getElementById('add-specialization').value.trim();
+          return {
+            first_name: document.getElementById('add-first-name').value,
+            last_name: document.getElementById('add-last-name').value,
+            faculty_number: document.getElementById('add-faculty-number').value,
+            email: document.getElementById('add-email').value,
+            department_name: document.getElementById('add-department').value,
+            specialization: specialization || 'N/A'
+          }
+        }
+      });
+
+      if (formValues) {
+        // Validate required fields
+        if (!formValues.first_name || !formValues.last_name || !formValues.faculty_number) {
+          Swal.fire({
+            icon: 'error',
+            title: 'Validation Error',
+            text: 'First name, last name, and faculty number are required',
+            confirmButtonColor: '#0059cc'
+          });
+          return;
+        }
+
+        // Send to server
+        try {
+          const response = await fetch('/api/faculty', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(formValues)
+          });
+
+          const result = await response.json();
+
+          if (result.success) {
+            Swal.fire({
+              icon: 'success',
+              title: 'Success!',
+              text: 'Faculty member added successfully',
+              toast: true,
+              position: 'top-end',
+              showConfirmButton: false,
+              timer: 3000,
+              timerProgressBar: true
+            });
+            
+            // Reload faculty data
+            loadFacultyData();
+          } else {
+            Swal.fire({
+              icon: 'error',
+              title: 'Error',
+              text: result.error || 'Failed to add faculty member',
+              confirmButtonColor: '#0059cc'
+            });
+          }
+        } catch (error) {
+          Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: 'An error occurred while adding faculty member',
+            confirmButtonColor: '#0059cc'
+          });
+          console.error('Error adding faculty:', error);
+        }
+      }
+    }
+    
+    // Edit faculty details
+    async function editFacultyDetails(faculty) {
+      // Get programs/departments from API for dropdown
+      let departmentOptions = '';
+      try {
+        const deptResponse = await fetch('/api/programs');
+        const deptResult = await deptResponse.json();
+        if (deptResult.success) {
+          departmentOptions = deptResult.data.map(dept => 
+            `<option value="${dept.name}" ${faculty.department_name === dept.name ? 'selected' : ''}>${dept.program_code} - ${dept.name}</option>`
+          ).join('');
+        }
+      } catch (error) {
+        console.error('Error loading departments:', error);
+        // Fallback to existing departments from faculty data
+        const departments = [...new Set(facultyData.map(f => f.department_name).filter(d => d))];
+        departmentOptions = departments.map(dept => 
+          `<option value="${dept}" ${faculty.department_name === dept ? 'selected' : ''}>${dept}</option>`
+        ).join('');
+      }
+      
+      const { value: formValues } = await Swal.fire({
+        title: 'Edit Faculty Details',
+        html: `
+          <div class="space-y-3 sm:space-y-4 text-left">
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
+              <div>
+                <label class="block text-xs sm:text-sm font-medium text-gray-700 mb-1">First Name</label>
+                <input id="edit-first-name" class="swal2-input w-full text-sm" value="${faculty.first_name}" placeholder="First Name">
+              </div>
+              <div>
+                <label class="block text-xs sm:text-sm font-medium text-gray-700 mb-1">Last Name</label>
+                <input id="edit-last-name" class="swal2-input w-full text-sm" value="${faculty.last_name}" placeholder="Last Name">
+              </div>
+            </div>
+            <div>
+              <label class="block text-xs sm:text-sm font-medium text-gray-700 mb-1">Faculty Number</label>
+              <input id="edit-faculty-number" class="swal2-input w-full text-sm" value="${faculty.faculty_number}" placeholder="Faculty Number">
+            </div>
+            <div>
+              <label class="block text-xs sm:text-sm font-medium text-gray-700 mb-1">Email</label>
+              <input id="edit-email" type="email" class="swal2-input w-full text-sm" value="${faculty.email || ''}" placeholder="Email">
+            </div>
+            <div>
+              <label class="block text-xs sm:text-sm font-medium text-gray-700 mb-1">Department</label>
+              <select id="edit-department" class="swal2-input w-full text-sm">
+                <option value="">Select Department</option>
+                ${departmentOptions}
+              </select>
+            </div>
+            <div>
+              <label class="block text-xs sm:text-sm font-medium text-gray-700 mb-1">Specialization</label>
+              <input id="edit-specialization" class="swal2-input w-full text-sm" value="${faculty.specialization || ''}" placeholder="Specialization">
+            </div>
+          </div>
+        `,
+        focusConfirm: false,
+        showCancelButton: true,
+        confirmButtonText: 'Save Changes',
+        cancelButtonText: 'Cancel',
+        confirmButtonColor: '#0059cc',
+        width: window.innerWidth < 640 ? '95%' : '600px',
+        customClass: {
+          container: 'swal-responsive',
+          popup: 'swal-responsive-popup',
+          title: 'text-base sm:text-lg',
+          confirmButton: 'text-sm sm:text-base',
+          cancelButton: 'text-sm sm:text-base'
+        },
+        preConfirm: () => {
+          const specialization = document.getElementById('edit-specialization').value.trim();
+          return {
+            first_name: document.getElementById('edit-first-name').value,
+            last_name: document.getElementById('edit-last-name').value,
+            faculty_number: document.getElementById('edit-faculty-number').value,
+            email: document.getElementById('edit-email').value,
+            department_name: document.getElementById('edit-department').value,
+            specialization: specialization || 'N/A'
+          }
+        }
+      });
+
+      if (formValues) {
+        // Validate required fields
+        if (!formValues.first_name || !formValues.last_name || !formValues.faculty_number) {
+          Swal.fire({
+            icon: 'error',
+            title: 'Validation Error',
+            text: 'First name, last name, and faculty number are required',
+            confirmButtonColor: '#0059cc'
+          });
+          return;
+        }
+
+        // Send update to server
+        try {
+          const response = await fetch(`/api/faculty/${faculty.faculty_id}`, {
+            method: 'PUT',
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(formValues)
+          });
+
+          const result = await response.json();
+
+          if (result.success) {
+            Swal.fire({
+              icon: 'success',
+              title: 'Success!',
+              text: 'Faculty details updated successfully',
+              toast: true,
+              position: 'top-end',
+              showConfirmButton: false,
+              timer: 3000,
+              timerProgressBar: true
+            });
+            
+            // Reload faculty data
+            loadFacultyData();
+          } else {
+            Swal.fire({
+              icon: 'error',
+              title: 'Error',
+              text: result.error || 'Failed to update faculty details',
+              confirmButtonColor: '#0059cc'
+            });
+          }
+        } catch (error) {
+          Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: 'An error occurred while updating faculty details',
+            confirmButtonColor: '#0059cc'
+          });
+          console.error('Error updating faculty:', error);
+        }
+      }
+    }
+
+    
+    // Archive faculty
+    async function archiveFaculty(faculty) {
+      const result = await Swal.fire({
+        title: 'Archive Faculty Member?',
+        html: `
+          <div class="text-left">
+            <p class="mb-2">Are you sure you want to archive:</p>
+            <p class="font-semibold">${faculty.first_name} ${faculty.last_name}</p>
+            <p class="text-sm text-gray-600">${faculty.faculty_number}</p>
+            <p class="mt-4 text-sm text-gray-500">
+              <i class="fas fa-info-circle mr-1"></i>
+              This will remove the faculty member from the active list. You can restore them later if needed.
+            </p>
+          </div>
+        `,
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#f59e0b',
+        cancelButtonColor: '#6b7280',
+        confirmButtonText: '<i class="fas fa-archive mr-2"></i>Yes, Archive',
+        cancelButtonText: 'Cancel',
+        reverseButtons: true
+      });
+
+      if (result.isConfirmed) {
+        try {
+          const response = await fetch(`/api/faculty/${faculty.faculty_id}/archive`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json'
+            }
+          });
+          
+          const data = await response.json();
+          
+          if (data.success) {
+            Swal.fire({
+              icon: 'success',
+              title: 'Archived!',
+              text: data.message || 'Faculty member has been archived successfully.',
+              toast: true,
+              position: 'top-end',
+              showConfirmButton: false,
+              timer: 3000,
+              timerProgressBar: true
+            });
+            
+            // Reload faculty data
+            loadFacultyData();
+          } else {
+            Swal.fire({
+              icon: 'error',
+              title: 'Error',
+              text: data.error || 'Failed to archive faculty member',
+              confirmButtonColor: '#0059cc'
+            });
+          }
+        } catch (error) {
+          Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: 'An error occurred while archiving the faculty member',
+            confirmButtonColor: '#0059cc'
+          });
+          console.error('Error archiving faculty:', error);
+        }
+      }
+    }
+    
+    // Show error message
+    function showError(message) {
+      const tableBody = document.getElementById('faculty-table-body');
+      tableBody.innerHTML = `
+        <tr>
+          <td colspan="6" class="px-6 py-8 text-center">
+            <div class="text-red-500">
+              <i class="fas fa-exclamation-triangle text-2xl mb-2"></i>
+              <p>${message}</p>
+              <button onclick="loadFacultyData()" class="mt-2 text-blue-600 hover:text-blue-800">
+                <i class="fas fa-retry mr-1"></i> Retry
+              </button>
+            </div>
+          </td>
+        </tr>
+      `;
+      
+      if (typeof Swal !== 'undefined') {
+        Swal.fire({
+          icon: 'error',
+          title: 'Error',
+          text: message,
+          toast: true,
+          position: 'top-end',
+          showConfirmButton: false,
+          timer: 5000
+        });
+      }
+    }
+  </script>
+
+  <!-- Include admin navigation script -->
+  <script src="{{ url_for('static', filename='js/admin-navigation.js') }}"></script>
+  
+  <!-- Include loading animation script -->
+  <script src="{{ url_for('static', filename='js/loading-animation.js') }}"></script>
+
+  <!-- Prevent logout on browser back button -->
+  <script src="{{ url_for('static', filename='js/prevent-back-logout.js') }}"></script>
+
+  <!-- Session Timeout Monitor (Auto-logout after 1 hour) -->
+  <script src="{{ url_for('static', filename='js/session-timeout.js') }}"></script>
+
+</body>
+</html>

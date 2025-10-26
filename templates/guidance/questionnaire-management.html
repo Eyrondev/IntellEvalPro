@@ -1,0 +1,2383 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+  <title>Assessment Tools | IntellEvalPro</title>
+  
+  <!-- Favicon -->
+  <link rel="icon" type="image/png" href="{{ url_for('static', filename='images/nclogo.png') }}">
+  <link rel="shortcut icon" type="image/png" href="{{ url_for('static', filename='images/nclogo.png') }}">
+  <link rel="apple-touch-icon" href="{{ url_for('static', filename='images/nclogo.png') }}">
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  
+  <!-- Font Awesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"/>
+  
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  
+  <!-- jQuery -->
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  
+  <!-- SweetAlert2 -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11.7.12/dist/sweetalert2.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.7.12/dist/sweetalert2.all.min.js"></script>
+  
+  <!-- Load Guidance Navigation JS -->
+  <script src="{{ url_for('static', filename='js/guidance-navigation.js') }}"></script>
+  
+  <script>
+    tailwind.config = {
+      theme: {
+        fontFamily: {
+          'sans': ['Inter', 'system-ui', 'sans-serif'],
+        },
+        extend: {
+          colors: {
+            primary: {
+              50: '#e6f0ff',
+              100: '#b3d1ff',
+              200: '#80b3ff',
+              300: '#4d94ff', 
+              400: '#1a75ff',
+              500: '#0059cc',
+              600: '#004799',
+              700: '#003566',
+              800: '#002233',
+              900: '#001019'
+            },
+            secondary: {
+              50: '#f8f9fa',
+              100: '#e9ecef',
+              200: '#dee2e6',
+              300: '#ced4da',
+              400: '#adb5bd',
+              500: '#6c757d',
+              600: '#495057',
+              700: '#343a40',
+              800: '#212529',
+              900: '#0d1117'
+            }
+          }
+        }
+      }
+    }
+  </script>
+  
+  <style>
+    /* Global styles */
+    * {
+      box-sizing: border-box;
+    }
+    
+    body {
+      font-family: 'Inter', sans-serif;
+      overflow-x: hidden;
+      width: 100%;
+      margin: 0;
+      padding: 0;
+    }
+    
+    /* Ensure no content goes beyond viewport */
+    html {
+      overflow-x: hidden;
+      width: 100%;
+    }
+    
+    .active-nav {
+      background-color: #e6f0ff;
+      color: #0059cc;
+      border-left: 4px solid #0059cc;
+    }
+    
+    /* Custom scrollbar */
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    
+    ::-webkit-scrollbar-track {
+      background: #f1f1f1;
+      border-radius: 10px;
+    }
+    
+    ::-webkit-scrollbar-thumb {
+      background: #c1c1c1;
+      border-radius: 10px;
+    }
+    
+    ::-webkit-scrollbar-thumb:hover {
+      background: #a8a8a8;
+    }
+    
+    /* Active nav link */
+    .nav-link.active {
+      position: relative;
+    }
+    
+    .nav-link.active::after {
+      content: '';
+      position: absolute;
+      left: 0;
+      width: 4px;
+      height: 100%;
+      background-color: #0059cc;
+    }
+
+    /* Responsive improvements */
+    @media (max-width: 640px) {
+      /* Ensure modals don't overflow */
+      .swal2-popup {
+        width: 90% !important;
+        padding: 1rem !important;
+      }
+      
+      /* Better spacing on mobile */
+      main {
+        padding: 1rem !important;
+      }
+      
+      /* Improve touch targets */
+      button, a {
+        min-height: 44px;
+      }
+      
+      /* Better form inputs on mobile */
+      input, select, textarea {
+        font-size: 16px !important; /* Prevents zoom on iOS */
+      }
+    }
+
+    /* Smooth transitions */
+    .transition-colors {
+      transition-property: color, background-color, border-color;
+      transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+      transition-duration: 200ms;
+    }
+  </style>
+</head>
+
+<body class="bg-gray-50">
+
+  <div class="flex h-screen bg-gray-50">
+    <!-- Sidebar (will be loaded dynamically) -->
+    <div id="sidebar-container"></div>
+    
+    <!-- Main content -->
+    <div class="lg:ml-64 flex flex-col flex-1 min-h-screen">
+      <!-- Top Navigation (will be loaded dynamically) -->
+      <div id="header-container"></div>
+
+      <!-- Main content area -->
+      <main class="flex-1 overflow-auto p-4 md:p-6 bg-gray-50">
+        <!-- Page Header -->
+        <div class="mb-6">
+          <div class="flex flex-col gap-4">
+            <div>
+              <h1 class="text-xl sm:text-2xl font-bold text-gray-900">Assessment Tools</h1>
+              <p class="mt-1 text-sm text-gray-600">Manage evaluation assessment tools</p>
+            </div>
+            <div class="flex flex-col sm:flex-row gap-2">
+              <!--<button onclick="showImportModal()" class="inline-flex items-center justify-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 w-full sm:w-auto">
+                <i class="fas fa-file-import mr-2"></i>
+                Import
+              </button>
+              <button onclick="exportQuestionnaires()" class="inline-flex items-center justify-center px-4 py-2 border border-green-300 rounded-md shadow-sm text-sm font-medium text-green-700 bg-green-50 hover:bg-green-100 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 w-full sm:w-auto">
+                <i class="fas fa-file-export mr-2"></i>
+                Export
+              </button>-->
+              <button onclick="createQuestionnaire()" class="inline-flex items-center justify-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 w-full sm:w-auto">
+                <i class="fas fa-plus mr-2"></i>
+                <span class="hidden sm:inline">Create Questionnaire</span>
+                <span class="sm:hidden">Create</span>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Statistics Cards -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5 mb-6">
+          <!-- Total Questionnaires -->
+          <div class="bg-white overflow-hidden shadow-sm rounded-lg border border-gray-200">
+            <div class="p-4 sm:p-5">
+              <div class="flex items-center">
+                <div class="flex-shrink-0">
+                  <i class="fas fa-clipboard-list text-xl sm:text-2xl text-primary-500"></i>
+                </div>
+                <div class="ml-4 sm:ml-5 w-0 flex-1">
+                  <dl>
+                    <dt class="text-xs sm:text-sm font-medium text-gray-500 truncate">Total Questionnaires</dt>
+                    <dd id="stat-total" class="text-base sm:text-lg font-medium text-gray-900 mt-1">-</dd>
+                  </dl>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Active Questionnaires -->
+          <div class="bg-white overflow-hidden shadow-sm rounded-lg border border-gray-200">
+            <div class="p-4 sm:p-5">
+              <div class="flex items-center">
+                <div class="flex-shrink-0">
+                  <i class="fas fa-check-circle text-xl sm:text-2xl text-green-500"></i>
+                </div>
+                <div class="ml-4 sm:ml-5 w-0 flex-1">
+                  <dl>
+                    <dt class="text-xs sm:text-sm font-medium text-gray-500 truncate">Active</dt>
+                    <dd id="stat-active" class="text-base sm:text-lg font-medium text-gray-900 mt-1">-</dd>
+                  </dl>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Total Categories -->
+          <div class="bg-white overflow-hidden shadow-sm rounded-lg border border-gray-200">
+            <div class="p-4 sm:p-5">
+              <div class="flex items-center">
+                <div class="flex-shrink-0">
+                  <i class="fas fa-folder text-xl sm:text-2xl text-blue-500"></i>
+                </div>
+                <div class="ml-4 sm:ml-5 w-0 flex-1">
+                  <dl>
+                    <dt class="text-xs sm:text-sm font-medium text-gray-500 truncate">Categories</dt>
+                    <dd id="stat-categories" class="text-base sm:text-lg font-medium text-gray-900 mt-1">-</dd>
+                  </dl>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Total Criteria -->
+          <div class="bg-white overflow-hidden shadow-sm rounded-lg border border-gray-200">
+            <div class="p-4 sm:p-5">
+              <div class="flex items-center">
+                <div class="flex-shrink-0">
+                  <i class="fas fa-list text-xl sm:text-2xl text-yellow-500"></i>
+                </div>
+                <div class="ml-4 sm:ml-5 w-0 flex-1">
+                  <dl>
+                    <dt class="text-xs sm:text-sm font-medium text-gray-500 truncate">Total Criteria</dt>
+                    <dd id="stat-criteria" class="text-base sm:text-lg font-medium text-gray-900 mt-1">-</dd>
+                  </dl>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Questionnaires Table -->
+        <div class="bg-white shadow-sm overflow-hidden sm:rounded-md border border-gray-200">
+          <div class="px-4 py-4 sm:px-6 sm:py-5">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between">
+              <div>
+                <h3 class="text-base sm:text-lg leading-6 font-medium text-gray-900">Questionnaires</h3>
+                <p class="mt-1 max-w-2xl text-xs sm:text-sm text-gray-500">Manage evaluation questionnaires</p>
+              </div>
+              <div class="mt-3 sm:mt-0">
+                <div class="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-3">
+                  <div class="relative">
+                    <input id="search-questionnaire" type="text" placeholder="Search questionnaires..." class="block w-full pl-10 pr-3 py-2 text-base border border-gray-300 rounded-md leading-5 bg-white placeholder-gray-500 focus:outline-none focus:placeholder-gray-400 focus:ring-1 focus:ring-primary-500 focus:border-primary-500 sm:text-sm">
+                    <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                      <i class="fas fa-search text-gray-400"></i>
+                    </div>
+                  </div>
+                  <select id="status-filter" class="block w-full pl-3 pr-10 py-2 text-base border border-gray-300 focus:outline-none focus:ring-primary-500 focus:border-primary-500 sm:text-sm rounded-md">
+                    <option value="">All Status</option>
+                    <option value="Active">Active</option>
+                    <option value="Inactive">Inactive</option>
+                    <option value="Draft">Draft</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Desktop Table View -->
+          <div class="hidden md:block overflow-x-auto">
+            <table class="min-w-full divide-y divide-gray-200">
+              <thead class="bg-gray-50">
+                <tr>
+                  <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Questionnaire Name</th>
+                  <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Categories</th>
+                  <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Criteria</th>
+                  <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                  <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Created</th>
+                  <th scope="col" class="relative px-6 py-3"><span class="sr-only">Actions</span></th>
+                </tr>
+              </thead>
+              <tbody id="questionnaires-table-body" class="bg-white divide-y divide-gray-200">
+                <!-- Loading state -->
+                <tr>
+                  <td colspan="6" class="px-6 py-8 text-center">
+                    <div class="flex justify-center items-center">
+                      <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-600"></div>
+                      <span class="ml-3 text-gray-600">Loading questionnaires...</span>
+                    </div>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+            
+            <!-- Desktop Empty state -->
+            <div id="empty-state" class="hidden px-6 py-12 text-center">
+              <i class="fas fa-clipboard-list text-5xl text-gray-400 mb-4"></i>
+              <h3 class="text-lg font-medium text-gray-900 mb-2">No Questionnaires Found</h3>
+              <p class="text-gray-500 mb-4">Get started by creating your first questionnaire.</p>
+              <button onclick="createQuestionnaire()" class="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-primary-600 hover:bg-primary-700">
+                <i class="fas fa-plus mr-2"></i>
+                Create Questionnaire
+              </button>
+            </div>
+          </div>
+
+          <!-- Mobile Card View -->
+          <div class="md:hidden">
+            <div id="questionnaires-mobile-cards" class="divide-y divide-gray-200">
+              <!-- Loading state -->
+              <div class="px-4 py-8 text-center">
+                <div class="flex justify-center items-center">
+                  <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-600"></div>
+                  <span class="ml-3 text-sm text-gray-600">Loading questionnaires...</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Mobile Empty state -->
+            <div id="empty-state-mobile" class="hidden px-4 py-12 text-center">
+              <i class="fas fa-clipboard-list text-4xl text-gray-400 mb-3"></i>
+              <h3 class="text-base font-medium text-gray-900 mb-2">No Questionnaires Found</h3>
+              <p class="text-sm text-gray-500 mb-4">Get started by creating your first questionnaire.</p>
+              <button onclick="createQuestionnaire()" class="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-primary-600 hover:bg-primary-700">
+                <i class="fas fa-plus mr-2"></i>
+                Create
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Categories Section -->
+        <div class="mt-4 sm:mt-6 bg-white shadow-sm overflow-hidden sm:rounded-md border border-gray-200">
+          <div class="px-4 py-4 sm:px-6 sm:py-5">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between">
+              <div>
+                <h3 class="text-base sm:text-lg leading-6 font-medium text-gray-900">Evaluation Categories</h3>
+                <p class="mt-1 max-w-2xl text-xs sm:text-sm text-gray-500">Organize criteria into categories</p>
+              </div>
+              <div class="mt-3 sm:mt-0">
+                <button onclick="createCategory()" class="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-green-600 hover:bg-green-700 w-full sm:w-auto justify-center">
+                  <i class="fas fa-plus mr-2"></i>
+                  <span class="hidden sm:inline">Add Category</span>
+                  <span class="sm:hidden">Add</span>
+                </button>
+              </div>
+            </div>
+          </div>
+          
+          <div class="px-4 py-4 sm:px-6">
+            <div id="categories-list" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
+              <!-- Categories will be loaded here -->
+              <div class="text-center py-8 col-span-full text-sm text-gray-500">
+                Loading categories...
+              </div>
+            </div>
+          </div>
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <!-- Import Modal -->
+  <div id="import-modal" class="hidden fixed inset-0 z-50 overflow-y-auto" aria-labelledby="import-modal-title" role="dialog" aria-modal="true">
+    <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+      <!-- Background overlay -->
+      <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" aria-hidden="true" onclick="closeImportModal()"></div>
+
+      <!-- Modal panel -->
+      <div class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle w-full max-w-2xl">
+        <div class="bg-gradient-to-r from-primary-600 to-primary-700 px-4 py-4 sm:px-6">
+          <div class="flex items-center justify-between">
+            <div class="flex items-center">
+              <div class="flex-shrink-0 bg-white bg-opacity-20 rounded-lg p-2 sm:p-3">
+                <i class="fas fa-file-import text-white text-xl sm:text-2xl"></i>
+              </div>
+              <div class="ml-3 sm:ml-4">
+                <h3 class="text-lg sm:text-xl font-semibold text-white" id="import-modal-title">Import Questionnaire</h3>
+                <p class="text-xs sm:text-sm text-primary-100">Upload categories and questions from a file</p>
+              </div>
+            </div>
+            <button onclick="closeImportModal()" class="text-white hover:text-primary-100 transition-colors">
+              <i class="fas fa-times text-xl sm:text-2xl"></i>
+            </button>
+          </div>
+        </div>
+
+        <div class="bg-white px-4 py-4 sm:px-6 sm:py-6">
+          <!-- File Upload Area -->
+          <div class="mb-4 sm:mb-6">
+            <label class="block text-sm font-medium text-gray-700 mb-2 sm:mb-3">
+              <i class="fas fa-upload mr-2 text-primary-600"></i>
+              Upload File
+            </label>
+            <div id="drop-zone" class="relative border-3 border-dashed border-gray-300 rounded-lg p-6 sm:p-8 text-center hover:border-primary-400 transition-all duration-200 bg-gray-50 hover:bg-primary-50 cursor-pointer">
+              <input type="file" id="import-file-input" accept=".json,.xlsx,.csv" class="hidden" onchange="handleFileSelect(event)">
+              <div id="drop-zone-content">
+                <div class="mb-3 sm:mb-4">
+                  <i class="fas fa-cloud-upload-alt text-5xl sm:text-6xl text-gray-400"></i>
+                </div>
+                <p class="text-base sm:text-lg font-medium text-gray-700 mb-2">Drop your file here or click to browse</p>
+                <p class="text-xs sm:text-sm text-gray-500 mb-3 sm:mb-4">Supported formats: JSON, Excel (.xlsx), CSV</p>
+                <button type="button" onclick="document.getElementById('import-file-input').click()" class="inline-flex items-center px-4 py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors shadow-sm text-sm">
+                  <i class="fas fa-folder-open mr-2"></i>
+                  Choose File
+                </button>
+              </div>
+              <div id="file-selected-info" class="hidden">
+                <i class="fas fa-file-alt text-4xl sm:text-5xl text-green-500 mb-3"></i>
+                <p class="text-base sm:text-lg font-semibold text-gray-800" id="selected-file-name"></p>
+                <p class="text-sm text-gray-500" id="selected-file-size"></p>
+                <button type="button" onclick="clearFileSelection()" class="mt-3 text-sm text-red-600 hover:text-red-800">
+                  <i class="fas fa-times-circle mr-1"></i>Clear
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Import Options -->
+          <div class="mb-4 sm:mb-6 p-3 sm:p-4 bg-blue-50 border border-blue-200 rounded-lg">
+            <h4 class="text-xs sm:text-sm font-semibold text-blue-900 mb-2 sm:mb-3">
+              <i class="fas fa-cog mr-2"></i>Import Options
+            </h4>
+            <div class="space-y-2 sm:space-y-3">
+              <label class="flex items-center">
+                <input type="checkbox" id="import-overwrite" class="h-4 w-4 text-primary-600 focus:ring-primary-500 border-gray-300 rounded">
+                <span class="ml-3 text-xs sm:text-sm text-gray-700">Replace existing categories and questions</span>
+              </label>
+              <label class="flex items-center">
+                <input type="checkbox" id="import-merge" class="h-4 w-4 text-primary-600 focus:ring-primary-500 border-gray-300 rounded" checked>
+                <span class="ml-3 text-xs sm:text-sm text-gray-700">Merge with existing data (recommended)</span>
+              </label>
+              <label class="flex items-center">
+                <input type="checkbox" id="import-validate" class="h-4 w-4 text-primary-600 focus:ring-primary-500 border-gray-300 rounded" checked>
+                <span class="ml-3 text-xs sm:text-sm text-gray-700">Validate data before importing</span>
+              </label>
+            </div>
+          </div>
+
+          <!-- Format Help -->
+          <div class="mb-4">
+            <button type="button" onclick="toggleFormatHelp()" class="text-xs sm:text-sm text-primary-600 hover:text-primary-800 font-medium">
+              <i class="fas fa-question-circle mr-1"></i>
+              View expected file format
+            </button>
+            <div id="format-help" class="hidden mt-3 p-3 sm:p-4 bg-gray-100 rounded-lg text-xs sm:text-sm">
+              <h5 class="font-semibold text-gray-900 mb-2">JSON Format Example:</h5>
+              <pre class="bg-gray-800 text-green-400 p-2 sm:p-3 rounded overflow-x-auto text-xs"><code>{
+  "categories": [
+    {
+      "name": "Teaching Effectiveness",
+      "description": "Questions about teaching quality",
+      "questions": [
+        "The instructor explains concepts clearly",
+        "The instructor is well-prepared for class"
+      ]
+    }
+  ]
+}</code></pre>
+            </div>
+          </div>
+
+          <!-- Preview Area -->
+          <div id="import-preview" class="hidden mb-4">
+            <h4 class="text-xs sm:text-sm font-semibold text-gray-900 mb-2 sm:mb-3">
+              <i class="fas fa-eye mr-2 text-primary-600"></i>Preview
+            </h4>
+            <div id="import-preview-content" class="max-h-48 sm:max-h-60 overflow-y-auto bg-gray-50 border border-gray-200 rounded-lg p-3 sm:p-4">
+              <!-- Preview content will be inserted here -->
+            </div>
+          </div>
+        </div>
+
+        <!-- Modal Footer -->
+        <div class="bg-gray-50 px-4 py-3 sm:px-6 sm:py-4 flex flex-col-reverse sm:flex-row-reverse gap-2 sm:gap-3">
+          <button onclick="processImport()" type="button" class="w-full sm:w-auto inline-flex justify-center items-center rounded-lg border border-transparent shadow-sm px-4 py-2 sm:px-5 sm:py-2.5 bg-primary-600 text-sm sm:text-base font-medium text-white hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 transition-colors">
+            <i class="fas fa-check mr-2"></i>
+            Import Data
+          </button>
+          <button onclick="downloadTemplate()" type="button" class="w-full sm:w-auto inline-flex justify-center items-center rounded-lg border border-gray-300 shadow-sm px-4 py-2 sm:px-5 sm:py-2.5 bg-white text-sm sm:text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 transition-colors">
+            <i class="fas fa-download mr-2"></i>
+            <span class="hidden sm:inline">Download Template</span>
+            <span class="sm:hidden">Template</span>
+          </button>
+          <button onclick="closeImportModal()" type="button" class="w-full sm:w-auto inline-flex justify-center items-center rounded-lg border border-gray-300 shadow-sm px-4 py-2 sm:px-5 sm:py-2.5 bg-white text-sm sm:text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 transition-colors">
+            Cancel
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Question Management Modal -->
+  <div id="questions-modal" class="hidden fixed inset-0 z-50 overflow-y-auto" aria-labelledby="modal-title" role="dialog" aria-modal="true">
+    <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+      <!-- Background overlay -->
+      <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" aria-hidden="true" onclick="closeQuestionsModal()"></div>
+
+      <!-- Modal panel -->
+      <div class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle w-full max-w-4xl">
+        <div class="bg-white px-4 pt-4 pb-4 sm:px-6 sm:pt-5 sm:pb-4">
+          <div class="flex items-center justify-between mb-3 sm:mb-4">
+            <div>
+              <h3 class="text-base sm:text-lg leading-6 font-medium text-gray-900" id="modal-title">Manage Questions</h3>
+              <p class="mt-1 text-xs sm:text-sm text-gray-500" id="modal-category-name">Category Name</p>
+            </div>
+            <button onclick="closeQuestionsModal()" class="text-gray-400 hover:text-gray-500">
+              <i class="fas fa-times text-lg sm:text-xl"></i>
+            </button>
+          </div>
+
+          <!-- Add Question Form -->
+          <div class="mb-4 p-3 sm:p-4 bg-gray-50 rounded-md">
+            <div class="flex flex-col sm:flex-row sm:items-end space-y-2 sm:space-y-0 sm:space-x-3">
+              <div class="flex-1">
+                <label class="block text-xs sm:text-sm font-medium text-gray-700 mb-1">New Question</label>
+                <input type="text" id="new-question-text" placeholder="Enter question or criterion name" class="w-full px-3 py-2 text-base border border-gray-300 rounded-md focus:outline-none focus:ring-primary-500 focus:border-primary-500">
+              </div>
+              <button onclick="addQuestion()" class="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 text-sm sm:text-base w-full sm:w-auto">
+                <i class="fas fa-plus mr-2"></i>Add Question
+              </button>
+            </div>
+          </div>
+
+          <!-- Questions List -->
+          <div class="border border-gray-200 rounded-md max-h-64 sm:max-h-96 overflow-y-auto">
+            <div id="questions-list-container">
+              <!-- Questions will be loaded here -->
+              <div class="text-center py-8 text-gray-500">
+                <i class="fas fa-spinner fa-spin text-xl sm:text-2xl mb-2"></i>
+                <p class="text-sm">Loading questions...</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Empty State -->
+          <div id="questions-empty-state" class="hidden text-center py-6 sm:py-8">
+            <i class="fas fa-question-circle text-3xl sm:text-4xl text-gray-400 mb-2 sm:mb-3"></i>
+            <p class="text-sm sm:text-base text-gray-600">No questions found. Add your first question above.</p>
+          </div>
+        </div>
+
+        <div class="bg-gray-50 px-4 py-3 sm:px-6 flex flex-col-reverse sm:flex-row-reverse gap-2 sm:gap-0">
+          <button onclick="closeQuestionsModal()" type="button" class="w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-sm sm:text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 sm:ml-3 sm:w-auto">
+            Done
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <script src="{{ url_for('static', filename='js/loading-animation.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/guidance-navigation.js') }}"></script>
+  <script>
+    let questionnairesData = [];
+    let categoriesData = [];
+    let criteriaData = [];
+    let currentCategoryId = null;
+    let currentQuestions = [];
+    
+    $(document).ready(function() {
+      // Load navigation and header
+      loadGuidanceNavigation('questionnaire-management');
+      
+      // Load questionnaires data
+      loadQuestionnaires();
+      loadCategories();
+      
+      // Setup event listeners
+      setupEventListeners();
+      
+      // Hide loader once everything is loaded
+      setTimeout(function() {
+        $('#loader-overlay').fadeOut(300);
+      }, 1000);
+    });
+    
+    /**
+     * Load questionnaires from API
+     */
+    function loadQuestionnaires() {
+      fetch('/api/guidance/questionnaires')
+        .then(response => response.json())
+        .then(data => {
+          if (data.success) {
+            questionnairesData = data.questionnaires || [];
+            criteriaData = data.criteria || [];
+            
+            // Update statistics
+            updateStatistics(data.statistics);
+            
+            // Display questionnaires
+            displayQuestionnaires(questionnairesData);
+            
+            console.log('Questionnaires loaded:', questionnairesData.length);
+          } else {
+            showError('Failed to load questionnaires');
+          }
+        })
+        .catch(error => {
+          console.error('Error loading questionnaires:', error);
+          showError('Error loading questionnaires: ' + error.message);
+        });
+    }
+    
+    /**
+     * Load categories from API
+     */
+    function loadCategories() {
+      fetch('/api/guidance/categories')
+        .then(response => response.json())
+        .then(data => {
+          if (data.success) {
+            categoriesData = data.categories || [];
+            displayCategories(categoriesData);
+            console.log('Categories loaded:', categoriesData.length);
+          } else {
+            showError('Failed to load categories');
+          }
+        })
+        .catch(error => {
+          console.error('Error loading categories:', error);
+          showError('Error loading categories: ' + error.message);
+        });
+    }
+    
+    /**
+     * Update statistics cards
+     */
+    function updateStatistics(stats) {
+      document.getElementById('stat-total').textContent = stats.total_questionnaires || 0;
+      document.getElementById('stat-active').textContent = stats.active_questionnaires || 0;
+      document.getElementById('stat-categories').textContent = stats.total_categories || 0;
+      document.getElementById('stat-criteria').textContent = stats.total_criteria || 0;
+    }
+    
+    /**
+     * Display questionnaires in table
+     */
+    function displayQuestionnaires(questionnaires) {
+      const tbody = document.getElementById('questionnaires-table-body');
+      const mobileCards = document.getElementById('questionnaires-mobile-cards');
+      const emptyState = document.getElementById('empty-state');
+      const emptyStateMobile = document.getElementById('empty-state-mobile');
+      
+      if (questionnaires.length === 0) {
+        tbody.innerHTML = '';
+        mobileCards.innerHTML = '';
+        emptyState.classList.remove('hidden');
+        emptyStateMobile.classList.remove('hidden');
+        return;
+      }
+      
+      emptyState.classList.add('hidden');
+      emptyStateMobile.classList.add('hidden');
+      
+      // Desktop Table View
+      tbody.innerHTML = questionnaires.map(q => {
+        const statusBadge = getStatusBadge(q.status);
+        const createdDate = formatDate(q.created_at);
+        
+        return `
+          <tr class="hover:bg-gray-50">
+            <td class="px-6 py-4 whitespace-nowrap">
+              <div class="flex items-center">
+                <div class="flex-shrink-0">
+                  <i class="fas fa-clipboard-list text-primary-500 text-xl"></i>
+                </div>
+                <div class="ml-4">
+                  <div class="text-sm font-medium text-gray-900">${q.name || 'Unnamed Questionnaire'}</div>
+                  <div class="text-sm text-gray-500">${q.description || 'No description'}</div>
+                </div>
+              </div>
+            </td>
+            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${q.category_count || 0}</td>
+            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${q.criteria_count || 0}</td>
+            <td class="px-6 py-4 whitespace-nowrap">
+              ${statusBadge}
+            </td>
+            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${createdDate}</td>
+            <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+              <button onclick="viewQuestionnaire(${q.questionnaire_id})" class="text-primary-600 hover:text-primary-900 mr-3">
+                View
+              </button>
+              <button onclick="editQuestionnaire(${q.questionnaire_id})" class="text-blue-600 hover:text-blue-900 mr-3">
+                Edit
+              </button>
+              <button onclick="deleteQuestionnaire(${q.questionnaire_id})" class="text-red-600 hover:text-red-900">
+                Delete
+              </button>
+            </td>
+          </tr>
+        `;
+      }).join('');
+
+      // Mobile Card View
+      mobileCards.innerHTML = questionnaires.map(q => {
+        const statusBadge = getStatusBadge(q.status);
+        const createdDate = formatDate(q.created_at);
+        
+        return `
+          <div class="p-4 bg-white hover:bg-gray-50">
+            <div class="flex items-start space-x-3 mb-3">
+              <div class="flex-shrink-0">
+                <i class="fas fa-clipboard-list text-primary-500 text-xl"></i>
+              </div>
+              <div class="flex-1 min-w-0">
+                <p class="text-sm font-medium text-gray-900 truncate">${q.name || 'Unnamed Questionnaire'}</p>
+                <p class="text-xs text-gray-500 line-clamp-2">${q.description || 'No description'}</p>
+              </div>
+            </div>
+            
+            <div class="grid grid-cols-3 gap-3 mb-3">
+              <div class="text-center">
+                <p class="text-xs text-gray-500">Categories</p>
+                <p class="text-sm font-semibold text-gray-900">${q.category_count || 0}</p>
+              </div>
+              <div class="text-center">
+                <p class="text-xs text-gray-500">Criteria</p>
+                <p class="text-sm font-semibold text-gray-900">${q.criteria_count || 0}</p>
+              </div>
+              <div class="text-center">
+                <p class="text-xs text-gray-500">Status</p>
+                <div class="flex justify-center">${statusBadge}</div>
+              </div>
+            </div>
+            
+            <div class="flex items-center justify-between text-xs text-gray-500 mb-3">
+              <span><i class="far fa-calendar-alt mr-1"></i>${createdDate}</span>
+            </div>
+            
+            <div class="flex justify-end space-x-3 pt-3 border-t border-gray-200">
+              <button onclick="viewQuestionnaire(${q.questionnaire_id})" class="text-primary-600 hover:text-primary-900 text-sm font-medium">
+                View
+              </button>
+              <button onclick="editQuestionnaire(${q.questionnaire_id})" class="text-blue-600 hover:text-blue-900 text-sm font-medium">
+                Edit
+              </button>
+              <button onclick="deleteQuestionnaire(${q.questionnaire_id})" class="text-red-600 hover:text-red-900 text-sm font-medium">
+                Delete
+              </button>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+    
+    /**
+     * Display categories
+     */
+    function displayCategories(categories) {
+      const container = document.getElementById('categories-list');
+      
+      if (categories.length === 0) {
+        container.innerHTML = `
+          <div class="text-center py-8 col-span-full text-gray-500">
+            No categories found. Create your first category to get started.
+          </div>
+        `;
+        return;
+      }
+      
+      // Sort categories by display_order
+      const sortedCategories = [...categories].sort((a, b) => (a.display_order || 999) - (b.display_order || 999));
+      
+      // Function to convert number to letter (A, B, C, etc.)
+      const getLetterLabel = (index) => {
+        return String.fromCharCode(65 + index); // 65 is ASCII for 'A'
+      };
+      
+      container.innerHTML = sortedCategories.map((cat, index) => {
+        const isArchived = cat.is_archived;
+        const cardClass = isArchived ? 'bg-gray-100 opacity-75' : 'bg-white';
+        const borderClass = isArchived ? 'border-gray-300' : 'border-gray-200 hover:border-primary-300 hover:shadow-md';
+        const categoryLetter = getLetterLabel(index);
+        
+        return `
+        <div class="${cardClass} rounded-xl p-4 sm:p-5 border-2 ${borderClass} transition-all duration-200" data-category-id="${cat.category_id}">
+          <div class="flex items-start justify-between">
+            <div class="flex-1 min-w-0">
+              <div class="flex items-center gap-2 flex-wrap mb-2">
+                <!-- Order Badge with Letter -->
+                <span class="inline-flex items-center justify-center w-8 h-8 sm:w-9 sm:h-9 rounded-lg bg-gradient-to-br from-primary-500 to-primary-600 text-white text-sm sm:text-base font-bold shadow-md flex-shrink-0">
+                  ${categoryLetter}
+                </span>
+                <h4 class="text-sm sm:text-base font-semibold text-gray-900 truncate">${cat.name}</h4>
+                ${isArchived ? '<span class="inline-flex items-center px-2 py-0.5 sm:px-2.5 rounded-md text-xs font-semibold bg-gray-200 text-gray-700"><i class="fas fa-archive mr-1"></i>Archived</span>' : ''}
+              </div>
+              <p class="mt-1 text-xs sm:text-sm text-gray-600 mb-2 sm:mb-3 line-clamp-2">${cat.description || 'No description'}</p>
+              <div class="flex items-center text-xs sm:text-sm text-gray-500 mb-3 sm:mb-4">
+                <i class="fas fa-list mr-2"></i>
+                <span class="font-medium">${cat.criteria_count || 0}</span>
+                <span class="ml-1">criteria</span>
+              </div>
+              <div class="flex gap-2 flex-wrap">
+                <button onclick="manageQuestions(${cat.category_id}, '${cat.name.replace(/'/g, "\\'")}')" class="inline-flex items-center text-xs sm:text-sm px-3 py-1.5 sm:py-2 bg-primary-600 text-white rounded-lg hover:bg-primary-700 transition-colors shadow-sm">
+                  <i class="fas fa-cog mr-1 sm:mr-2"></i><span class="hidden sm:inline">Manage Questions</span><span class="sm:hidden">Manage</span>
+                </button>
+                ${isArchived ? `<button onclick="unarchiveCategory(${cat.category_id})" class="inline-flex items-center text-xs sm:text-sm px-3 py-1.5 sm:py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors shadow-sm">
+                  <i class="fas fa-undo mr-1 sm:mr-2"></i>Unarchive
+                </button>` : ''}
+              </div>
+            </div>
+            <div class="ml-2 sm:ml-3 flex flex-col gap-1.5 sm:gap-2 flex-shrink-0">
+              <!-- Reorder Buttons -->
+              ${!isArchived ? `
+              <div class="flex flex-col gap-1 border-b border-gray-200 pb-1.5 sm:pb-2 mb-1">
+                <button onclick="moveCategoryUp(${cat.category_id})" class="p-1 sm:p-1.5 rounded ${index === 0 ? 'text-gray-300 cursor-not-allowed' : 'text-gray-600 hover:text-primary-600 hover:bg-primary-50'} transition-colors" title="Move Up" ${index === 0 ? 'disabled' : ''}>
+                  <i class="fas fa-chevron-up text-xs sm:text-sm"></i>
+                </button>
+                <button onclick="moveCategoryDown(${cat.category_id})" class="p-1 sm:p-1.5 rounded ${index === sortedCategories.filter(c => !c.is_archived).length - 1 ? 'text-gray-300 cursor-not-allowed' : 'text-gray-600 hover:text-primary-600 hover:bg-primary-50'} transition-colors" title="Move Down" ${index === sortedCategories.filter(c => !c.is_archived).length - 1 ? 'disabled' : ''}>
+                  <i class="fas fa-chevron-down text-xs sm:text-sm"></i>
+                </button>
+              </div>
+              ` : ''}
+              <!-- Action Buttons -->
+              ${!isArchived ? `<button onclick="editCategory(${cat.category_id})" class="p-1 sm:p-1.5 text-blue-600 hover:text-blue-800 hover:bg-blue-50 rounded transition-colors" title="Edit Category">
+                <i class="fas fa-edit text-xs sm:text-sm"></i>
+              </button>` : ''}
+              ${!isArchived ? `<button onclick="archiveCategory(${cat.category_id})" class="p-1 sm:p-1.5 text-orange-600 hover:text-orange-800 hover:bg-orange-50 rounded transition-colors" title="Archive Category">
+                <i class="fas fa-archive text-xs sm:text-sm"></i>
+              </button>` : ''}
+              <button onclick="deleteCategory(${cat.category_id})" class="p-1 sm:p-1.5 text-red-600 hover:text-red-800 hover:bg-red-50 rounded transition-colors" title="Delete Category">
+                <i class="fas fa-trash text-xs sm:text-sm"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+      `;
+      }).join('');
+    }
+    
+    /**
+     * Get status badge HTML
+     */
+    function getStatusBadge(status) {
+      const badges = {
+        'Active': '<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">Active</span>',
+        'Inactive': '<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">Inactive</span>',
+        'Draft': '<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">Draft</span>'
+      };
+      return badges[status] || '<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-600">Unknown</span>';
+    }
+    
+    /**
+     * Format date to readable string
+     */
+    function formatDate(dateString) {
+      if (!dateString) return 'N/A';
+      try {
+        const date = new Date(dateString);
+        return date.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
+      } catch {
+        return 'Invalid Date';
+      }
+    }
+    
+    /**
+     * Setup event listeners
+     */
+    function setupEventListeners() {
+      // Search functionality
+      let searchTimeout;
+      document.getElementById('search-questionnaire').addEventListener('input', function() {
+        clearTimeout(searchTimeout);
+        searchTimeout = setTimeout(filterQuestionnaires, 300);
+      });
+      
+      // Status filter
+      document.getElementById('status-filter').addEventListener('change', filterQuestionnaires);
+    }
+    
+    /**
+     * Filter questionnaires
+     */
+    function filterQuestionnaires() {
+      const searchTerm = document.getElementById('search-questionnaire').value.toLowerCase();
+      const status = document.getElementById('status-filter').value;
+      
+      const filtered = questionnairesData.filter(q => {
+        const matchesSearch = !searchTerm || 
+          (q.name && q.name.toLowerCase().includes(searchTerm)) ||
+          (q.description && q.description.toLowerCase().includes(searchTerm));
+        
+        const matchesStatus = !status || q.status === status;
+        
+        return matchesSearch && matchesStatus;
+      });
+      
+      displayQuestionnaires(filtered);
+    }
+    
+    /**
+     * Create new questionnaire
+     */
+    function createQuestionnaire() {
+      Swal.fire({
+        title: 'Create Questionnaire',
+        html: `
+          <div class="text-left space-y-4">
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1">Questionnaire Name</label>
+              <input id="q-name" type="text" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-primary-500 focus:border-primary-500" placeholder="Enter questionnaire name">
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1">Description</label>
+              <textarea id="q-description" rows="3" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-primary-500 focus:border-primary-500" placeholder="Enter description"></textarea>
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1">Status</label>
+              <select id="q-status" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-primary-500 focus:border-primary-500">
+                <option value="Draft">Draft</option>
+                <option value="Active">Active</option>
+                <option value="Inactive">Inactive</option>
+              </select>
+            </div>
+          </div>
+        `,
+        width: 600,
+        showCancelButton: true,
+        confirmButtonText: 'Create',
+        cancelButtonText: 'Cancel',
+        confirmButtonColor: '#0059cc',
+        preConfirm: () => {
+          const name = document.getElementById('q-name').value;
+          const description = document.getElementById('q-description').value;
+          const status = document.getElementById('q-status').value;
+          
+          if (!name) {
+            Swal.showValidationMessage('Please enter a questionnaire name');
+            return false;
+          }
+          
+          return { name, description, status };
+        }
+      }).then((result) => {
+        if (result.isConfirmed) {
+          // TODO: Send to API
+          Swal.fire({
+            icon: 'success',
+            title: 'Questionnaire Created!',
+            text: 'The questionnaire has been created successfully.',
+            confirmButtonColor: '#0059cc'
+          }).then(() => {
+            loadQuestionnaires();
+          });
+        }
+      });
+    }
+    
+    /**
+     * Create new category
+     */
+    function createCategory() {
+      Swal.fire({
+        title: 'Create Category',
+        html: `
+          <div class="text-left space-y-4">
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1">Category Name</label>
+              <input id="cat-name" type="text" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-primary-500 focus:border-primary-500" placeholder="Enter category name">
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1">Description</label>
+              <textarea id="cat-description" rows="2" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-primary-500 focus:border-primary-500" placeholder="Enter description"></textarea>
+            </div>
+          </div>
+        `,
+        width: 600,
+        showCancelButton: true,
+        confirmButtonText: 'Create',
+        cancelButtonText: 'Cancel',
+        confirmButtonColor: '#10b981',
+        preConfirm: () => {
+          const name = document.getElementById('cat-name').value;
+          const description = document.getElementById('cat-description').value;
+          
+          if (!name) {
+            Swal.showValidationMessage('Please enter a category name');
+            return false;
+          }
+          
+          return { name, description };
+        }
+      }).then((result) => {
+        if (result.isConfirmed) {
+          // Show loading
+          Swal.fire({
+            title: 'Creating Category...',
+            allowOutsideClick: false,
+            didOpen: () => {
+              Swal.showLoading();
+            }
+          });
+          
+          // Send to API
+          fetch('/api/guidance/categories', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              name: result.value.name,
+              description: result.value.description,
+              weight: 1.0
+            })
+          })
+          .then(response => response.json())
+          .then(data => {
+            if (data.success) {
+              Swal.fire({
+                icon: 'success',
+                title: 'Category Created!',
+                text: 'The category has been created successfully.',
+                confirmButtonColor: '#10b981'
+              }).then(() => {
+                loadCategories();
+                loadQuestionnaires();
+              });
+            } else {
+              showError(data.message || 'Failed to create category');
+            }
+          })
+          .catch(error => {
+            console.error('Error creating category:', error);
+            showError('Error creating category: ' + error.message);
+          });
+        }
+      });
+    }
+    
+    /**
+     * View questionnaire details
+     */
+    function viewQuestionnaire(id) {
+      const questionnaire = questionnairesData.find(q => q.questionnaire_id === id);
+      if (!questionnaire) return;
+      
+      Swal.fire({
+        title: questionnaire.name,
+        html: `
+          <div class="text-left space-y-3">
+            <div><strong>Description:</strong> ${questionnaire.description || 'N/A'}</div>
+            <div><strong>Status:</strong> ${questionnaire.status}</div>
+            <div><strong>Categories:</strong> ${questionnaire.category_count || 0}</div>
+            <div><strong>Criteria:</strong> ${questionnaire.criteria_count || 0}</div>
+            <div><strong>Created:</strong> ${formatDate(questionnaire.created_at)}</div>
+          </div>
+        `,
+        width: 500,
+        confirmButtonText: 'Close',
+        confirmButtonColor: '#0059cc'
+      });
+    }
+    
+    /**
+     * Edit questionnaire
+     */
+    function editQuestionnaire(id) {
+      Swal.fire({
+        icon: 'info',
+        title: 'Edit Questionnaire',
+        text: 'Questionnaire editing functionality will be available soon.',
+        confirmButtonColor: '#0059cc'
+      });
+    }
+    
+    /**
+     * Delete questionnaire (same as deleteCategory since questionnaires = categories)
+     */
+    function deleteQuestionnaire(id) {
+      deleteCategory(id);
+    }
+    
+    /**
+     * Edit category
+     */
+    function editCategory(id) {
+      const category = categoriesData.find(c => c.category_id === id);
+      if (!category) return;
+      
+      Swal.fire({
+        title: 'Edit Category',
+        html: `
+          <div class="text-left space-y-4">
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1">Category Name</label>
+              <input id="edit-cat-name" type="text" value="${category.name}" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-primary-500 focus:border-primary-500" placeholder="Enter category name">
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1">Description</label>
+              <textarea id="edit-cat-description" rows="2" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-primary-500 focus:border-primary-500" placeholder="Enter description">${category.description || ''}</textarea>
+            </div>
+          </div>
+        `,
+        width: 600,
+        showCancelButton: true,
+        confirmButtonText: 'Save Changes',
+        cancelButtonText: 'Cancel',
+        confirmButtonColor: '#0059cc',
+        preConfirm: () => {
+          const name = document.getElementById('edit-cat-name').value;
+          const description = document.getElementById('edit-cat-description').value;
+          
+          if (!name) {
+            Swal.showValidationMessage('Please enter a category name');
+            return false;
+          }
+          
+          return { name, description };
+        }
+      }).then((result) => {
+        if (result.isConfirmed) {
+          // Show loading
+          Swal.fire({
+            title: 'Updating Category...',
+            allowOutsideClick: false,
+            didOpen: () => {
+              Swal.showLoading();
+            }
+          });
+          
+          // Send to API
+          fetch(`/api/guidance/categories/${id}`, {
+            method: 'PUT',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              name: result.value.name,
+              description: result.value.description
+            })
+          })
+          .then(response => response.json())
+          .then(data => {
+            if (data.success) {
+              Swal.fire({
+                icon: 'success',
+                title: 'Category Updated!',
+                text: 'The category has been updated successfully.',
+                confirmButtonColor: '#0059cc'
+              }).then(() => {
+                loadCategories();
+                loadQuestionnaires();
+              });
+            } else {
+              showError(data.message || 'Failed to update category');
+            }
+          })
+          .catch(error => {
+            console.error('Error updating category:', error);
+            showError('Error updating category: ' + error.message);
+          });
+        }
+      });
+    }
+    
+    /**
+     * Delete category
+     */
+    function deleteCategory(id, forceDelete = false) {
+      // First confirmation
+      if (!forceDelete) {
+        Swal.fire({
+          title: 'Delete Category?',
+          text: 'All criteria in this category will also be removed.',
+          icon: 'warning',
+          showCancelButton: true,
+          confirmButtonColor: '#dc2626',
+          cancelButtonColor: '#6b7280',
+          confirmButtonText: 'Yes, Delete',
+          cancelButtonText: 'Cancel'
+        }).then((result) => {
+          if (result.isConfirmed) {
+            performDelete(id, false);
+          }
+        });
+      } else {
+        performDelete(id, true);
+      }
+    }
+    
+    /**
+     * Perform the actual delete operation
+     */
+    function performDelete(id, force = false) {
+      // Show loading
+      Swal.fire({
+        title: 'Deleting Category...',
+        allowOutsideClick: false,
+        didOpen: () => {
+          Swal.showLoading();
+        }
+      });
+      
+      // Build URL with force parameter if needed
+      const url = `/api/guidance/categories/${id}${force ? '?force=true' : ''}`;
+      
+      // Send delete request to API
+      fetch(url, {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json',
+        }
+      })
+      .then(response => response.json())
+      .then(data => {
+        if (data.success) {
+          const deletedInfo = data.deleted_responses > 0 
+            ? `Category deleted along with ${data.deleted_responses} student response(s).`
+            : 'The category has been deleted successfully.';
+          
+          Swal.fire({
+            icon: 'success',
+            title: 'Deleted!',
+            text: deletedInfo,
+            confirmButtonColor: '#dc2626'
+          }).then(() => {
+            loadCategories();
+            loadQuestionnaires();
+          });
+        } else if (data.requires_confirmation) {
+          // Second confirmation - show warning about responses
+          Swal.fire({
+            title: 'Warning: Data Will Be Lost!',
+            html: `
+              <div class="text-left space-y-3">
+                <p class="text-red-600 font-semibold">
+                  <i class="fas fa-exclamation-triangle mr-2"></i>
+                  This category contains <strong>${data.response_count}</strong> student evaluation response(s).
+                </p>
+                <p class="text-gray-700">Deleting this category will:</p>
+                <ul class="list-disc pl-5 text-gray-700 space-y-1">
+                  <li>Delete all ${data.response_count} student responses</li>
+                  <li>Delete all questions/criteria in this category</li>
+                  <li>Delete the category itself</li>
+                  <li><strong class="text-red-600">This action cannot be undone!</strong></li>
+                </ul>
+                <p class="text-gray-700 mt-3">
+                  <strong>Recommendation:</strong> Consider archiving instead of deleting to preserve evaluation history.
+                </p>
+              </div>
+            `,
+            icon: 'error',
+            showCancelButton: true,
+            confirmButtonColor: '#dc2626',
+            cancelButtonColor: '#6b7280',
+            confirmButtonText: 'Delete Everything',
+            cancelButtonText: 'Cancel',
+            width: 600
+          }).then((result) => {
+            if (result.isConfirmed) {
+              // User confirmed - perform force delete
+              deleteCategory(id, true);
+            }
+          });
+        } else {
+          showError(data.message || 'Failed to delete category');
+        }
+      })
+      .catch(error => {
+        console.error('Error deleting category:', error);
+        showError('Error deleting category: ' + error.message);
+      });
+    }
+    
+    /**
+     * Open question management modal for a category
+     */
+    function manageQuestions(categoryId, categoryName) {
+      currentCategoryId = categoryId;
+      document.getElementById('modal-category-name').textContent = categoryName;
+      document.getElementById('questions-modal').classList.remove('hidden');
+      document.getElementById('new-question-text').value = '';
+      
+      // Load questions for this category
+      loadQuestions(categoryId);
+    }
+    
+    /**
+     * Close question management modal
+     */
+    function closeQuestionsModal() {
+      document.getElementById('questions-modal').classList.add('hidden');
+      currentCategoryId = null;
+      currentQuestions = [];
+      
+      // Reload categories to update counts
+      loadCategories();
+      loadQuestionnaires();
+    }
+    
+    /**
+     * Load questions for a specific category
+     */
+    function loadQuestions(categoryId) {
+      const container = document.getElementById('questions-list-container');
+      const emptyState = document.getElementById('questions-empty-state');
+      
+      container.innerHTML = '<div class="text-center py-8 text-gray-500"><i class="fas fa-spinner fa-spin text-2xl mb-2"></i><p>Loading questions...</p></div>';
+      emptyState.classList.add('hidden');
+      
+      // First, get all categories to calculate the starting number for this category
+      fetch('/api/guidance/categories')
+        .then(response => response.json())
+        .then(categoriesResponse => {
+          if (!categoriesResponse.success) {
+            throw new Error('Failed to load categories');
+          }
+          
+          const allCategories = categoriesResponse.categories || [];
+          const sortedCategories = [...allCategories]
+            .filter(c => !c.is_archived)
+            .sort((a, b) => (a.display_order || 999) - (b.display_order || 999));
+          
+          // Calculate starting number based on categories before this one
+          let startingNumber = 1;
+          for (let cat of sortedCategories) {
+            if (cat.category_id === categoryId) {
+              break;
+            }
+            startingNumber += cat.criteria_count || 0;
+          }
+          
+          // Now load the questions for this category
+          return fetch(`/api/guidance/criteria?category_id=${categoryId}`)
+            .then(response => response.json())
+            .then(data => {
+              if (data.success) {
+                currentQuestions = data.criteria || [];
+                displayQuestions(currentQuestions, startingNumber);
+              } else {
+                showError('Failed to load questions');
+              }
+            });
+        })
+        .catch(error => {
+          console.error('Error loading questions:', error);
+          showError('Error loading questions: ' + error.message);
+        });
+    }
+    
+    /**
+     * Display questions in the modal
+     */
+    function displayQuestions(questions, startingNumber = 1) {
+      const container = document.getElementById('questions-list-container');
+      const emptyState = document.getElementById('questions-empty-state');
+      
+      if (questions.length === 0) {
+        container.innerHTML = '';
+        emptyState.classList.remove('hidden');
+        return;
+      }
+      
+      emptyState.classList.add('hidden');
+      
+      container.innerHTML = questions.map((q, index) => {
+        const globalNumber = startingNumber + index;
+        
+        return `
+        <div class="p-4 border-b border-gray-200 hover:bg-gray-50 transition" data-criteria-id="${q.criteria_id}">
+          <div class="flex items-start justify-between">
+            <div class="flex-1">
+              <div class="flex items-center space-x-3">
+                <span class="text-lg font-bold text-gray-700 min-w-[2rem]">${globalNumber}.</span>
+                <span class="text-sm font-medium text-gray-900" id="question-text-${q.criteria_id}">${q.description}</span>
+              </div>
+              <div class="mt-1 ml-11 text-xs text-gray-500">
+                Order: ${q.order} | ID: ${q.criteria_id}
+              </div>
+            </div>
+            <div class="ml-4 flex items-center space-x-2">
+              <button onclick="moveQuestionUp(${q.criteria_id})" class="text-gray-600 hover:text-primary-600" title="Move Up" ${index === 0 ? 'disabled class="text-gray-300 cursor-not-allowed"' : ''}>
+                <i class="fas fa-arrow-up"></i>
+              </button>
+              <button onclick="moveQuestionDown(${q.criteria_id})" class="text-gray-600 hover:text-primary-600" title="Move Down" ${index === questions.length - 1 ? 'disabled class="text-gray-300 cursor-not-allowed"' : ''}>
+                <i class="fas fa-arrow-down"></i>
+              </button>
+              <button onclick="editQuestionInline(${q.criteria_id})" class="text-blue-600 hover:text-blue-800" title="Edit">
+                <i class="fas fa-edit"></i>
+              </button>
+              <button onclick="deleteQuestion(${q.criteria_id})" class="text-red-600 hover:text-red-800" title="Delete">
+                <i class="fas fa-trash"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+      `;
+      }).join('');
+    }
+    
+    /**
+     * Add new question
+     */
+    function addQuestion() {
+      const questionText = document.getElementById('new-question-text').value.trim();
+      
+      if (!questionText) {
+        Swal.fire({
+          icon: 'warning',
+          title: 'Missing Information',
+          text: 'Please enter a question or criterion name',
+          confirmButtonColor: '#0059cc'
+        });
+        return;
+      }
+      
+      if (!currentCategoryId) {
+        showError('No category selected');
+        return;
+      }
+      
+      // Show loading
+      Swal.fire({
+        title: 'Adding Question...',
+        allowOutsideClick: false,
+        didOpen: () => {
+          Swal.showLoading();
+        }
+      });
+      
+      fetch('/api/guidance/criteria', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          category_id: currentCategoryId,
+          description: questionText,
+          order: currentQuestions.length + 1
+        })
+      })
+      .then(response => response.json())
+      .then(data => {
+        if (data.success) {
+          Swal.fire({
+            icon: 'success',
+            title: 'Question Added!',
+            text: 'The question has been added successfully.',
+            timer: 1500,
+            showConfirmButton: false
+          });
+          
+          // Clear input and reload questions
+          document.getElementById('new-question-text').value = '';
+          loadQuestions(currentCategoryId);
+        } else {
+          showError(data.message || 'Failed to add question');
+        }
+      })
+      .catch(error => {
+        console.error('Error adding question:', error);
+        showError('Error adding question: ' + error.message);
+      });
+    }
+    
+    /**
+     * Edit question inline
+     */
+    function editQuestionInline(criteriaId) {
+      const question = currentQuestions.find(q => q.criteria_id === criteriaId);
+      if (!question) return;
+      
+      Swal.fire({
+        title: 'Edit Question',
+        input: 'text',
+        inputLabel: 'Question Text',
+        inputValue: question.description,
+        showCancelButton: true,
+        confirmButtonText: 'Save',
+        cancelButtonText: 'Cancel',
+        confirmButtonColor: '#0059cc',
+        inputValidator: (value) => {
+          if (!value) {
+            return 'Please enter a question text';
+          }
+        }
+      }).then((result) => {
+        if (result.isConfirmed) {
+          updateQuestion(criteriaId, result.value);
+        }
+      });
+    }
+    
+    /**
+     * Update question via API
+     */
+    function updateQuestion(criteriaId, newText) {
+      Swal.fire({
+        title: 'Updating Question...',
+        allowOutsideClick: false,
+        didOpen: () => {
+          Swal.showLoading();
+        }
+      });
+      
+      fetch(`/api/guidance/criteria/${criteriaId}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          description: newText
+        })
+      })
+      .then(response => response.json())
+      .then(data => {
+        if (data.success) {
+          Swal.fire({
+            icon: 'success',
+            title: 'Question Updated!',
+            text: 'The question has been updated successfully.',
+            timer: 1500,
+            showConfirmButton: false
+          });
+          
+          loadQuestions(currentCategoryId);
+        } else {
+          showError(data.message || 'Failed to update question');
+        }
+      })
+      .catch(error => {
+        console.error('Error updating question:', error);
+        showError('Error updating question: ' + error.message);
+      });
+    }
+    
+    /**
+     * Delete question
+     */
+    function deleteQuestion(criteriaId) {
+      Swal.fire({
+        title: 'Delete Question?',
+        text: 'This action cannot be undone. Make sure no student responses exist for this question.',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#dc2626',
+        cancelButtonColor: '#6b7280',
+        confirmButtonText: 'Yes, Delete',
+        cancelButtonText: 'Cancel'
+      }).then((result) => {
+        if (result.isConfirmed) {
+          Swal.fire({
+            title: 'Deleting Question...',
+            allowOutsideClick: false,
+            didOpen: () => {
+              Swal.showLoading();
+            }
+          });
+          
+          fetch(`/api/guidance/criteria/${criteriaId}`, {
+            method: 'DELETE'
+          })
+          .then(response => response.json())
+          .then(data => {
+            if (data.success) {
+              Swal.fire({
+                icon: 'success',
+                title: 'Question Deleted!',
+                text: 'The question has been deleted successfully.',
+                timer: 1500,
+                showConfirmButton: false
+              });
+              
+              loadQuestions(currentCategoryId);
+            } else {
+              showError(data.message || 'Failed to delete question');
+            }
+          })
+          .catch(error => {
+            console.error('Error deleting question:', error);
+            showError('Error deleting question: ' + error.message);
+          });
+        }
+      });
+    }
+    
+    /**
+     * Move question up
+     */
+    function moveQuestionUp(criteriaId) {
+      const index = currentQuestions.findIndex(q => q.criteria_id === criteriaId);
+      if (index <= 0) return;
+      
+      // Swap with previous question
+      const currentOrder = currentQuestions[index].order;
+      const previousOrder = currentQuestions[index - 1].order;
+      
+      reorderQuestions([
+        { criteria_id: criteriaId, order: previousOrder },
+        { criteria_id: currentQuestions[index - 1].criteria_id, order: currentOrder }
+      ]);
+    }
+    
+    /**
+     * Move question down
+     */
+    function moveQuestionDown(criteriaId) {
+      const index = currentQuestions.findIndex(q => q.criteria_id === criteriaId);
+      if (index < 0 || index >= currentQuestions.length - 1) return;
+      
+      // Swap with next question
+      const currentOrder = currentQuestions[index].order;
+      const nextOrder = currentQuestions[index + 1].order;
+      
+      reorderQuestions([
+        { criteria_id: criteriaId, order: nextOrder },
+        { criteria_id: currentQuestions[index + 1].criteria_id, order: currentOrder }
+      ]);
+    }
+    
+    /**
+     * Reorder questions via API
+     */
+    function reorderQuestions(criteriaOrder) {
+      fetch('/api/guidance/criteria/reorder', {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          criteria_order: criteriaOrder
+        })
+      })
+      .then(response => response.json())
+      .then(data => {
+        if (data.success) {
+          loadQuestions(currentCategoryId);
+        } else {
+          showError(data.message || 'Failed to reorder questions');
+        }
+      })
+      .catch(error => {
+        console.error('Error reordering questions:', error);
+        showError('Error reordering questions: ' + error.message);
+      });
+    }
+    
+    /**
+     * Move category up in order
+     */
+    function moveCategoryUp(categoryId) {
+      const sortedCategories = [...categoriesData]
+        .filter(c => !c.is_archived)
+        .sort((a, b) => (a.display_order || 999) - (b.display_order || 999));
+      
+      const index = sortedCategories.findIndex(c => c.category_id === categoryId);
+      if (index <= 0) return;
+      
+      const currentOrder = sortedCategories[index].display_order || index + 1;
+      const previousOrder = sortedCategories[index - 1].display_order || index;
+      
+      reorderCategories([
+        { category_id: categoryId, display_order: previousOrder },
+        { category_id: sortedCategories[index - 1].category_id, display_order: currentOrder }
+      ]);
+    }
+    
+    /**
+     * Move category down in order
+     */
+    function moveCategoryDown(categoryId) {
+      const sortedCategories = [...categoriesData]
+        .filter(c => !c.is_archived)
+        .sort((a, b) => (a.display_order || 999) - (b.display_order || 999));
+      
+      const index = sortedCategories.findIndex(c => c.category_id === categoryId);
+      if (index < 0 || index >= sortedCategories.length - 1) return;
+      
+      const currentOrder = sortedCategories[index].display_order || index + 1;
+      const nextOrder = sortedCategories[index + 1].display_order || index + 2;
+      
+      reorderCategories([
+        { category_id: categoryId, display_order: nextOrder },
+        { category_id: sortedCategories[index + 1].category_id, display_order: currentOrder }
+      ]);
+    }
+    
+    /**
+     * Reorder categories via API
+     */
+    function reorderCategories(categoryOrder) {
+      // Show loading indicator
+      Swal.fire({
+        title: 'Reordering...',
+        allowOutsideClick: false,
+        didOpen: () => {
+          Swal.showLoading();
+        }
+      });
+      
+      fetch('/api/guidance/categories/reorder', {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          category_order: categoryOrder
+        })
+      })
+      .then(response => response.json())
+      .then(data => {
+        Swal.close();
+        if (data.success) {
+          // Show brief success message
+          const Toast = Swal.mixin({
+            toast: true,
+            position: 'top-end',
+            showConfirmButton: false,
+            timer: 1000,
+            timerProgressBar: true,
+          });
+          
+          Toast.fire({
+            icon: 'success',
+            title: 'Order updated'
+          });
+          
+          loadCategories();
+        } else {
+          showError(data.message || 'Failed to reorder categories');
+        }
+      })
+      .catch(error => {
+        Swal.close();
+        console.error('Error reordering categories:', error);
+        showError('Error reordering categories: ' + error.message);
+      });
+    }
+    
+    /**
+     * Archive a category
+     */
+    function archiveCategory(id) {
+      const category = categoriesData.find(c => c.category_id === id);
+      if (!category) return;
+      
+      Swal.fire({
+        title: 'Archive Category?',
+        html: `
+          <div class="text-left space-y-3">
+            <p>Archive "<strong>${category.name}</strong>"?</p>
+            <p class="text-gray-600">Archived categories:</p>
+            <ul class="list-disc pl-5 text-gray-600 text-sm">
+              <li>Will not appear in student evaluation forms</li>
+              <li>Can be unarchived later if needed</li>
+              <li>All questions and data are preserved</li>
+            </ul>
+          </div>
+        `,
+        icon: 'question',
+        showCancelButton: true,
+        confirmButtonColor: '#f97316',
+        cancelButtonColor: '#6b7280',
+        confirmButtonText: 'Archive',
+        cancelButtonText: 'Cancel'
+      }).then((result) => {
+        if (result.isConfirmed) {
+          // Show loading
+          Swal.fire({
+            title: 'Archiving Category...',
+            allowOutsideClick: false,
+            didOpen: () => {
+              Swal.showLoading();
+            }
+          });
+          
+          fetch(`/api/guidance/categories/${id}/archive`, {
+            method: 'PUT',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ is_archived: true })
+          })
+          .then(response => response.json())
+          .then(data => {
+            if (data.success) {
+              Swal.fire({
+                icon: 'success',
+                title: 'Archived!',
+                text: 'The category has been archived successfully.',
+                confirmButtonColor: '#f97316'
+              }).then(() => {
+                loadCategories();
+                loadQuestionnaires();
+              });
+            } else {
+              showError(data.message || 'Failed to archive category');
+            }
+          })
+          .catch(error => {
+            console.error('Error archiving category:', error);
+            showError('Error archiving category: ' + error.message);
+          });
+        }
+      });
+    }
+    
+    /**
+     * Unarchive a category
+     */
+    function unarchiveCategory(id) {
+      const category = categoriesData.find(c => c.category_id === id);
+      if (!category) return;
+      
+      Swal.fire({
+        title: 'Unarchive Category?',
+        text: `Unarchive "${category.name}"? It will be visible in student evaluation forms again.`,
+        icon: 'question',
+        showCancelButton: true,
+        confirmButtonColor: '#3b82f6',
+        cancelButtonColor: '#6b7280',
+        confirmButtonText: 'Unarchive',
+        cancelButtonText: 'Cancel'
+      }).then((result) => {
+        if (result.isConfirmed) {
+          // Show loading
+          Swal.fire({
+            title: 'Unarchiving Category...',
+            allowOutsideClick: false,
+            didOpen: () => {
+              Swal.showLoading();
+            }
+          });
+          
+          fetch(`/api/guidance/categories/${id}/archive`, {
+            method: 'PUT',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ is_archived: false })
+          })
+          .then(response => response.json())
+          .then(data => {
+            if (data.success) {
+              Swal.fire({
+                icon: 'success',
+                title: 'Unarchived!',
+                text: 'The category has been unarchived successfully.',
+                confirmButtonColor: '#3b82f6'
+              }).then(() => {
+                loadCategories();
+                loadQuestionnaires();
+              });
+            } else {
+              showError(data.message || 'Failed to unarchive category');
+            }
+          })
+          .catch(error => {
+            console.error('Error unarchiving category:', error);
+            showError('Error unarchiving category: ' + error.message);
+          });
+        }
+      });
+    }
+    
+    /**
+     * Show error message
+     */
+    function showError(message) {
+      Swal.fire({
+        icon: 'error',
+        title: 'Error',
+        text: message,
+        confirmButtonColor: '#0059cc'
+      });
+    }
+
+    // ============================================
+    // IMPORT/EXPORT FUNCTIONALITY
+    // ============================================
+    
+    let selectedFile = null;
+    
+    /**
+     * Show import modal
+     */
+    function showImportModal() {
+      document.getElementById('import-modal').classList.remove('hidden');
+      document.body.style.overflow = 'hidden';
+    }
+    
+    /**
+     * Close import modal
+     */
+    function closeImportModal() {
+      document.getElementById('import-modal').classList.add('hidden');
+      document.body.style.overflow = 'auto';
+      clearFileSelection();
+      document.getElementById('import-preview').classList.add('hidden');
+    }
+    
+    /**
+     * Toggle format help section
+     */
+    function toggleFormatHelp() {
+      const helpDiv = document.getElementById('format-help');
+      helpDiv.classList.toggle('hidden');
+    }
+    
+    /**
+     * Setup drag and drop
+     */
+    const dropZone = document.getElementById('drop-zone');
+    
+    if (dropZone) {
+      ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+        dropZone.addEventListener(eventName, preventDefaults, false);
+      });
+      
+      function preventDefaults(e) {
+        e.preventDefault();
+        e.stopPropagation();
+      }
+      
+      ['dragenter', 'dragover'].forEach(eventName => {
+        dropZone.addEventListener(eventName, () => {
+          dropZone.classList.add('border-primary-500', 'bg-primary-100');
+        }, false);
+      });
+      
+      ['dragleave', 'drop'].forEach(eventName => {
+        dropZone.addEventListener(eventName, () => {
+          dropZone.classList.remove('border-primary-500', 'bg-primary-100');
+        }, false);
+      });
+      
+      dropZone.addEventListener('drop', (e) => {
+        const files = e.dataTransfer.files;
+        if (files.length > 0) {
+          handleFileSelect({ target: { files: files } });
+        }
+      }, false);
+    }
+    
+    /**
+     * Handle file selection
+     */
+    function handleFileSelect(event) {
+      const files = event.target.files;
+      if (files.length === 0) return;
+      
+      const file = files[0];
+      const validExtensions = ['.json', '.xlsx', '.csv'];
+      const fileExtension = '.' + file.name.split('.').pop().toLowerCase();
+      
+      if (!validExtensions.includes(fileExtension)) {
+        Swal.fire({
+          icon: 'error',
+          title: 'Invalid File Type',
+          text: 'Please upload a JSON, Excel (.xlsx), or CSV file.',
+          confirmButtonColor: '#0059cc'
+        });
+        return;
+      }
+      
+      selectedFile = file;
+      
+      // Update UI to show selected file
+      document.getElementById('drop-zone-content').classList.add('hidden');
+      document.getElementById('file-selected-info').classList.remove('hidden');
+      document.getElementById('selected-file-name').textContent = file.name;
+      document.getElementById('selected-file-size').textContent = formatFileSize(file.size);
+      
+      // Auto-preview if JSON
+      if (fileExtension === '.json') {
+        previewJSONFile(file);
+      }
+    }
+    
+    /**
+     * Clear file selection
+     */
+    function clearFileSelection() {
+      selectedFile = null;
+      document.getElementById('import-file-input').value = '';
+      document.getElementById('drop-zone-content').classList.remove('hidden');
+      document.getElementById('file-selected-info').classList.add('hidden');
+      document.getElementById('import-preview').classList.add('hidden');
+    }
+    
+    /**
+     * Format file size
+     */
+    function formatFileSize(bytes) {
+      if (bytes === 0) return '0 Bytes';
+      const k = 1024;
+      const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+      const i = Math.floor(Math.log(bytes) / Math.log(k));
+      return Math.round(bytes / Math.pow(k, i) * 100) / 100 + ' ' + sizes[i];
+    }
+    
+    /**
+     * Preview JSON file content
+     */
+    function previewJSONFile(file) {
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        try {
+          const data = JSON.parse(e.target.result);
+          displayPreview(data);
+        } catch (error) {
+          Swal.fire({
+            icon: 'error',
+            title: 'Invalid JSON',
+            text: 'The file contains invalid JSON. Please check the file format.',
+            confirmButtonColor: '#0059cc'
+          });
+        }
+      };
+      reader.readAsText(file);
+    }
+    
+    /**
+     * Display preview of import data
+     */
+    function displayPreview(data) {
+      const previewDiv = document.getElementById('import-preview');
+      const contentDiv = document.getElementById('import-preview-content');
+      
+      let html = '';
+      
+      if (data.categories && Array.isArray(data.categories)) {
+        html += `<div class="mb-3">
+          <p class="font-semibold text-gray-900 mb-2">
+            <i class="fas fa-layer-group mr-2 text-primary-600"></i>
+            Categories to import: ${data.categories.length}
+          </p>
+        </div>`;
+        
+        data.categories.forEach((cat, index) => {
+          const questionCount = cat.questions ? cat.questions.length : 0;
+          html += `
+            <div class="mb-3 p-3 bg-white border border-gray-200 rounded-lg">
+              <div class="flex items-start justify-between">
+                <div class="flex-1">
+                  <p class="font-medium text-gray-900">${index + 1}. ${cat.name || 'Unnamed Category'}</p>
+                  ${cat.description ? `<p class="text-sm text-gray-600 mt-1">${cat.description}</p>` : ''}
+                  <p class="text-xs text-gray-500 mt-1">
+                    <i class="fas fa-question-circle mr-1"></i>
+                    ${questionCount} question${questionCount !== 1 ? 's' : ''}
+                  </p>
+                </div>
+                <span class="ml-2 px-2 py-1 bg-green-100 text-green-800 text-xs font-medium rounded">New</span>
+              </div>
+            </div>
+          `;
+        });
+      } else {
+        html = '<p class="text-sm text-red-600">No valid categories found in the file.</p>';
+      }
+      
+      contentDiv.innerHTML = html;
+      previewDiv.classList.remove('hidden');
+    }
+    
+    /**
+     * Process import
+     */
+    function processImport() {
+      if (!selectedFile) {
+        Swal.fire({
+          icon: 'warning',
+          title: 'No File Selected',
+          text: 'Please select a file to import.',
+          confirmButtonColor: '#0059cc'
+        });
+        return;
+      }
+      
+      const overwrite = document.getElementById('import-overwrite').checked;
+      const merge = document.getElementById('import-merge').checked;
+      const validate = document.getElementById('import-validate').checked;
+      
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        try {
+          const data = JSON.parse(e.target.result);
+          
+          // Show confirmation
+          Swal.fire({
+            title: 'Confirm Import',
+            html: `
+              <div class="text-left">
+                <p class="mb-2">You are about to import:</p>
+                <ul class="list-disc pl-5 mb-4 text-sm">
+                  <li><strong>${data.categories?.length || 0}</strong> categories</li>
+                  <li>Import mode: <strong>${overwrite ? 'Replace' : 'Merge'}</strong></li>
+                  <li>Validation: <strong>${validate ? 'Enabled' : 'Disabled'}</strong></li>
+                </ul>
+                <p class="text-sm text-yellow-700 bg-yellow-50 p-2 rounded">
+                  <i class="fas fa-exclamation-triangle mr-1"></i>
+                  ${overwrite ? 'This will replace all existing data!' : 'New items will be added to existing data.'}
+                </p>
+              </div>
+            `,
+            icon: 'question',
+            showCancelButton: true,
+            confirmButtonColor: '#0059cc',
+            cancelButtonColor: '#6b7280',
+            confirmButtonText: 'Yes, Import',
+            cancelButtonText: 'Cancel'
+          }).then((result) => {
+            if (result.isConfirmed) {
+              performImport(data, { overwrite, merge, validate });
+            }
+          });
+        } catch (error) {
+          Swal.fire({
+            icon: 'error',
+            title: 'Invalid File',
+            text: 'Unable to parse the file. Please check the file format.',
+            confirmButtonColor: '#0059cc'
+          });
+        }
+      };
+      reader.readAsText(selectedFile);
+    }
+    
+    /**
+     * Perform the actual import via API
+     */
+    function performImport(data, options) {
+      Swal.fire({
+        title: 'Importing Data...',
+        html: 'Please wait while we import your questionnaire data.',
+        allowOutsideClick: false,
+        didOpen: () => {
+          Swal.showLoading();
+        }
+      });
+      
+      fetch('/api/guidance/questionnaires/import', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          data: data,
+          options: options
+        })
+      })
+      .then(response => response.json())
+      .then(result => {
+        if (result.success) {
+          Swal.fire({
+            icon: 'success',
+            title: 'Import Successful!',
+            html: `
+              <div class="text-left">
+                <p class="mb-2">Data imported successfully:</p>
+                <ul class="list-disc pl-5 text-sm">
+                  <li>${result.imported?.categories || 0} categories imported</li>
+                  <li>${result.imported?.questions || 0} questions imported</li>
+                </ul>
+              </div>
+            `,
+            confirmButtonColor: '#0059cc'
+          }).then(() => {
+            closeImportModal();
+            loadCategories();
+            loadQuestionnaires();
+          });
+        } else {
+          Swal.fire({
+            icon: 'error',
+            title: 'Import Failed',
+            text: result.message || 'An error occurred during import.',
+            confirmButtonColor: '#0059cc'
+          });
+        }
+      })
+      .catch(error => {
+        console.error('Import error:', error);
+        Swal.fire({
+          icon: 'error',
+          title: 'Import Error',
+          text: 'An error occurred while importing the data: ' + error.message,
+          confirmButtonColor: '#0059cc'
+        });
+      });
+    }
+    
+    /**
+     * Export questionnaires
+     */
+    function exportQuestionnaires() {
+      Swal.fire({
+        title: 'Export Questionnaires',
+        html: `
+          <div class="text-left space-y-4">
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-2">Export Format</label>
+              <select id="export-format" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-primary-500 focus:border-primary-500">
+                <option value="excel">Excel (.xlsx) - Recommended</option>
+                <option value="csv">CSV</option>
+              </select>
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-2">Export Options</label>
+              <div class="space-y-2">
+                <label class="flex items-center">
+                  <input type="checkbox" id="export-active" class="h-4 w-4 text-primary-600 focus:ring-primary-500 border-gray-300 rounded" checked>
+                  <span class="ml-2 text-sm text-gray-700">Include active categories</span>
+                </label>
+                <label class="flex items-center">
+                  <input type="checkbox" id="export-archived" class="h-4 w-4 text-primary-600 focus:ring-primary-500 border-gray-300 rounded">
+                  <span class="ml-2 text-sm text-gray-700">Include archived categories</span>
+                </label>
+                <label class="flex items-center">
+                  <input type="checkbox" id="export-questions" class="h-4 w-4 text-primary-600 focus:ring-primary-500 border-gray-300 rounded" checked>
+                  <span class="ml-2 text-sm text-gray-700">Include all questions</span>
+                </label>
+              </div>
+            </div>
+          </div>
+        `,
+        width: 600,
+        showCancelButton: true,
+        confirmButtonText: '<i class="fas fa-download mr-2"></i>Export',
+        cancelButtonText: 'Cancel',
+        confirmButtonColor: '#10b981',
+        preConfirm: () => {
+          return {
+            format: document.getElementById('export-format').value,
+            includeActive: document.getElementById('export-active').checked,
+            includeArchived: document.getElementById('export-archived').checked,
+            includeQuestions: document.getElementById('export-questions').checked
+          };
+        }
+      }).then((result) => {
+        if (result.isConfirmed) {
+          performExport(result.value);
+        }
+      });
+    }
+    
+    /**
+     * Perform the actual export
+     */
+    function performExport(options) {
+      Swal.fire({
+        title: 'Exporting Data...',
+        html: 'Please wait while we prepare your export file.',
+        allowOutsideClick: false,
+        didOpen: () => {
+          Swal.showLoading();
+        }
+      });
+      
+      const params = new URLSearchParams({
+        format: options.format,
+        include_active: options.includeActive,
+        include_archived: options.includeArchived,
+        include_questions: options.includeQuestions
+      });
+      
+      fetch(`/api/guidance/questionnaires/export?${params.toString()}`)
+        .then(response => {
+          if (!response.ok) {
+            throw new Error('Export failed');
+          }
+          return response.blob();
+        })
+        .then(blob => {
+          // Create download link
+          const url = window.URL.createObjectURL(blob);
+          const a = document.createElement('a');
+          a.href = url;
+          
+          const timestamp = new Date().toISOString().replace(/[:.]/g, '-').slice(0, -5);
+          const extension = options.format === 'excel' ? 'xlsx' : options.format;
+          a.download = `questionnaires_export_${timestamp}.${extension}`;
+          
+          document.body.appendChild(a);
+          a.click();
+          window.URL.revokeObjectURL(url);
+          document.body.removeChild(a);
+          
+          Swal.fire({
+            icon: 'success',
+            title: 'Export Complete!',
+            text: 'Your questionnaire data has been exported successfully.',
+            confirmButtonColor: '#10b981'
+          });
+        })
+        .catch(error => {
+          console.error('Export error:', error);
+          Swal.fire({
+            icon: 'error',
+            title: 'Export Failed',
+            text: 'An error occurred while exporting the data: ' + error.message,
+            confirmButtonColor: '#0059cc'
+          });
+        });
+    }
+    
+    /**
+     * Download template file
+     */
+    function downloadTemplate() {
+      const template = {
+        categories: [
+          {
+            name: "Teaching Effectiveness",
+            description: "Questions about teaching quality and methods",
+            questions: [
+              "The instructor explains concepts clearly and effectively",
+              "The instructor is well-prepared for each class session",
+              "The instructor uses appropriate teaching methods"
+            ]
+          },
+          {
+            name: "Course Content",
+            description: "Questions about course materials and content",
+            questions: [
+              "The course content is relevant and up-to-date",
+              "The course materials are well-organized",
+              "The workload is appropriate for the course level"
+            ]
+          }
+        ]
+      };
+      
+      const dataStr = JSON.stringify(template, null, 2);
+      const dataBlob = new Blob([dataStr], { type: 'application/json' });
+      const url = window.URL.createObjectURL(dataBlob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'questionnaire_template.json';
+      document.body.appendChild(a);
+      a.click();
+      window.URL.revokeObjectURL(url);
+      document.body.removeChild(a);
+      
+      Swal.fire({
+        icon: 'success',
+        title: 'Template Downloaded!',
+        text: 'You can now edit this template and import it back.',
+        confirmButtonColor: '#0059cc'
+      });
+    }
+  </script>
+  
+  <!-- Prevent logout on browser back button -->
+  <script src="{{ url_for('static', filename='js/prevent-back-logout.js') }}"></script>
+
+  <!-- Session Timeout Monitor (Auto-logout after 1 hour) -->
+  <script src="{{ url_for('static', filename='js/session-timeout.js') }}"></script>
+</body>
+</html>

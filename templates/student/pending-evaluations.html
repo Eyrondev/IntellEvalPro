@@ -1,0 +1,1398 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+  <title>Pending Evaluations | IntellEvalPro</title>
+  
+  <!-- Favicon -->
+  <link rel="icon" type="image/png" href="{{ url_for('static', filename='images/nclogo.png') }}">
+  <link rel="shortcut icon" type="image/png" href="{{ url_for('static', filename='images/nclogo.png') }}">
+  <link rel="apple-touch-icon" href="{{ url_for('static', filename='images/nclogo.png') }}">
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  
+  <!-- Font Awesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"/>
+  
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  
+  <!-- jQuery -->
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  
+  <!-- SweetAlert2 -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11.7.12/dist/sweetalert2.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.7.12/dist/sweetalert2.all.min.js"></script>
+  
+  <script>
+    tailwind.config = {
+      theme: {
+        fontFamily: {
+          'sans': ['Inter', 'system-ui', 'sans-serif'],
+        },
+        extend: {
+          colors: {
+            primary: {
+              50: '#e6f0ff',
+              100: '#b3d1ff',
+              200: '#80b3ff',
+              300: '#4d94ff', 
+              400: '#1a75ff',
+              500: '#0059cc', // Primary color
+              600: '#004db3',
+              700: '#004099',
+              800: '#003380',
+              900: '#002766',
+            },
+            secondary: {
+              50: '#f5f7fa',
+              100: '#e4e7eb',
+              200: '#cbd2d9',
+              300: '#9aa5b1',
+              400: '#7b8794',
+              500: '#616e7c',
+              600: '#52606d',
+              700: '#3e4c59',
+              800: '#323f4b',
+              900: '#1f2933',
+            },
+          },
+        }
+      }
+    }
+  </script>
+  
+  <style>
+    /* Global styles */
+    body {
+      font-family: 'Inter', sans-serif;
+      overflow-x: hidden;
+    }
+    
+    /* Custom scrollbar */
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    
+    ::-webkit-scrollbar-track {
+      background: #f1f1f1;
+      border-radius: 10px;
+    }
+    
+    ::-webkit-scrollbar-thumb {
+      background: #c1c1c1;
+      border-radius: 10px;
+    }
+    
+    ::-webkit-scrollbar-thumb:hover {
+      background: #a8a8a8;
+    }
+    
+    /* Card hover effect */
+    .evaluation-card {
+      transition: all 0.3s ease;
+    }
+    
+    .evaluation-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+    }
+    
+    /* Progress bar animation */
+    .progress-bar {
+      transition: width 0.5s ease-in-out;
+    }
+    
+    /* Button styles */
+    .btn-primary {
+      background: linear-gradient(135deg, #0059cc 0%, #004db3 100%);
+      transition: all 0.3s ease;
+    }
+    
+    .btn-primary:hover {
+      background: linear-gradient(135deg, #004db3 0%, #004099 100%);
+      transform: translateY(-1px);
+    }
+
+    /* Enhanced button and filter styles */
+    .btn-transition {
+      transition: all 0.3s ease;
+    }
+
+    .spin-slow {
+      animation: spin-slow 1s linear infinite;
+    }
+
+    @keyframes spin-slow {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
+    }
+
+    .modal-backdrop {
+      backdrop-filter: blur(4px);
+      background-color: rgba(0, 0, 0, 0.5);
+    }
+
+    .filter-section {
+      border-left: 3px solid #3B82F6;
+      padding-left: 1rem;
+      margin-bottom: 1rem;
+    }
+
+    .filter-option:hover {
+      background-color: #F3F4F6;
+    }
+
+    .floating-notification {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      z-index: 9999;
+      min-width: 300px;
+      border-radius: 8px;
+      padding: 16px;
+      box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
+      transform: translateX(100%);
+      transition: transform 0.3s ease;
+    }
+
+    .floating-notification.show {
+      transform: translateX(0);
+    }
+  </style>
+</head>
+
+<body class="bg-gray-50">
+  <div class="flex h-screen bg-gray-50">
+    <!-- Sidebar (will be loaded dynamically) -->
+    <div id="sidebar-container"></div>
+    
+    <!-- Main content -->
+    <div class="lg:ml-64 flex flex-col flex-1 min-h-screen">
+      <!-- Top Navigation (will be loaded dynamically) -->
+      <div id="header-container"></div>
+
+      <!-- Main content area -->
+      <main id="main-content" class="flex-1 overflow-auto p-4 md:p-6 bg-gray-50">
+        <!-- Page title and controls -->
+        <div class="mb-6 md:flex md:items-center md:justify-between">
+          <div class="flex-1 min-w-0">
+            <h1 class="text-2xl font-bold leading-7 text-gray-900 sm:text-3xl sm:truncate">
+              Pending Evaluations
+            </h1>
+            <p class="mt-1 text-sm text-gray-500">
+              Complete your faculty evaluations before the deadline
+            </p>
+          </div>
+          <div class="mt-4 flex md:mt-0 md:ml-4 space-x-2">
+            <button type="button" id="refresh-btn" class="btn-transition inline-flex items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 transition-colors duration-200">
+              <i class="fas fa-sync-alt -ml-1 mr-2 h-4 w-4" id="refresh-icon"></i>
+              Refresh List
+            </button>
+            <button type="button" id="filter-btn" class="btn-transition inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 transition-colors duration-200">
+              <i class="fas fa-filter -ml-1 mr-2 h-4 w-4"></i>
+              Filter
+            </button>
+          </div>
+        </div>
+
+        <!-- Academic Period Info -->
+        <div class="bg-gradient-to-r from-primary-50 to-blue-50 border border-primary-200 rounded-lg shadow-sm p-6 mb-6">
+          <div class="flex flex-col lg:flex-row items-start lg:items-center justify-between">
+            <div class="flex items-center mb-4 lg:mb-0">
+              <div class="flex-shrink-0">
+                <div class="w-16 h-16 rounded-full bg-gradient-to-br from-primary-500 to-primary-600 flex items-center justify-center text-white shadow-lg">
+                  <i class="fas fa-calendar-alt text-xl"></i>
+                </div>
+              </div>
+              <div class="ml-4">
+                {% if current_period %}
+                <h2 class="text-xl font-semibold text-gray-900">{{ current_period.title }}</h2>
+                <p class="text-sm text-gray-600 mt-1">
+                  Evaluation period: {{ current_period.start_date.strftime('%B %d') }} - {{ current_period.end_date.strftime('%B %d, %Y') }}
+                </p>
+                <div class="flex items-center mt-2">
+                  {% if current_period.status == 'Active' %}
+                  <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                    <span class="w-1.5 h-1.5 mr-1 rounded-full bg-green-500"></span>
+                    Active Period
+                  </span>
+                  {% else %}
+                  <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
+                    <span class="w-1.5 h-1.5 mr-1 rounded-full bg-gray-500"></span>
+                    {{ current_period.status }}
+                  </span>
+                  {% endif %}
+                </div>
+                {% else %}
+                <h2 class="text-xl font-semibold text-gray-900">No Active Evaluation Period</h2>
+                <p class="text-sm text-gray-600 mt-1">There are currently no active evaluation periods.</p>
+                <div class="flex items-center mt-2">
+                  <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
+                    <span class="w-1.5 h-1.5 mr-1 rounded-full bg-gray-500"></span>
+                    No Active Period
+                  </span>
+                </div>
+                {% endif %}
+              </div>
+            </div>
+            <div class="flex flex-col items-start lg:items-end">
+              {% if current_period and current_period.days_remaining is not none %}
+                {% if current_period.days_remaining > 0 %}
+                <div class="text-sm font-medium text-gray-700 mb-1">Time Remaining</div>
+                <div class="text-3xl font-bold text-primary-600 mb-1">{{ current_period.days_remaining }} days</div>
+                <div class="text-sm text-gray-500">Until deadline</div>
+                {% elif current_period.days_remaining == 0 %}
+                <div class="text-sm font-medium text-red-700 mb-1">Last Day!</div>
+                <div class="text-3xl font-bold text-red-600 mb-1">Today</div>
+                <div class="text-sm text-red-500">Deadline is today</div>
+                {% else %}
+                <div class="text-sm font-medium text-red-700 mb-1">Period Ended</div>
+                <div class="text-3xl font-bold text-red-600 mb-1">{{ current_period.days_remaining|abs }} days</div>
+                <div class="text-sm text-red-500">Past deadline</div>
+                {% endif %}
+              {% else %}
+              <div class="text-sm font-medium text-gray-700 mb-1">Status</div>
+              <div class="text-lg font-bold text-gray-600 mb-1">No Period</div>
+              <div class="text-sm text-gray-500">Check back later</div>
+              {% endif %}
+            </div>
+          </div>
+        </div>
+
+        <!-- Evaluation Progress -->
+        <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6 mb-6">
+          <div class="flex items-center justify-between mb-4">
+            <h3 class="text-lg font-semibold text-gray-900">Your Progress</h3>
+            {% if progress_percentage == 100 %}
+            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+              Complete
+            </span>
+            {% elif progress_percentage > 0 %}
+            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
+              In Progress
+            </span>
+            {% else %}
+            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
+              Not Started
+            </span>
+            {% endif %}
+          </div>
+          
+          <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <!-- Progress Bar -->
+            <div class="lg:col-span-2">
+              <div class="flex justify-between text-sm text-gray-600 mb-2">
+                <span>Evaluations Completed</span>
+                <span>{{ completed_count }} of {{ total_evaluations }}</span>
+              </div>
+              <div class="w-full bg-gray-200 rounded-full h-3">
+                <div id="progress-bar" class="progress-bar bg-gradient-to-r from-primary-500 to-primary-600 h-3 rounded-full shadow-sm" data-progress="{{ progress_percentage|default(0) }}" style="width: 0%"></div>
+              </div>
+              <div class="flex justify-between text-xs text-gray-500 mt-1">
+                <span>Started</span>
+                <span>{{ progress_percentage }}% Complete</span>
+                <span>Goal</span>
+              </div>
+            </div>
+            
+            <!-- Stats -->
+            <div class="flex flex-col justify-center">
+              <div class="text-center lg:text-right">
+                <div class="text-3xl font-bold text-primary-600 mb-1">{{ progress_percentage }}%</div>
+                <div class="text-sm text-gray-500">Complete</div>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Quick Stats -->
+          <div class="grid grid-cols-3 gap-4 mt-6 pt-4 border-t border-gray-200">
+            <div class="text-center">
+              <div class="text-lg font-semibold text-green-600">{{ completed_count }}</div>
+              <div class="text-xs text-gray-500">Completed</div>
+            </div>
+            <div class="text-center">
+              <div class="text-lg font-semibold text-yellow-600">{{ pending_count }}</div>
+              <div class="text-xs text-gray-500">Pending</div>
+            </div>
+            <div class="text-center">
+              {% if current_period and current_period.days_remaining is not none %}
+                {% if current_period.days_remaining >= 0 %}
+                <div class="text-lg font-semibold text-gray-600">{{ current_period.days_remaining }}</div>
+                <div class="text-xs text-gray-500">Days Left</div>
+                {% else %}
+                <div class="text-lg font-semibold text-red-600">{{ current_period.days_remaining|abs }}</div>
+                <div class="text-xs text-red-500">Days Past</div>
+                {% endif %}
+              {% else %}
+              <div class="text-lg font-semibold text-gray-600">-</div>
+              <div class="text-xs text-gray-500">No Period</div>
+              {% endif %}
+            </div>
+          </div>
+        </div>
+
+        <!-- Pending Evaluations List -->
+        <div class="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden mb-6">
+          <div class="px-6 py-4 border-b border-gray-200 bg-gray-50">
+            <div class="flex items-center justify-between">
+              <h3 class="text-lg font-semibold text-gray-900">Pending Evaluations</h3>
+              {% if pending_count > 0 %}
+              <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">
+                {{ pending_count }} Pending
+              </span>
+              {% else %}
+              <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                0 Pending
+              </span>
+              {% endif %}
+            </div>
+          </div>
+          
+          <!-- Evaluation Cards -->
+          <div class="divide-y divide-gray-200">
+            {% if evaluations %}
+              {% for evaluation in evaluations %}
+              <!-- Dynamic Evaluation Item -->
+              <div class="evaluation-card p-6 hover:bg-gray-50 transition-all duration-300">
+                <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between">
+                  <div class="flex items-start mb-4 lg:mb-0">
+                    <div class="flex-shrink-0">
+                      <div class="w-14 h-14 rounded-full bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center text-white shadow-lg">
+                        <i class="fas fa-user-tie text-lg"></i>
+                      </div>
+                    </div>
+                    <div class="ml-4 flex-1">
+                      <h4 class="text-lg font-semibold text-gray-900">{{ evaluation.faculty_name }}</h4>
+                      <div class="text-sm text-gray-600 mt-0.5">{{ evaluation.subject_title }} ({{ evaluation.subject_code }})</div>
+                      <div class="text-sm text-gray-500 mt-1">{{ evaluation.period_title }}</div>
+                      <div class="flex items-center mt-2 space-x-4">
+                        <div class="flex items-center text-xs text-gray-500">
+                          <i class="fas fa-door-open mr-1"></i>
+                          <span>{{ evaluation.section_name }}</span>
+                        </div>
+                        {% if evaluation.schedule %}
+                        <div class="flex items-center text-xs text-gray-500">
+                          <i class="fas fa-clock mr-1"></i>
+                          <span>{{ evaluation.schedule }}</span>
+                        </div>
+                        {% endif %}
+                        {% if evaluation.room %}
+                        <div class="flex items-center text-xs text-gray-500">
+                          <i class="fas fa-map-marker-alt mr-1"></i>
+                          <span>{{ evaluation.room }}</span>
+                        </div>
+                        {% endif %}
+                      </div>
+                    </div>
+                  </div>
+                  <div class="flex flex-col lg:items-end space-y-2">
+                    {% if evaluation.status == 'Expired' %}
+                    <div class="flex items-center text-red-600 text-sm font-medium">
+                      <i class="fas fa-exclamation-triangle mr-2"></i>
+                      <span>Timer Expired</span>
+                    </div>
+                    <button type="button" class="bg-red-600 inline-flex items-center px-4 py-2 rounded-lg text-sm font-medium text-white shadow-lg cursor-not-allowed opacity-75 w-full lg:w-auto justify-center" disabled title="The evaluation time limit has been exceeded">
+                      <i class="fas fa-clock mr-2"></i>
+                      Time Expired
+                    </button>
+                    {% else %}
+                    <div class="flex items-center text-yellow-600 text-sm font-medium">
+                      <i class="fas fa-clock mr-2"></i>
+                      <span>Due {{ evaluation.end_date.strftime('%b %d, %Y') if evaluation.end_date else 'Soon' }}</span>
+                    </div>
+                    {% if evaluation.status == 'Pending' %}
+                    <button type="button" class="btn-primary inline-flex items-center px-4 py-2 rounded-lg text-sm font-medium text-white shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all duration-300 w-full lg:w-auto justify-center" data-evaluation-id="{{ evaluation.evaluation_id }}">
+                      <i class="fas fa-clipboard-check mr-2"></i>
+                      Start Evaluation
+                    </button>
+                    {% elif evaluation.status == 'In Progress' %}
+                    <button type="button" class="bg-orange-500 hover:bg-orange-600 inline-flex items-center px-4 py-2 rounded-lg text-sm font-medium text-white shadow-lg hover:shadow-xl transform hover:-translate-y-0.5 transition-all duration-300 w-full lg:w-auto justify-center" data-evaluation-id="{{ evaluation.evaluation_id }}">
+                      <i class="fas fa-edit mr-2"></i>
+                      Continue Evaluation
+                    </button>
+                    {% endif %}
+                    {% endif %}
+                  </div>
+                </div>
+              </div>
+              {% endfor %}
+            {% else %}
+              <!-- No Evaluations Message -->
+              <div class="p-12 text-center">
+                <div class="w-24 h-24 rounded-full bg-gray-100 flex items-center justify-center mx-auto mb-4">
+                  <i class="fas fa-clipboard-list text-gray-400 text-2xl"></i>
+                </div>
+                <h3 class="text-lg font-medium text-gray-900 mb-2">No Pending Evaluations</h3>
+                <p class="text-sm text-gray-500 mb-4">You have no pending faculty evaluations at this time.</p>
+                <button type="button" id="refresh-btn" class="btn-transition inline-flex items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500">
+                  <i class="fas fa-sync-alt mr-2"></i>
+                  Check Again
+                </button>
+              </div>
+            {% endif %}
+          </div>
+        </div>
+    
+    <!-- Completed Evaluations Summary -->
+    <div class="bg-white rounded-lg shadow-sm overflow-hidden mb-6">
+      <div class="p-4 border-b border-gray-200">
+        <div class="flex items-center justify-between">
+          <h3 class="text-lg font-medium text-gray-800">Recently Completed</h3>
+          {% if completed_count > 0 %}
+          <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+            {{ completed_count }} Completed
+          </span>
+          {% endif %}
+        </div>
+      </div>
+      
+      <div class="divide-y divide-gray-200">
+        {% if completed_evaluations %}
+          {% for eval in completed_evaluations %}
+          <div class="p-4 hover:bg-gray-50 transition-colors duration-150">
+            <div class="flex flex-col md:flex-row md:items-center md:justify-between">
+              <div class="mb-4 md:mb-0">
+                <div class="flex items-start">
+                  <div class="w-12 h-12 rounded-full bg-green-100 flex items-center justify-center text-green-700">
+                    <i class="fas fa-user-tie"></i>
+                  </div>
+                  <div class="ml-4">
+                    <h4 class="font-medium text-gray-900">{{ eval.faculty_name }}</h4>
+                    <div class="text-sm text-gray-600 mt-0.5">{{ eval.subject_title }} ({{ eval.subject_code }})</div>
+                    <div class="text-sm text-gray-500 mt-1">{{ eval.period_title }}</div>
+                  </div>
+                </div>
+              </div>
+              <div class="flex flex-col md:items-end">
+                <div class="flex items-center text-green-600 text-sm mb-2">
+                  <i class="fas fa-check-circle mr-1"></i> 
+                  Completed {% if eval.completion_time %}on {{ eval.completion_time.strftime('%b %d, %Y') }}{% else %}recently{% endif %}
+                </div>
+                <button type="button" class="inline-flex items-center px-3 py-1.5 border border-gray-300 rounded-md text-xs font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 transition-colors duration-200" data-evaluation-id="{{ eval.evaluation_id }}">
+                  <i class="fas fa-eye mr-1"></i> View Details
+                </button>
+              </div>
+            </div>
+          </div>
+          {% endfor %}
+        {% else %}
+          <div class="p-8 text-center">
+            <div class="w-16 h-16 rounded-full bg-gray-100 flex items-center justify-center mx-auto mb-4">
+              <i class="fas fa-clipboard-check text-gray-400 text-xl"></i>
+            </div>
+            <h3 class="text-sm font-medium text-gray-900 mb-2">No Completed Evaluations</h3>
+            <p class="text-xs text-gray-500">Complete your pending evaluations to see them here.</p>
+          </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+
+  <!-- Filter Modal -->
+  <div id="filter-modal" class="hidden fixed inset-0 z-50 overflow-y-auto" aria-labelledby="filter-modal-title" role="dialog" aria-modal="true">
+    <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+      <!-- Background overlay -->
+      <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" aria-hidden="true"></div>
+
+      <!-- Modal panel -->
+      <div class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
+        <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
+          <div class="sm:flex sm:items-start">
+            <div class="mx-auto flex-shrink-0 flex items-center justify-center h-12 w-12 rounded-full bg-primary-100 sm:mx-0 sm:h-10 sm:w-10">
+              <i class="fas fa-filter text-primary-600"></i>
+            </div>
+            <div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left w-full">
+              <h3 class="text-lg leading-6 font-medium text-gray-900" id="filter-modal-title">
+                Filter Evaluations
+              </h3>
+              <div class="mt-4">
+                <form id="filter-form" class="space-y-4">
+                  <!-- Status Filter -->
+                  <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Status</label>
+                    <div class="space-y-2">
+                      <label class="inline-flex items-center">
+                        <input type="checkbox" name="status" value="all" checked class="rounded border-gray-300 text-primary-600 shadow-sm focus:border-primary-300 focus:ring focus:ring-primary-200 focus:ring-opacity-50">
+                        <span class="ml-2 text-sm text-gray-700">All Evaluations</span>
+                      </label>
+                      <label class="inline-flex items-center">
+                        <input type="checkbox" name="status" value="pending" class="rounded border-gray-300 text-primary-600 shadow-sm focus:border-primary-300 focus:ring focus:ring-primary-200 focus:ring-opacity-50">
+                        <span class="ml-2 text-sm text-gray-700">Pending Only</span>
+                      </label>
+                      <label class="inline-flex items-center">
+                        <input type="checkbox" name="status" value="completed" class="rounded border-gray-300 text-primary-600 shadow-sm focus:border-primary-300 focus:ring focus:ring-primary-200 focus:ring-opacity-50">
+                        <span class="ml-2 text-sm text-gray-700">Completed Only</span>
+                      </label>
+                    </div>
+                  </div>
+
+                  <!-- Course Filter -->
+                  <div>
+                    <label for="course-filter" class="block text-sm font-medium text-gray-700 mb-2">Course</label>
+                    <select id="course-filter" name="course" class="mt-1 block w-full pl-3 pr-10 py-2 text-base border border-gray-300 rounded-md focus:outline-none focus:ring-primary-500 focus:border-primary-500 sm:text-sm">
+                      <option value="">All Courses</option>
+                      <option value="CS101">CS101 - Programming Fundamentals</option>
+                      <option value="CS201">CS201 - Data Structures</option>
+                      <option value="CS301">CS301 - Algorithms</option>
+                      <option value="CS403">CS403 - Software Engineering</option>
+                    </select>
+                  </div>
+
+                  <!-- Faculty Filter -->
+                  <div>
+                    <label for="faculty-filter" class="block text-sm font-medium text-gray-700 mb-2">Faculty</label>
+                    <select id="faculty-filter" name="faculty" class="mt-1 block w-full pl-3 pr-10 py-2 text-base border border-gray-300 rounded-md focus:outline-none focus:ring-primary-500 focus:border-primary-500 sm:text-sm">
+                      <option value="">All Faculty</option>
+                      <option value="John Smith">John Smith</option>
+                      <option value="Emily Chen">Prof. Emily Chen</option>
+                      <option value="Robert Brown">Dr. Robert Brown</option>
+                      <option value="Sarah Johnson">Dr. Sarah Johnson</option>
+                    </select>
+                  </div>
+
+                  <!-- Sort By -->
+                  <div>
+                    <label for="sort-filter" class="block text-sm font-medium text-gray-700 mb-2">Sort By</label>
+                    <select id="sort-filter" name="sort" class="mt-1 block w-full pl-3 pr-10 py-2 text-base border border-gray-300 rounded-md focus:outline-none focus:ring-primary-500 focus:border-primary-500 sm:text-sm">
+                      <option value="deadline">Deadline (Nearest First)</option>
+                      <option value="course">Course Name</option>
+                      <option value="faculty">Faculty Name</option>
+                      <option value="status">Status</option>
+                    </select>
+                  </div>
+                </form>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
+          <button type="button" id="apply-filter-btn" class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-primary-600 text-base font-medium text-white hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 sm:ml-3 sm:w-auto sm:text-sm">
+            Apply Filters
+          </button>
+          <button type="button" id="clear-filter-btn" class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm">
+            Clear All
+          </button>
+          <button type="button" id="cancel-filter-btn" class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 sm:mt-0 sm:w-auto sm:text-sm">
+            Cancel
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Evaluation Form Modal -->
+  <div id="evaluation-modal" class="hidden fixed inset-0 z-50 overflow-y-auto" aria-labelledby="modal-title" role="dialog" aria-modal="true">
+    <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+      <!-- Background overlay -->
+      <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" aria-hidden="true"></div>
+
+      <!-- Modal panel -->
+      <div class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-2xl sm:w-full">
+        <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
+          <div class="sm:flex sm:items-start">
+            <div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left w-full">
+              <h3 class="text-lg leading-6 font-medium text-gray-900" id="modal-title">
+                Faculty Evaluation Form
+              </h3>
+              <div class="mt-4 border-b border-gray-200 pb-4">
+                <div class="flex items-start">
+                  <div class="flex-shrink-0">
+                    <div class="w-12 h-12 rounded-full bg-blue-100 flex items-center justify-center text-blue-700">
+                      <i class="fas fa-user-tie"></i>
+                    </div>
+                  </div>
+                  <div class="ml-4">
+                    <h4 class="font-medium text-gray-900" id="faculty-name">Prof. John Smith</h4>
+                    <p class="text-sm text-gray-600" id="course-name">Computer Programming 1 (CS101)</p>
+                    <p class="text-sm text-gray-500" id="department-name">Department of Computer Science</p>
+                  </div>
+                </div>
+              </div>
+              
+              <div class="mt-4">
+                <form id="evaluation-form" class="space-y-6">
+                  <!-- Instructions -->
+                  <div class="text-sm text-gray-600">
+                    <p>Please rate the instructor on a scale of 1-5 for each criterion:</p>
+                    <div class="flex items-center mt-1">
+                      <span class="text-yellow-400 flex">
+                        <i class="fas fa-star"></i>
+                        <i class="far fa-star"></i>
+                        <i class="far fa-star"></i>
+                        <i class="far fa-star"></i>
+                        <i class="far fa-star"></i>
+                      </span>
+                      <span class="ml-2 text-xs">Poor</span>
+                    </div>
+                    <div class="flex items-center">
+                      <span class="text-yellow-400 flex">
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                        <i class="fas fa-star"></i>
+                      </span>
+                      <span class="ml-2 text-xs">Excellent</span>
+                    </div>
+                  </div>
+                  
+                  <!-- Evaluation Categories -->
+                  <div class="space-y-4">
+                    <!-- Category 1 -->
+                    <div>
+                      <h5 class="font-medium text-gray-800 mb-2">1. Teaching Effectiveness</h5>
+                      
+                      <!-- Question 1.1 -->
+                      <div class="bg-gray-50 p-3 rounded-lg mb-3">
+                        <div class="mb-2 text-sm">The instructor explains concepts clearly and effectively.</div>
+                        <div class="flex flex-wrap items-center">
+                          <div class="rating-group" data-question="q1_1">
+                            <label class="star-rating-label">
+                              <input type="radio" name="q1_1" value="1" class="star-rating">
+                              <i class="far fa-star text-yellow-400 hover:text-yellow-500 cursor-pointer"></i>
+                            </label>
+                            <label class="star-rating-label">
+                              <input type="radio" name="q1_1" value="2" class="star-rating">
+                              <i class="far fa-star text-yellow-400 hover:text-yellow-500 cursor-pointer"></i>
+                            </label>
+                            <label class="star-rating-label">
+                              <input type="radio" name="q1_1" value="3" class="star-rating">
+                              <i class="far fa-star text-yellow-400 hover:text-yellow-500 cursor-pointer"></i>
+                            </label>
+                            <label class="star-rating-label">
+                              <input type="radio" name="q1_1" value="4" class="star-rating">
+                              <i class="far fa-star text-yellow-400 hover:text-yellow-500 cursor-pointer"></i>
+                            </label>
+                            <label class="star-rating-label">
+                              <input type="radio" name="q1_1" value="5" class="star-rating">
+                              <i class="far fa-star text-yellow-400 hover:text-yellow-500 cursor-pointer"></i>
+                            </label>
+                          </div>
+                        </div>
+                      </div>
+                      
+                      <!-- Question 1.2 -->
+                      <div class="bg-gray-50 p-3 rounded-lg mb-3">
+                        <div class="mb-2 text-sm">The instructor is well-prepared for each class session.</div>
+                        <div class="flex flex-wrap items-center">
+                          <div class="rating-group" data-question="q1_2">
+                            <label class="star-rating-label">
+                              <input type="radio" name="q1_2" value="1" class="star-rating">
+                              <i class="far fa-star text-yellow-400 hover:text-yellow-500 cursor-pointer"></i>
+                            </label>
+                            <label class="star-rating-label">
+                              <input type="radio" name="q1_2" value="2" class="star-rating">
+                              <i class="far fa-star text-yellow-400 hover:text-yellow-500 cursor-pointer"></i>
+                            </label>
+                            <label class="star-rating-label">
+                              <input type="radio" name="q1_2" value="3" class="star-rating">
+                              <i class="far fa-star text-yellow-400 hover:text-yellow-500 cursor-pointer"></i>
+                            </label>
+                            <label class="star-rating-label">
+                              <input type="radio" name="q1_2" value="4" class="star-rating">
+                              <i class="far fa-star text-yellow-400 hover:text-yellow-500 cursor-pointer"></i>
+                            </label>
+                            <label class="star-rating-label">
+                              <input type="radio" name="q1_2" value="5" class="star-rating">
+                              <i class="far fa-star text-yellow-400 hover:text-yellow-500 cursor-pointer"></i>
+                            </label>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    
+                    <!-- Category 2 -->
+                    <div>
+                      <h5 class="font-medium text-gray-800 mb-2">2. Communication Skills</h5>
+                      
+                      <!-- Question 2.1 -->
+                      <div class="bg-gray-50 p-3 rounded-lg mb-3">
+                        <div class="mb-2 text-sm">The instructor communicates effectively and clearly.</div>
+                        <div class="flex flex-wrap items-center">
+                          <div class="rating-group" data-question="q2_1">
+                            <label class="star-rating-label">
+                              <input type="radio" name="q2_1" value="1" class="star-rating">
+                              <i class="far fa-star text-yellow-400 hover:text-yellow-500 cursor-pointer"></i>
+                            </label>
+                            <label class="star-rating-label">
+                              <input type="radio" name="q2_1" value="2" class="star-rating">
+                              <i class="far fa-star text-yellow-400 hover:text-yellow-500 cursor-pointer"></i>
+                            </label>
+                            <label class="star-rating-label">
+                              <input type="radio" name="q2_1" value="3" class="star-rating">
+                              <i class="far fa-star text-yellow-400 hover:text-yellow-500 cursor-pointer"></i>
+                            </label>
+                            <label class="star-rating-label">
+                              <input type="radio" name="q2_1" value="4" class="star-rating">
+                              <i class="far fa-star text-yellow-400 hover:text-yellow-500 cursor-pointer"></i>
+                            </label>
+                            <label class="star-rating-label">
+                              <input type="radio" name="q2_1" value="5" class="star-rating">
+                              <i class="far fa-star text-yellow-400 hover:text-yellow-500 cursor-pointer"></i>
+                            </label>
+                          </div>
+                        </div>
+                      </div>
+                      
+                      <!-- Question 2.2 -->
+                      <div class="bg-gray-50 p-3 rounded-lg mb-3">
+                        <div class="mb-2 text-sm">The instructor is responsive to questions and concerns.</div>
+                        <div class="flex flex-wrap items-center">
+                          <div class="rating-group" data-question="q2_2">
+                            <label class="star-rating-label">
+                              <input type="radio" name="q2_2" value="1" class="star-rating">
+                              <i class="far fa-star text-yellow-400 hover:text-yellow-500 cursor-pointer"></i>
+                            </label>
+                            <label class="star-rating-label">
+                              <input type="radio" name="q2_2" value="2" class="star-rating">
+                              <i class="far fa-star text-yellow-400 hover:text-yellow-500 cursor-pointer"></i>
+                            </label>
+                            <label class="star-rating-label">
+                              <input type="radio" name="q2_2" value="3" class="star-rating">
+                              <i class="far fa-star text-yellow-400 hover:text-yellow-500 cursor-pointer"></i>
+                            </label>
+                            <label class="star-rating-label">
+                              <input type="radio" name="q2_2" value="4" class="star-rating">
+                              <i class="far fa-star text-yellow-400 hover:text-yellow-500 cursor-pointer"></i>
+                            </label>
+                            <label class="star-rating-label">
+                              <input type="radio" name="q2_2" value="5" class="star-rating">
+                              <i class="far fa-star text-yellow-400 hover:text-yellow-500 cursor-pointer"></i>
+                            </label>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                    
+                    <!-- Comments Section -->
+                    <div>
+                      <h5 class="font-medium text-gray-800 mb-2">Additional Comments</h5>
+                      <textarea name="comments" rows="3" class="form-input block w-full border border-gray-300 rounded-md focus:ring-primary-500 focus:border-primary-500" placeholder="Please provide any additional feedback you have for the instructor..."></textarea>
+                    </div>
+                  </div>
+                </form>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
+          <button type="button" id="submit-evaluation-btn" class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-primary-600 text-base font-medium text-white hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 sm:ml-3 sm:w-auto sm:text-sm">
+            Submit Evaluation
+          </button>
+          <button type="button" id="save-draft-btn" class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm">
+            Save as Draft
+          </button>
+          <button type="button" id="close-eval-modal-btn" class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm">
+            Cancel
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Overlay for mobile sidebar -->
+  <div id="sidebar-overlay" class="fixed inset-0 z-30 bg-black bg-opacity-50 hidden lg:hidden"></div>
+
+  <!-- Include loading animation and unified navigation scripts -->
+  <script src="{{ url_for('static', filename='js/loading-animation.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/student-navigation-unified.js') }}"></script>
+  
+  <!-- Prevent logout on browser back button -->
+  <script src="{{ url_for('static', filename='js/prevent-back-logout.js') }}"></script>
+  
+  <!-- Session Timeout Monitor (Auto-logout after 1 hour) -->
+  <script src="{{ url_for('static', filename='js/session-timeout.js') }}"></script>
+  
+  <script>
+    // Initialize navigation for pending evaluations page
+    loadStudentNavigation('pending-evaluations');
+    
+    // Page-specific functionality
+    document.addEventListener('DOMContentLoaded', function() {
+      // Get modal elements
+      const evaluationModal = document.getElementById('evaluation-modal');
+      const closeEvalModalBtn = document.getElementById('close-eval-modal-btn');
+      const saveDraftBtn = document.getElementById('save-draft-btn');
+      const submitEvaluationBtn = document.getElementById('submit-evaluation-btn');
+      
+      // Initialize progress bar
+      const progressBar = document.getElementById('progress-bar');
+      if (progressBar) {
+        const progressPercentage = parseInt(progressBar.getAttribute('data-progress')) || 0;
+        progressBar.style.width = progressPercentage + '%';
+      }
+      
+      // Star rating functionality (if modal is present)
+      const ratingGroups = document.querySelectorAll('.rating-group');
+      
+      ratingGroups.forEach(group => {
+        const stars = group.querySelectorAll('i.fa-star');
+        const inputs = group.querySelectorAll('input.star-rating');
+        
+        stars.forEach((star, index) => {
+          star.addEventListener('click', function() {
+            // Set the corresponding radio button as checked
+            inputs[index].checked = true;
+            
+            // Update the stars display
+            updateStars(group, index + 1);
+          });
+          
+          star.addEventListener('mouseenter', function() {
+            // Highlight stars on hover
+            for (let i = 0; i <= index; i++) {
+              stars[i].classList.remove('far');
+              stars[i].classList.add('fas');
+            }
+          });
+          
+          star.addEventListener('mouseleave', function() {
+            // Reset stars to current rating
+            const checkedInput = group.querySelector('input.star-rating:checked');
+            const rating = checkedInput ? parseInt(checkedInput.value) : 0;
+            updateStars(group, rating);
+          });
+        });
+      });
+      
+      function updateStars(group, rating) {
+        const stars = group.querySelectorAll('i.fa-star');
+        
+        stars.forEach((star, index) => {
+          if (index < rating) {
+            star.classList.remove('far');
+            star.classList.add('fas');
+          } else {
+            star.classList.remove('fas');
+            star.classList.add('far');
+          }
+        });
+      }
+      
+      // Initialize refresh button
+      document.getElementById('refreshBtn')?.addEventListener('click', function() {
+        const btn = this;
+        const icon = btn.querySelector('i');
+        
+        // Add spinning animation
+        icon.classList.add('fa-spin');
+        btn.disabled = true;
+        
+        // Simulate refresh (replace with actual API call)
+        setTimeout(() => {
+          icon.classList.remove('fa-spin');
+          btn.disabled = false;
+          
+          Swal.fire({
+            icon: 'success',
+            title: 'Refreshed!',
+            text: 'Evaluation list has been updated.',
+            showConfirmButton: false,
+            timer: 1500,
+            toast: true,
+            position: 'top-end'
+          });
+        }, 1500);
+      });
+      
+      // Initialize filter button
+      document.getElementById('filterBtn')?.addEventListener('click', function() {
+        Swal.fire({
+          title: 'Filter Evaluations',
+          html: `
+            <div class="text-left space-y-4">
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">Department</label>
+                <select id="dept-filter" class="w-full border border-gray-300 rounded-lg px-3 py-2">
+                  <option value="">All Departments</option>
+                  <option value="cs">Computer Science</option>
+                  <option value="it">Information Technology</option>
+                  <option value="math">Mathematics</option>
+                </select>
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">Status</label>
+                <select id="status-filter" class="w-full border border-gray-300 rounded-lg px-3 py-2">
+                  <option value="">All Status</option>
+                  <option value="pending">Pending</option>
+                  <option value="urgent">Due Soon</option>
+                </select>
+              </div>
+            </div>
+          `,
+          showCancelButton: true,
+          confirmButtonText: 'Apply Filters',
+          cancelButtonText: 'Clear All',
+          customClass: {
+            popup: 'rounded-lg'
+          }
+        }).then((result) => {
+          if (result.isConfirmed) {
+            // Apply filters (implement actual filtering logic)
+            Swal.fire({
+              icon: 'success',
+              title: 'Filters Applied!',
+              showConfirmButton: false,
+              timer: 1500,
+              toast: true,
+              position: 'top-end'
+            });
+          }
+        });
+      });
+
+      // Handle evaluation start with event delegation for dynamically loaded buttons
+      document.addEventListener('click', function(e) {
+        console.log('Document clicked:', e.target); // Debug log
+        
+        // Check if the clicked element or its parent has data-evaluation-id
+        const button = e.target.hasAttribute('data-evaluation-id') ? e.target : e.target.closest('[data-evaluation-id]');
+        
+        console.log('Button found:', button); // Debug log
+        
+        if (button && button.hasAttribute('data-evaluation-id')) {
+          e.preventDefault();
+          e.stopPropagation();
+          
+          const evaluationId = button.getAttribute('data-evaluation-id');
+          console.log('Button clicked! Evaluation ID:', evaluationId); // Debug log
+          
+          // Get faculty name from the card
+          const card = button.closest('.evaluation-card');
+          if (!card) {
+            console.error('Could not find evaluation card');
+            return;
+          }
+          
+          const facultyNameElement = card.querySelector('h4');
+          const courseElement = card.querySelector('.text-sm.text-gray-600');
+          
+          if (!facultyNameElement || !courseElement) {
+            console.error('Could not find faculty or course elements');
+            return;
+          }
+          
+          const facultyName = facultyNameElement.textContent.trim();
+          const courseName = courseElement.textContent.trim();
+          
+          // Check if SweetAlert is available
+          if (typeof Swal !== 'undefined') {
+            Swal.fire({
+              title: 'Start Evaluation',
+              html: `
+                <div class="text-center space-y-3">
+                  <div class="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <i class="fas fa-clipboard-check text-blue-600 text-xl"></i>
+                  </div>
+                  <p class="text-gray-600">You are about to evaluate:</p>
+                  <div class="bg-gray-50 rounded-lg p-4 text-left">
+                    <p class="font-semibold text-gray-900">${facultyName}</p>
+                    <p class="text-sm text-gray-600">${courseName}</p>
+                  </div>
+                </div>
+              `,
+              showCancelButton: true,
+              confirmButtonText: '<i class="fas fa-play mr-2"></i>Start Evaluation',
+              cancelButtonText: 'Cancel',
+              confirmButtonColor: '#3b82f6',
+              cancelButtonColor: '#6b7280',
+              customClass: {
+                popup: 'rounded-lg',
+                confirmButton: 'rounded-lg',
+                cancelButton: 'rounded-lg'
+              }
+            }).then((result) => {
+              if (result.isConfirmed) {
+                // Show loading state
+                Swal.fire({
+                  title: 'Starting Evaluation...',
+                  html: 'Please wait while we prepare your evaluation form.',
+                  allowOutsideClick: false,
+                  showConfirmButton: false,
+                  willOpen: () => {
+                    Swal.showLoading();
+                  }
+                });
+                
+                // Call start-evaluation endpoint to record start_time
+                $.ajax({
+                  url: '/student/start-evaluation',
+                  method: 'POST',
+                  contentType: 'application/json',
+                  data: JSON.stringify({
+                    evaluation_id: evaluationId
+                  }),
+                  success: function(response) {
+                    if (response.success) {
+                      // Redirect to evaluation form after successful start
+                      window.location.href = `/student/evaluation-form/${evaluationId}`;
+                    } else {
+                      Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: response.message || 'Failed to start evaluation',
+                        confirmButtonColor: '#0059cc'
+                      });
+                    }
+                  },
+                  error: function(xhr, status, error) {
+                    console.error('Error starting evaluation:', error);
+                    Swal.fire({
+                      icon: 'error',
+                      title: 'Error',
+                      text: 'Failed to start evaluation. Please try again.',
+                      confirmButtonColor: '#0059cc'
+                    });
+                  }
+                });
+              }
+            });
+          } else {
+            // Fallback if SweetAlert is not loaded
+            if (confirm(`Start evaluation for ${facultyName} - ${courseName}?`)) {
+              // Call start-evaluation endpoint
+              $.ajax({
+                url: '/student/start-evaluation',
+                method: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify({
+                  evaluation_id: evaluationId
+                }),
+                success: function(response) {
+                  if (response.success) {
+                    window.location.href = `/student/evaluation-form/${evaluationId}`;
+                  } else {
+                    alert('Error: ' + (response.message || 'Failed to start evaluation'));
+                  }
+                },
+                error: function() {
+                  alert('Failed to start evaluation. Please try again.');
+                }
+              });
+            }
+          }
+        }
+      });
+      
+      function showEvaluationModal(evaluationId) {
+        // In a real application, this would fetch the evaluation data from the server
+        // For now, we'll just set the faculty name based on the ID
+        let facultyName, courseName, departmentName;
+        
+        switch(evaluationId) {
+          case '1':
+            facultyName = 'Prof. John Smith';
+            courseName = 'Computer Programming 1 (CS101)';
+            departmentName = 'Department of Computer Science';
+            break;
+          case '2':
+            facultyName = 'Dr. Sarah Johnson';
+            courseName = 'Database Systems (CS202)';
+            departmentName = 'Department of Computer Science';
+            break;
+          case '3':
+            facultyName = 'Dr. Michael Williams';
+            courseName = 'Web Development (CS304)';
+            departmentName = 'Department of Computer Science';
+            break;
+          default:
+            facultyName = 'Unknown Faculty';
+            courseName = 'Unknown Course';
+            departmentName = 'Unknown Department';
+        }
+        
+        const facultyNameEl = document.getElementById('faculty-name');
+        const courseNameEl = document.getElementById('course-name');
+        const departmentNameEl = document.getElementById('department-name');
+        
+        if (facultyNameEl) facultyNameEl.textContent = facultyName;
+        if (courseNameEl) courseNameEl.textContent = courseName;
+        if (departmentNameEl) departmentNameEl.textContent = departmentName;
+        
+        const modal = document.getElementById('evaluation-modal');
+        if (modal) {
+          modal.classList.remove('hidden');
+        }
+      }
+      
+      // Modal event handlers
+      if (closeEvalModalBtn) {
+        closeEvalModalBtn.addEventListener('click', function() {
+          if (evaluationModal) {
+            evaluationModal.classList.add('hidden');
+          }
+        });
+      }
+      
+      if (saveDraftBtn) {
+        saveDraftBtn.addEventListener('click', function() {
+          showAlert('Evaluation saved as draft!', 'success');
+          if (evaluationModal) {
+            evaluationModal.classList.add('hidden');
+          }
+        });
+      }
+      
+      if (submitEvaluationBtn) {
+        submitEvaluationBtn.addEventListener('click', function() {
+        // Check if all questions are answered
+        const unansweredQuestions = [];
+        const ratingGroups = document.querySelectorAll('.rating-group');
+        
+        ratingGroups.forEach(group => {
+          const questionId = group.getAttribute('data-question');
+          const answered = group.querySelector('input.star-rating:checked');
+          
+          if (!answered) {
+            unansweredQuestions.push(questionId);
+          }
+        });
+        
+        if (unansweredQuestions.length > 0) {
+          showAlert(`Please answer all questions before submitting. You have ${unansweredQuestions.length} unanswered question(s).`, 'warning');
+          return;
+        }
+        
+        // Show success message
+        showAlert('Evaluation submitted successfully!', 'success');
+        if (evaluationModal) {
+          evaluationModal.classList.add('hidden');
+        }
+        
+        // Update the progress bar and count
+        updateEvaluationCounts();
+        });
+      }
+      
+      // Close modal when clicking outside
+      if (evaluationModal) {
+        window.addEventListener('click', function(event) {
+          if (event.target === evaluationModal) {
+            evaluationModal.classList.add('hidden');
+          }
+        });
+      }
+      
+      // Enhanced Refresh button functionality
+      const refreshBtn = document.getElementById('refresh-btn');
+      const refreshIcon = document.getElementById('refresh-icon');
+      
+      refreshBtn.addEventListener('click', function() {
+        // Show loading state
+        refreshIcon.classList.add('fa-spin');
+        refreshBtn.disabled = true;
+        refreshBtn.classList.add('opacity-50', 'cursor-not-allowed');
+        
+        showAlert('Refreshing evaluation list...', 'info');
+        
+        // Update counts and refresh data
+        updateEvaluationCounts();
+        updateEvaluationPeriod();
+        
+        // Simulate refresh completion
+        setTimeout(() => {
+          refreshIcon.classList.remove('fa-spin');
+          refreshBtn.disabled = false;
+          refreshBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+          showAlert('Evaluation list updated!', 'success');
+          
+          // Reload the page to get fresh data
+          setTimeout(() => {
+            location.reload();
+          }, 500);
+        }, 2000);
+      });
+
+      // Filter Modal functionality
+      const filterBtn = document.getElementById('filter-btn');
+      const filterModal = document.getElementById('filter-modal');
+      const cancelFilterBtn = document.getElementById('cancel-filter-btn');
+      const clearFilterBtn = document.getElementById('clear-filter-btn');
+      const applyFilterBtn = document.getElementById('apply-filter-btn');
+
+      // Show filter modal
+      filterBtn.addEventListener('click', function() {
+        filterModal.classList.remove('hidden');
+        document.body.style.overflow = 'hidden';
+      });
+
+      // Hide filter modal
+      function hideFilterModal() {
+        filterModal.classList.add('hidden');
+        document.body.style.overflow = 'auto';
+      }
+
+      cancelFilterBtn.addEventListener('click', hideFilterModal);
+
+      // Close modal when clicking outside
+      filterModal.addEventListener('click', function(event) {
+        if (event.target === filterModal) {
+          hideFilterModal();
+        }
+      });
+
+      // Clear all filters
+      clearFilterBtn.addEventListener('click', function() {
+        const form = document.getElementById('filter-form');
+        form.reset();
+        // Check "All Evaluations" by default
+        document.querySelector('input[value="all"]').checked = true;
+        showAlert('Filters cleared!', 'info');
+      });
+
+      // Apply filters
+      applyFilterBtn.addEventListener('click', function() {
+        const formData = new FormData(document.getElementById('filter-form'));
+        const filters = {
+          status: [],
+          course: formData.get('course'),
+          faculty: formData.get('faculty'),
+          sort: formData.get('sort')
+        };
+
+        // Get selected status filters
+        document.querySelectorAll('input[name="status"]:checked').forEach(input => {
+          filters.status.push(input.value);
+        });
+
+        // Apply filters to the page
+        applyFilters(filters);
+        hideFilterModal();
+        
+        showAlert('Filters applied successfully!', 'success');
+      });
+
+      // Function to apply filters to evaluation cards
+      function applyFilters(filters) {
+        const evaluationCards = document.querySelectorAll('.evaluation-card');
+        const completedCards = document.querySelectorAll('.p-4.hover\\:bg-gray-50');
+        
+        let visibleCount = 0;
+
+        // Filter pending evaluations
+        evaluationCards.forEach(card => {
+          let showCard = true;
+
+          // Status filter
+          if (filters.status.length > 0 && !filters.status.includes('all')) {
+            if (!filters.status.includes('pending')) {
+              showCard = false;
+            }
+          }
+
+          // Course filter
+          if (filters.course && showCard) {
+            const courseText = card.querySelector('.text-primary-600')?.textContent;
+            if (!courseText || !courseText.includes(filters.course)) {
+              showCard = false;
+            }
+          }
+
+          // Faculty filter
+          if (filters.faculty && showCard) {
+            const facultyText = card.querySelector('.text-lg.font-semibold')?.textContent;
+            if (!facultyText || !facultyText.includes(filters.faculty)) {
+              showCard = false;
+            }
+          }
+
+          if (showCard) {
+            card.style.display = 'block';
+            visibleCount++;
+          } else {
+            card.style.display = 'none';
+          }
+        });
+
+        // Update visible count
+        updateFilterResults(visibleCount, filters);
+      }
+
+      // Function to update filter results display
+      function updateFilterResults(count, filters) {
+        // Results count display managed by UI filters
+      }
+
+      // Function to update evaluation period information
+      function updateEvaluationPeriod() {
+        fetch('/api/evaluation-period')
+          .then(response => response.json())
+          .then(data => {
+            if (data.success && data.period) {
+              // Update period display if elements exist
+              const periodTitle = document.querySelector('.text-xl.font-semibold.text-gray-900');
+              const periodDates = document.querySelector('.text-sm.text-gray-600');
+              const daysRemaining = document.querySelector('.text-3xl.font-bold.text-primary-600');
+              
+              if (periodTitle) periodTitle.textContent = data.period.title;
+              if (periodDates) periodDates.textContent = `Evaluation period: ${data.period.start_formatted} - ${data.period.end_formatted}`;
+              if (daysRemaining) daysRemaining.textContent = `${data.period.days_remaining} days`;
+            }
+          })
+          .catch(error => {
+            console.error('Error updating evaluation period:', error);
+          });
+      }
+      
+      // Function to update evaluation counts in navigation
+      function updateEvaluationCounts() {
+        fetch('/api/student/evaluation-counts')
+          .then(response => response.json())
+          .then(data => {
+            if (data.success) {
+              // Update navigation pending count
+              const navPendingBadge = document.querySelector('a[href="/student/pending-evaluations"] .bg-red-100');
+              if (navPendingBadge) {
+                navPendingBadge.textContent = data.pending_count;
+                if (data.pending_count === 0) {
+                  navPendingBadge.className = 'ml-auto inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800';
+                } else {
+                  navPendingBadge.className = 'ml-auto inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800';
+                }
+              }
+              
+              // Update progress on current page if elements exist
+              const progressBar = document.querySelector('.progress-bar');
+              const progressText = document.querySelector('.text-3xl.font-bold.text-primary-600');
+              
+              if (progressBar && progressText && data.total_count > 0) {
+                const percentage = Math.round((data.completed_count / data.total_count) * 100);
+                progressBar.style.width = percentage + '%';
+                progressText.textContent = percentage + '%';
+              }
+            }
+          })
+          .catch(error => {
+            console.error('Error updating evaluation counts:', error);
+          });
+      }
+      
+      // Update counts on page load
+      updateEvaluationCounts();
+      
+      // Helper function to show alerts
+      function showAlert(message, type) {
+        if (typeof Swal !== 'undefined') {
+          Swal.fire({
+            icon: type,
+            title: message,
+            toast: true,
+            position: 'top-end',
+            showConfirmButton: false,
+            timer: 3000,
+            timerProgressBar: true
+          });
+        } else {
+          alert(message);
+        }
+      }
+    });
+  </script>
+</body>
+</html>

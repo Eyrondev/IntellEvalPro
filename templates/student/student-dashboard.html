@@ -1,0 +1,704 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+  <title>Student Dashboard | IntellEvalPro</title>
+  
+  <!-- Favicon -->
+  <link rel="icon" type="image/png" href="{{ url_for('static', filename='images/nclogo.png') }}">
+  <link rel="shortcut icon" type="image/png" href="{{ url_for('static', filename='images/nclogo.png') }}">
+  <link rel="apple-touch-icon" href="{{ url_for('static', filename='images/nclogo.png') }}">
+
+  <!-- G        }, 500);
+    });
+    
+    // Load footer
+    document.addEventListener('DOMContentLoaded', function() {
+      $('#footer-container').load('/student/footer');
+    });
+    
+    // Mobile menu togglee Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  
+  <!-- Font Awesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"/>
+  
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  
+  <!-- Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  
+  <!-- jQuery -->
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  
+  <!-- SweetAlert2 -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11.7.12/dist/sweetalert2.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.7.12/dist/sweetalert2.all.min.js"></script>
+  
+  <script>
+    tailwind.config = {
+      theme: {
+        fontFamily: {
+          'sans': ['Inter', 'system-ui', 'sans-serif'],
+        },
+        extend: {
+          colors: {
+            primary: {
+              50: '#e6f0ff',
+              100: '#b3d1ff',
+              200: '#80b3ff',
+              300: '#4d94ff', 
+              400: '#1a75ff',
+              500: '#0059cc', // Primary color
+              600: '#004db3',
+              700: '#004099',
+              800: '#003380',
+              900: '#002766',
+            },
+            secondary: {
+              50: '#f5f7fa',
+              100: '#e4e7eb',
+              200: '#cbd2d9',
+              300: '#9aa5b1',
+              400: '#7b8794',
+              500: '#616e7c',
+              600: '#52606d',
+              700: '#3e4c59',
+              800: '#323f4b',
+              900: '#1f2933',
+            },
+          },
+        }
+      }
+    }
+  </script>
+  
+  <style>
+    /* Global styles */
+    body {
+      font-family: 'Inter', sans-serif;
+      overflow-x: hidden;
+    }
+    
+    /* Sidebar animation */
+    @keyframes slideIn {
+      from { transform: translateX(-100%); }
+      to { transform: translateX(0); }
+    }
+    
+    /* Dropdown animation */
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    
+    ::-webkit-scrollbar-track {
+      background: #f1f1f1;
+      border-radius: 10px;
+    }
+    
+    ::-webkit-scrollbar-thumb {
+      background: #c1c1c1;
+      border-radius: 10px;
+    }
+    
+    ::-webkit-scrollbar-thumb:hover {
+      background: #a8a8a8;
+    }
+    
+    /* Card hover effect */
+    .dashboard-card {
+      transition: all 0.3s ease;
+    }
+    
+    .dashboard-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+    }
+    
+    /* Disable hover effect on mobile */
+    @media (max-width: 768px) {
+      .dashboard-card:hover {
+        transform: none;
+      }
+    }
+    
+    /* Active nav link */
+    .nav-link.active {
+      position: relative;
+    }
+    
+    .nav-link.active::after {
+      content: '';
+      position: absolute;
+      left: 0;
+      width: 4px;
+      height: 100%;
+      background-color: #0059cc;
+    }
+    
+    /* Mobile table styles */
+    @media (max-width: 768px) {
+      .mobile-table-row {
+        display: block;
+        border-bottom: 1px solid #e5e7eb;
+        padding: 1rem;
+      }
+      
+      .mobile-table-row:last-child {
+        border-bottom: none;
+      }
+      
+      .mobile-table-cell {
+        display: flex;
+        justify-content: space-between;
+        padding: 0.5rem 0;
+      }
+      
+      .mobile-table-label {
+        font-weight: 600;
+        color: #374151;
+        font-size: 0.875rem;
+      }
+      
+      .mobile-table-value {
+        text-align: right;
+        color: #6b7280;
+        font-size: 0.875rem;
+      }
+    }
+    
+    /* Responsive font sizes */
+    @media (max-width: 640px) {
+      .responsive-title {
+        font-size: 1.125rem !important;
+      }
+      
+      .responsive-subtitle {
+        font-size: 0.875rem !important;
+      }
+    }
+    
+    /* Progress circle responsive */
+    @media (max-width: 640px) {
+      .progress-circle-container {
+        display: none;
+      }
+    }
+  </style>
+</head>
+
+<body class="bg-gray-50">
+  <div class="flex h-screen bg-gray-50">
+    <!-- Sidebar (will be loaded dynamically) -->
+    <div id="sidebar-container"></div>
+    
+    <!-- Main content -->
+    <div class="lg:ml-64 flex flex-col flex-1 min-h-screen">
+      <!-- Top Navigation (will be loaded dynamically) -->
+      <div id="header-container"></div>
+
+      <!-- Main content area -->
+      <main id="main-content" class="flex-1 overflow-auto p-3 sm:p-4 md:p-6 bg-gray-50">
+        <!-- Welcome Banner -->
+        <div class="bg-gradient-to-r from-primary-600 to-primary-800 rounded-lg shadow-md mb-4 sm:mb-6">
+          <div class="p-4 sm:p-5 md:p-6">
+            <div class="flex flex-col space-y-2">
+              <div>
+                <h2 class="text-base sm:text-lg md:text-xl font-bold text-white responsive-title">Welcome, {{ data.student_name }}!</h2>
+                <p class="mt-1 text-xs sm:text-sm md:text-base text-primary-100 responsive-subtitle">
+                  {% if data.evaluation_period %}
+                  <span class="block sm:inline">Current Period: {{ data.evaluation_period.title }}</span>
+                  {% else %}
+                  <span class="block sm:inline">No active evaluation period</span>
+                  <span class="hidden sm:inline"> | </span>
+                  <span class="block sm:inline mt-1 sm:mt-0">Status: <span class="font-medium text-white">Inactive</span></span>
+                  {% endif %}
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Progress Overview -->
+        <div class="grid grid-cols-1 gap-4 sm:gap-6 lg:grid-cols-2 mb-4 sm:mb-6">
+          <!-- Evaluation Progress -->
+          <div class="bg-white rounded-lg shadow dashboard-card">
+            <div class="p-4 sm:p-5">
+              <div class="flex items-center justify-between">
+                <h3 class="text-base sm:text-lg font-medium text-gray-900">Your Progress</h3>
+                {% if data.progress_percentage == 100 %}
+                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                  Completed
+                </span>
+                {% elif data.progress_percentage > 0 %}
+                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
+                  In Progress
+                </span>
+                {% else %}
+                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">
+                  Not Started
+                </span>
+                {% endif %}
+              </div>
+              <div class="mt-5">
+                <div class="flex items-center">
+                  <div class="flex-1">
+                    <div class="flex flex-col sm:flex-row sm:items-center">
+                      <span class="text-xl sm:text-2xl font-bold text-gray-900">{{ data.completed_evaluations }}/{{ data.total_evaluations }}</span>
+                      <span class="ml-0 sm:ml-2 text-xs sm:text-sm text-gray-500 mt-1 sm:mt-0">Faculty Evaluated</span>
+                    </div>
+                    <div class="w-full bg-gray-200 rounded-full h-2.5 mt-2">
+                      <div class="bg-primary-600 h-2.5 rounded-full progress-bar transition-all duration-1000 ease-out" 
+                           data-width="{{ data.progress_percentage }}"
+                           style="width: 0%;">
+                      </div>
+                    </div>
+                  </div>
+                  <div class="ml-4 w-12 h-12 sm:w-16 sm:h-16 progress-circle-container">
+                    <div class="relative h-full w-full">
+                      <svg class="w-full h-full" viewBox="0 0 36 36">
+                        <circle cx="18" cy="18" r="16" fill="none" stroke="#e5e7eb" stroke-width="2"></circle>
+                        <circle id="progress-circle" cx="18" cy="18" r="16" fill="none" stroke="#0059cc" stroke-width="2" 
+                                stroke-dasharray="100.53" 
+                                stroke-dashoffset="100.53"
+                                data-progress="{{ data.progress_percentage }}"
+                                stroke-linecap="round"
+                                transform="rotate(-90 18 18)"></circle>
+                        <text x="18" y="20" text-anchor="middle" fill="#0059cc" font-size="8" font-weight="bold">{{ data.progress_percentage }}%</text>
+                      </svg>
+                    </div>
+                  </div>
+                </div>
+                <div class="mt-4">
+                  <a href="{{ url_for('student.pending_evaluations') }}" class="text-xs sm:text-sm font-medium text-primary-600 hover:text-primary-700">View pending evaluations <i class="fas fa-chevron-right ml-1 text-xs"></i></a>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Evaluation Deadline -->
+          <div class="bg-white rounded-lg shadow dashboard-card">
+            <div class="p-4 sm:p-5">
+              <div class="flex items-center justify-between flex-wrap gap-2">
+                <h3 class="text-base sm:text-lg font-medium text-gray-900">Evaluation Period</h3>
+                {% if data.evaluation_period %}
+                  {% if data.evaluation_period.status == 'overdue' %}
+                  <span class="inline-flex items-center px-2 sm:px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">
+                    <i class="fas fa-exclamation-triangle mr-1"></i>
+                    <span class="hidden sm:inline">Overdue</span>
+                    <span class="sm:hidden">!</span>
+                  </span>
+                  {% elif data.evaluation_period.days_remaining <= 3 %}
+                  <span class="inline-flex items-center px-2 sm:px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">
+                    <i class="fas fa-clock mr-1"></i>
+                    {{ data.evaluation_period.days_remaining }}d
+                  </span>
+                  {% elif data.evaluation_period.days_remaining <= 7 %}
+                  <span class="inline-flex items-center px-2 sm:px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
+                    <i class="fas fa-clock mr-1"></i>
+                    {{ data.evaluation_period.days_remaining }}d
+                  </span>
+                  {% else %}
+                  <span class="inline-flex items-center px-2 sm:px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                    <i class="fas fa-clock mr-1"></i>
+                    {{ data.evaluation_period.days_remaining }}d
+                  </span>
+                  {% endif %}
+                {% else %}
+                <span class="inline-flex items-center px-2 sm:px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
+                  <i class="fas fa-info-circle mr-1"></i>
+                  <span class="hidden sm:inline">No active period</span>
+                  <span class="sm:hidden">Inactive</span>
+                </span>
+                {% endif %}
+              </div>
+              <div class="mt-5">
+                <div class="flex items-center justify-center">
+                  <div class="text-center">
+                    {% if data.evaluation_period %}
+                    <div class="text-2xl sm:text-3xl font-bold text-gray-900 mb-1">{{ data.evaluation_period.end_date }}</div>
+                    <p class="text-xs sm:text-sm text-gray-500">{{ data.evaluation_period.title }}</p>
+                    <p class="text-xs text-gray-400 mt-1">{{ data.evaluation_period.start_date }} - {{ data.evaluation_period.end_date }}</p>
+                    {% else %}
+                    <div class="text-lg sm:text-xl font-bold text-gray-500 mb-1">No Active Period</div>
+                    <p class="text-xs sm:text-sm text-gray-500">No evaluation period is currently active</p>
+                    {% endif %}
+                  </div>
+                </div>
+                {% if data.evaluation_period %}
+                <div class="mt-5 flex items-center">
+                  <div class="flex-grow h-1 bg-gray-200 rounded">
+                    {% if data.evaluation_period.status == 'overdue' %}
+                    <div class="h-1 bg-red-500 rounded time-progress-bar" data-width="100"></div>
+                    {% elif data.evaluation_period.time_progress >= 80 %}
+                    <div class="h-1 bg-red-500 rounded time-progress-bar" data-width="{{ data.evaluation_period.time_progress }}"></div>
+                    {% elif data.evaluation_period.time_progress >= 60 %}
+                    <div class="h-1 bg-yellow-500 rounded time-progress-bar" data-width="{{ data.evaluation_period.time_progress }}"></div>
+                    {% else %}
+                    <div class="h-1 bg-green-500 rounded time-progress-bar" data-width="{{ data.evaluation_period.time_progress }}"></div>
+                    {% endif %}
+                  </div>
+                  <span class="ml-2 text-xs font-medium text-gray-500 whitespace-nowrap">{{ data.evaluation_period.time_progress }}%</span>
+                </div>
+                {% endif %}
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Pending Evaluations Section -->
+        <div class="bg-white rounded-lg shadow mb-4 sm:mb-6 dashboard-card">
+          <div class="p-4 sm:p-5 border-b border-gray-200">
+            <div class="flex items-center justify-between">
+              <h3 class="text-base sm:text-lg font-medium text-gray-900">Pending Evaluations</h3>
+              <a href="{{ url_for('student.pending_evaluations') }}" class="text-xs sm:text-sm font-medium text-primary-600 hover:text-primary-700">
+                View All
+              </a>
+            </div>
+          </div>
+          
+          <!-- Desktop Table View (hidden on mobile) -->
+          <div class="hidden md:block overflow-x-auto">
+            <table class="min-w-full divide-y divide-gray-200">
+              <thead class="bg-gray-50">
+                <tr>
+                  <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Faculty
+                  </th>
+                  <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Course
+                  </th>
+                  <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Department
+                  </th>
+                  <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Status
+                  </th>
+                  <th scope="col" class="relative px-6 py-3">
+                    <span class="sr-only">Actions</span>
+                  </th>
+                </tr>
+              </thead>
+              <tbody class="bg-white divide-y divide-gray-200">
+                {% if data.pending_evaluations %}
+                  {% for evaluation in data.pending_evaluations %}
+                  <tr>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                      <div class="flex items-center">
+                        <div class="flex-shrink-0 h-10 w-10">
+                          <div class="h-10 w-10 rounded-full bg-primary-100 flex items-center justify-center">
+                            {% set name_parts = evaluation.faculty_name.split() %}
+                            <span class="text-primary-600 font-semibold">{{ name_parts[0][0] }}{{ name_parts[-1][0] if name_parts|length > 1 else '' }}</span>
+                          </div>
+                        </div>
+                        <div class="ml-4">
+                          <div class="text-sm font-medium text-gray-900">
+                            {{ evaluation.faculty_name }}
+                          </div>
+                          <div class="text-sm text-gray-500">
+                            {{ evaluation.department }}
+                          </div>
+                        </div>
+                      </div>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                      <div class="text-sm text-gray-900">{{ evaluation.course_code }}</div>
+                      <div class="text-sm text-gray-500">{{ evaluation.course_name }}</div>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                      <div class="text-sm text-gray-900">{{ evaluation.department }}</div>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                      <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-yellow-100 text-yellow-800">
+                        Pending
+                      </span>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                      <a href="{{ url_for('student.pending_evaluations') }}" class="text-primary-600 hover:text-primary-900 px-3 py-1.5 rounded-md bg-primary-50 hover:bg-primary-100 transition-colors">
+                        View All
+                      </a>
+                    </td>
+                  </tr>
+                  {% endfor %}
+                {% else %}
+                  <tr>
+                    <td colspan="5" class="px-6 py-4 text-center text-sm text-gray-500">
+                      <div class="flex flex-col items-center justify-center py-8">
+                        <i class="fas fa-check-circle text-4xl text-green-500 mb-4"></i>
+                        <h3 class="text-lg font-medium text-gray-900 mb-2">All evaluations completed!</h3>
+                        <p class="text-sm text-gray-500">You have completed all your faculty evaluations for this period.</p>
+                      </div>
+                    </td>
+                  </tr>
+                {% endif %}
+              </tbody>
+            </table>
+          </div>
+          
+          <!-- Mobile Card View (visible on mobile only) -->
+          <div class="md:hidden">
+            {% if data.pending_evaluations %}
+              {% for evaluation in data.pending_evaluations %}
+              <div class="border-b border-gray-200 p-4 hover:bg-gray-50 transition-colors">
+                <div class="flex items-start space-x-3 mb-3">
+                  <div class="flex-shrink-0">
+                    <div class="h-12 w-12 rounded-full bg-primary-100 flex items-center justify-center">
+                      {% set name_parts = evaluation.faculty_name.split() %}
+                      <span class="text-primary-600 font-semibold text-sm">{{ name_parts[0][0] }}{{ name_parts[-1][0] if name_parts|length > 1 else '' }}</span>
+                    </div>
+                  </div>
+                  <div class="flex-1 min-w-0">
+                    <p class="text-sm font-medium text-gray-900 truncate">{{ evaluation.faculty_name }}</p>
+                    <p class="text-xs text-gray-500">{{ evaluation.department }}</p>
+                  </div>
+                  <span class="px-2 py-1 text-xs font-semibold rounded-full bg-yellow-100 text-yellow-800 whitespace-nowrap">
+                    Pending
+                  </span>
+                </div>
+                <div class="space-y-2 text-sm">
+                  <div class="flex justify-between">
+                    <span class="text-gray-500">Course:</span>
+                    <span class="text-gray-900 font-medium text-right">{{ evaluation.course_code }}</span>
+                  </div>
+                  <div class="flex justify-between">
+                    <span class="text-gray-500">Subject:</span>
+                    <span class="text-gray-900 text-right">{{ evaluation.course_name }}</span>
+                  </div>
+                </div>
+              </div>
+              {% endfor %}
+              <div class="p-4 text-center bg-gray-50">
+                <a href="{{ url_for('student.pending_evaluations') }}" class="text-sm font-medium text-primary-600 hover:text-primary-700 inline-flex items-center">
+                  View All Pending Evaluations
+                  <i class="fas fa-chevron-right ml-1 text-xs"></i>
+                </a>
+              </div>
+            {% else %}
+              <div class="p-8 text-center">
+                <i class="fas fa-check-circle text-4xl text-green-500 mb-4"></i>
+                <h3 class="text-base font-medium text-gray-900 mb-2">All evaluations completed!</h3>
+                <p class="text-sm text-gray-500">You have completed all your faculty evaluations for this period.</p>
+              </div>
+            {% endif %}
+          </div>
+        </div>
+        
+        <!-- Completed Evaluations -->
+        <div class="bg-white rounded-lg shadow dashboard-card">
+          <div class="p-4 sm:p-5 border-b border-gray-200">
+            <div class="flex items-center justify-between">
+              <h3 class="text-base sm:text-lg font-medium text-gray-900">Recently Completed</h3>
+              <a href="#" class="text-xs sm:text-sm font-medium text-primary-600 hover:text-primary-700">
+                View All
+              </a>
+            </div>
+          </div>
+          
+          <!-- Desktop Table View (hidden on mobile) -->
+          <div class="hidden md:block overflow-x-auto">
+            <table class="min-w-full divide-y divide-gray-200">
+              <thead class="bg-gray-50">
+                <tr>
+                  <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Faculty
+                  </th>
+                  <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Course
+                  </th>
+                  <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Date Completed
+                  </th>
+                  <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Status
+                  </th>
+                </tr>
+              </thead>
+              <tbody class="bg-white divide-y divide-gray-200">
+                {% if data.recent_evaluations %}
+                  {% for evaluation in data.recent_evaluations %}
+                  <tr>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                      <div class="flex items-center">
+                        <div class="flex-shrink-0 h-10 w-10">
+                          <div class="h-10 w-10 rounded-full bg-green-100 flex items-center justify-center">
+                            {% set name_parts = evaluation.faculty_name.split() %}
+                            <span class="text-green-600 font-semibold">{{ name_parts[0][0] }}{{ name_parts[-1][0] if name_parts|length > 1 else '' }}</span>
+                          </div>
+                        </div>
+                        <div class="ml-4">
+                          <div class="text-sm font-medium text-gray-900">
+                            {{ evaluation.faculty_name }}
+                          </div>
+                          <div class="text-sm text-gray-500">
+                            Computer Science Department
+                          </div>
+                        </div>
+                      </div>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                      <div class="text-sm text-gray-900">{{ evaluation.course_code }}</div>
+                      <div class="text-sm text-gray-500">{{ evaluation.course_title }}</div>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                      <div class="text-sm text-gray-900">{{ evaluation.completion_time.strftime('%b %d, %Y') if evaluation.completion_time else 'Recently' }}</div>
+                    </td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                      <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
+                        Completed
+                      </span>
+                    </td>
+                  </tr>
+                  {% endfor %}
+                {% else %}
+                  <tr>
+                    <td colspan="4" class="px-6 py-4 text-center text-sm text-gray-500">
+                      <div class="flex flex-col items-center justify-center py-8">
+                        <i class="fas fa-clipboard-list text-4xl text-gray-400 mb-4"></i>
+                        <h3 class="text-lg font-medium text-gray-900 mb-2">No completed evaluations yet</h3>
+                        <p class="text-sm text-gray-500">Your completed evaluations will appear here.</p>
+                      </div>
+                    </td>
+                  </tr>
+                {% endif %}
+              </tbody>
+            </table>
+          </div>
+          
+          <!-- Mobile Card View (visible on mobile only) -->
+          <div class="md:hidden">
+            {% if data.recent_evaluations %}
+              {% for evaluation in data.recent_evaluations %}
+              <div class="border-b border-gray-200 p-4 hover:bg-gray-50 transition-colors">
+                <div class="flex items-start space-x-3 mb-3">
+                  <div class="flex-shrink-0">
+                    <div class="h-12 w-12 rounded-full bg-green-100 flex items-center justify-center">
+                      {% set name_parts = evaluation.faculty_name.split() %}
+                      <span class="text-green-600 font-semibold text-sm">{{ name_parts[0][0] }}{{ name_parts[-1][0] if name_parts|length > 1 else '' }}</span>
+                    </div>
+                  </div>
+                  <div class="flex-1 min-w-0">
+                    <p class="text-sm font-medium text-gray-900 truncate">{{ evaluation.faculty_name }}</p>
+                    <p class="text-xs text-gray-500">Computer Science Department</p>
+                  </div>
+                  <span class="px-2 py-1 text-xs font-semibold rounded-full bg-green-100 text-green-800 whitespace-nowrap">
+                    <i class="fas fa-check mr-1"></i>Done
+                  </span>
+                </div>
+                <div class="space-y-2 text-sm">
+                  <div class="flex justify-between">
+                    <span class="text-gray-500">Course:</span>
+                    <span class="text-gray-900 font-medium text-right">{{ evaluation.course_code }}</span>
+                  </div>
+                  <div class="flex justify-between">
+                    <span class="text-gray-500">Subject:</span>
+                    <span class="text-gray-900 text-right">{{ evaluation.course_title }}</span>
+                  </div>
+                  <div class="flex justify-between">
+                    <span class="text-gray-500">Completed:</span>
+                    <span class="text-gray-900 text-right">{{ evaluation.completion_time.strftime('%b %d, %Y') if evaluation.completion_time else 'Recently' }}</span>
+                  </div>
+                </div>
+              </div>
+              {% endfor %}
+            {% else %}
+              <div class="p-8 text-center">
+                <i class="fas fa-clipboard-list text-4xl text-gray-400 mb-4"></i>
+                <h3 class="text-base font-medium text-gray-900 mb-2">No completed evaluations yet</h3>
+                <p class="text-sm text-gray-500">Your completed evaluations will appear here.</p>
+              </div>
+            {% endif %}
+          </div>
+        </div>
+      </main>
+
+    </div>
+  </div>
+
+  <!-- Overlay for mobile sidebar -->
+  <div id="sidebar-overlay" class="fixed inset-0 z-30 bg-black bg-opacity-50 hidden lg:hidden"></div>
+
+  <!-- Include loading animation and unified navigation scripts -->
+  <script src="{{ url_for('static', filename='js/loading-animation.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/student-navigation-unified.js') }}"></script>
+  
+  <!-- Prevent logout on browser back button -->
+  <script src="{{ url_for('static', filename='js/prevent-back-logout.js') }}"></script>
+  
+  <!-- Session Timeout Monitor (Auto-logout after 1 hour) -->
+  <script src="{{ url_for('static', filename='js/session-timeout.js') }}"></script>
+  
+  <script>
+    // Initialize navigation for dashboard page
+    loadStudentNavigation('student-dashboard');
+    
+    // Dashboard-specific functionality
+    document.addEventListener('DOMContentLoaded', function() {
+      // Set evaluation progress bar with animation
+      const progressBar = document.querySelector('.progress-bar');
+      if (progressBar) {
+        const width = parseInt(progressBar.getAttribute('data-width')) || 0;
+        
+        // Start at 0 width and animate to target
+        progressBar.style.width = '0%';
+        setTimeout(() => {
+          progressBar.style.width = width + '%';
+          
+          // Add minimum visible width for very small percentages
+          if (width > 0 && width < 3) {
+            progressBar.style.minWidth = '4px';
+          }
+        }, 300);
+      }
+      
+      // Set circular progress with proper calculation
+      const progressCircle = document.getElementById('progress-circle');
+      if (progressCircle) {
+        const progress = parseInt(progressCircle.getAttribute('data-progress')) || 0;
+        
+        // Calculate circumference of circle (2πr where r=16)
+        const radius = 16;
+        const circumference = 2 * Math.PI * radius;
+        
+        // Calculate offset based on progress percentage
+        const offset = circumference - (progress / 100) * circumference;
+        
+        // Set initial state and animate
+        progressCircle.style.strokeDasharray = circumference;
+        progressCircle.style.strokeDashoffset = circumference;
+        progressCircle.style.transition = 'stroke-dashoffset 1.5s ease-in-out';
+        
+        // Animate to final position for non-zero progress
+        if (progress > 0) {
+          setTimeout(() => {
+            progressCircle.style.strokeDashoffset = offset;
+          }, 300);
+        }
+        
+        // Update percentage text
+        const percentText = progressCircle.parentElement.querySelector('text');
+        if (percentText) {
+          percentText.textContent = progress + '%';
+        }
+      }
+      
+      // Set time progress bars
+      const timeProgressBars = document.querySelectorAll('.time-progress-bar');
+      timeProgressBars.forEach(function(bar) {
+        const width = parseInt(bar.getAttribute('data-width')) || 0;
+        
+        bar.style.width = '0%';
+        bar.style.transition = 'width 1.2s ease-in-out';
+        
+        setTimeout(() => {
+          bar.style.width = width + '%';
+        }, 200);
+      });
+    });
+  </script>
+</body>
+</html>

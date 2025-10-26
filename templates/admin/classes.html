@@ -1,0 +1,807 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Classes Management | IntellEvalPro</title>
+  
+  <!-- Favicon -->
+  <link rel="icon" type="image/png" href="{{ url_for('static', filename='images/nclogo.png') }}">
+  <link rel="shortcut icon" type="image/png" href="{{ url_for('static', filename='images/nclogo.png') }}">
+  <link rel="apple-touch-icon" href="{{ url_for('static', filename='images/nclogo.png') }}">
+  
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  
+  <!-- Font Awesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" integrity="sha512-SnH5WK+bZxgPHs44uWIX+LLJAJ9/2PkPKZ5QiAj6Ta86w+fsb2TkcmfRyVX3pBnMFcV7oQPJkl9QevSCWr3W6A==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+  
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  
+  <!-- jQuery -->
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  
+  <!-- SweetAlert2 -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11.7.12/dist/sweetalert2.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.7.12/dist/sweetalert2.all.min.js"></script>
+  
+  <script>
+    tailwind.config = {
+      theme: {
+        fontFamily: {
+          'sans': ['Inter', 'system-ui', 'sans-serif'],
+        },
+        extend: {
+          colors: {
+            primary: {
+              50: '#e6f0ff',
+              100: '#b3d1ff',
+              200: '#80b3ff',
+              300: '#4d94ff', 
+              400: '#1a75ff',
+              500: '#0059cc',
+              600: '#004db3',
+              700: '#004099',
+              800: '#003380',
+              900: '#002766',
+            }
+          }
+        }
+      }
+    }
+  </script>
+  
+  <style>
+    /* Custom scrollbar */
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    
+    ::-webkit-scrollbar-track {
+      background: #f1f1f1;
+      border-radius: 10px;
+    }
+    
+    ::-webkit-scrollbar-thumb {
+      background: #c1c1c1;
+      border-radius: 10px;
+    }
+    
+    ::-webkit-scrollbar-thumb:hover {
+      background: #a8a8a8;
+    }
+  </style>
+</head>
+<body class="bg-gray-50 font-sans overflow-x-hidden">
+  
+  <!-- Loading overlay -->
+  <div id="loader-overlay" class="fixed inset-0 z-50 flex flex-col items-center justify-center bg-white bg-opacity-90 backdrop-blur-sm transition-opacity duration-300">
+  <img src="{{ url_for('static', filename='images/nclogo.png') }}" alt="Logo" class="w-32 h-auto mb-6 animate-bounce">
+    <div class="flex items-center space-x-2">
+      <div class="w-3 h-3 rounded-full bg-primary-500 animate-pulse"></div>
+      <div class="w-3 h-3 rounded-full bg-primary-500 animate-pulse" style="animation-delay: 0.2s"></div>
+      <div class="w-3 h-3 rounded-full bg-primary-500 animate-pulse" style="animation-delay: 0.4s"></div>
+    </div>
+  </div>
+
+  <div class="flex h-screen bg-gray-50">
+    <!-- Admin Sidebar -->
+    <div id="admin-sidebar"></div>
+    
+    <!-- Main content -->
+    <div class="lg:ml-64 flex flex-col flex-1 min-h-screen">
+      <!-- Admin Header -->
+      <div id="admin-header"></div>
+
+      <!-- Main content area -->
+      <main id="main-content" class="flex-1 overflow-auto p-4 md:p-6 bg-gray-50">
+        
+        <!-- Page header -->
+        <div class="mb-6">
+          <div class="flex flex-col md:flex-row md:items-center md:justify-between">
+            <div>
+              <h1 class="text-2xl font-bold text-gray-800">Classes Management</h1>
+              <p class="text-gray-500 mt-1">Assign subjects and faculty to sections</p>
+            </div>
+            <div class="mt-4 md:mt-0">
+              <button type="button" id="add-class-btn" class="inline-flex items-center px-4 py-2 bg-primary-600 hover:bg-primary-700 text-white text-sm font-medium rounded-lg shadow-sm transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500">
+                <i class="fas fa-plus mr-2"></i>
+                Add Class
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Statistics Cards -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+          <div class="bg-white rounded-lg shadow-sm p-6 hover:shadow-md transition-all">
+            <div class="flex items-center">
+              <div class="p-3 rounded-full bg-blue-100">
+                <i class="fas fa-chalkboard text-blue-600 text-xl"></i>
+              </div>
+              <div class="ml-4">
+                <h3 class="text-2xl font-bold text-gray-800" id="total-classes">0</h3>
+                <p class="text-gray-600 text-sm">Total Classes</p>
+              </div>
+            </div>
+          </div>
+          <div class="bg-white rounded-lg shadow-sm p-6 hover:shadow-md transition-all">
+            <div class="flex items-center">
+              <div class="p-3 rounded-full bg-green-100">
+                <i class="fas fa-book text-green-600 text-xl"></i>
+              </div>
+              <div class="ml-4">
+                <h3 class="text-2xl font-bold text-gray-800" id="total-subjects">0</h3>
+                <p class="text-gray-600 text-sm">Active Subjects</p>
+              </div>
+            </div>
+          </div>
+          <div class="bg-white rounded-lg shadow-sm p-6 hover:shadow-md transition-all">
+            <div class="flex items-center">
+              <div class="p-3 rounded-full bg-purple-100">
+                <i class="fas fa-user-tie text-purple-600 text-xl"></i>
+              </div>
+              <div class="ml-4">
+                <h3 class="text-2xl font-bold text-gray-800" id="active-faculty">0</h3>
+                <p class="text-gray-600 text-sm">Faculty</p>
+              </div>
+            </div>
+          </div>
+          <div class="bg-white rounded-lg shadow-sm p-6 hover:shadow-md transition-all">
+            <div class="flex items-center">
+              <div class="p-3 rounded-full bg-yellow-100">
+                <i class="fas fa-users text-yellow-600 text-xl"></i>
+              </div>
+              <div class="ml-4">
+                <h3 class="text-2xl font-bold text-gray-800" id="total-students">0</h3>
+                <p class="text-gray-600 text-sm">Enrolled Students</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Filters and search section -->
+        <div class="bg-white rounded-lg shadow-sm p-4 mb-6">
+          <div class="flex flex-col md:flex-row gap-4">
+            <div class="flex-grow">
+              <div class="relative">
+                <input type="text" id="search-classes" placeholder="Search classes..." class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500">
+                <i class="fas fa-search absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
+              </div>
+            </div>
+            <div class="flex flex-wrap gap-2">
+              <select id="section-filter" class="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500">
+                <option value="">All Sections</option>
+              </select>
+              <select id="term-filter" class="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500">
+                <option value="">All Terms</option>
+              </select>
+              <button type="button" id="reset-filters" class="px-4 py-2 bg-gray-100 text-gray-600 rounded-lg hover:bg-gray-200 transition-colors">
+                <i class="fas fa-sync-alt"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Classes Table -->
+        <div class="bg-white rounded-lg shadow-sm overflow-hidden">
+          <div class="overflow-x-auto">
+            <table class="min-w-full divide-y divide-gray-200">
+              <thead class="bg-gray-50">
+                <tr>
+                  <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Subject</th>
+                  <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Section</th>
+                  <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Faculty</th>
+                  <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Term</th>
+                  <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Schedule</th>
+                  <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Room</th>
+                  <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Students</th>
+                  <th scope="col" class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                </tr>
+              </thead>
+              <tbody id="classes-tbody" class="bg-white divide-y divide-gray-200">
+                <tr>
+                  <td colspan="8" class="px-6 py-12 text-center">
+                    <div class="flex flex-col items-center">
+                      <i class="fas fa-spinner fa-spin text-4xl text-gray-300 mb-3"></i>
+                      <p class="text-gray-500">Loading classes...</p>
+                    </div>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+      </main>
+    </div>
+  </div>
+
+  <!-- Add/Edit Class Modal -->
+  <div id="class-modal" class="hidden fixed inset-0 z-50 overflow-y-auto" aria-labelledby="modal-title" role="dialog" aria-modal="true">
+    <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+      <!-- Background overlay -->
+      <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" aria-hidden="true" onclick="closeModal()"></div>
+
+      <!-- Center modal -->
+      <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
+
+      <!-- Modal panel -->
+      <div class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-2xl sm:w-full">
+        <!-- Modal Header -->
+        <div class="bg-gradient-to-r from-primary-600 to-primary-700 px-6 py-4">
+          <div class="flex items-center justify-between">
+            <h3 class="text-lg font-semibold text-white flex items-center" id="modal-title">
+              <i class="fas fa-chalkboard mr-2"></i>
+              <span id="modal-title-text">Add New Class</span>
+            </h3>
+            <button type="button" onclick="closeModal()" class="text-white hover:text-gray-200 transition-colors">
+              <i class="fas fa-times text-xl"></i>
+            </button>
+          </div>
+        </div>
+
+        <!-- Modal Body -->
+        <form id="class-form" class="p-6">
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            
+            <!-- Subject Selection -->
+            <div class="md:col-span-2">
+              <label for="modal-subject" class="block text-sm font-medium text-gray-700 mb-2">
+                Subject <span class="text-red-500">*</span>
+              </label>
+              <div class="relative">
+                <select id="modal-subject" required class="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-all">
+                  <option value="">Select Subject</option>
+                </select>
+                <i class="fas fa-book absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
+              </div>
+            </div>
+
+            <!-- Section Selection -->
+            <div class="md:col-span-2">
+              <label for="modal-section" class="block text-sm font-medium text-gray-700 mb-2">
+                Section <span class="text-red-500">*</span>
+              </label>
+              <div class="relative">
+                <select id="modal-section" required class="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-all">
+                  <option value="">Select Section</option>
+                </select>
+                <i class="fas fa-users absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
+              </div>
+            </div>
+
+            <!-- Faculty Selection -->
+            <div class="md:col-span-2">
+              <label for="modal-faculty" class="block text-sm font-medium text-gray-700 mb-2">
+                Faculty <span class="text-red-500">*</span>
+              </label>
+              <div class="relative">
+                <select id="modal-faculty" required class="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-all">
+                  <option value="">Select Faculty</option>
+                </select>
+                <i class="fas fa-user-tie absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
+              </div>
+            </div>
+
+            <!-- Academic Term -->
+            <div class="md:col-span-2">
+              <label for="modal-term" class="block text-sm font-medium text-gray-700 mb-2">
+                Academic Term <span class="text-red-500">*</span>
+              </label>
+              <div class="relative">
+                <select id="modal-term" required class="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-all">
+                  <option value="">Select Term</option>
+                </select>
+                <i class="fas fa-calendar-alt absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
+              </div>
+            </div>
+
+            <!-- Schedule -->
+            <div>
+              <label for="modal-schedule" class="block text-sm font-medium text-gray-700 mb-2">
+                Schedule
+              </label>
+              <div class="relative">
+                <input type="text" id="modal-schedule" placeholder="e.g., MWF 8:00-9:00 AM" class="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-all">
+                <i class="fas fa-clock absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
+              </div>
+            </div>
+
+            <!-- Room -->
+            <div>
+              <label for="modal-room" class="block text-sm font-medium text-gray-700 mb-2">
+                Room
+              </label>
+              <div class="relative">
+                <input type="text" id="modal-room" placeholder="e.g., Room 201" class="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 transition-all">
+                <i class="fas fa-door-open absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
+              </div>
+            </div>
+
+          </div>
+
+          <!-- Hidden field for class ID (used in edit mode) -->
+          <input type="hidden" id="modal-class-id">
+
+          <!-- Modal Footer -->
+          <div class="mt-8 flex flex-col sm:flex-row gap-3 sm:gap-4">
+            <button type="button" onclick="closeModal()" class="flex-1 px-6 py-3 bg-gray-100 text-gray-700 font-medium rounded-lg hover:bg-gray-200 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500">
+              <i class="fas fa-times mr-2"></i>
+              Cancel
+            </button>
+            <button type="submit" class="flex-1 px-6 py-3 bg-gradient-to-r from-primary-600 to-primary-700 text-white font-medium rounded-lg hover:from-primary-700 hover:to-primary-800 transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 shadow-lg hover:shadow-xl">
+              <i class="fas fa-save mr-2"></i>
+              <span id="modal-submit-text">Add Class</span>
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- Scripts -->
+  <script src="{{ url_for('static', filename='js/admin-navigation.js') }}"></script>
+  
+  <script>
+    let allClasses = [];
+    let allSubjects = [];
+    let allSections = [];
+    let allFaculty = [];
+    let allTerms = [];
+    let isEditMode = false;
+
+    $(document).ready(function() {
+      loadClasses();
+      loadSubjects();
+      loadSections();
+      loadFaculty();
+      loadTerms();
+
+      // Event listeners
+      $('#add-class-btn').click(function() {
+        openAddModal();
+      });
+
+      $('#search-classes').on('keyup', filterClasses);
+      $('#section-filter').on('change', filterClasses);
+      $('#term-filter').on('change', filterClasses);
+      $('#reset-filters').on('click', resetFilters);
+
+      // Form submission
+      $('#class-form').on('submit', function(e) {
+        e.preventDefault();
+        if (isEditMode) {
+          updateClass();
+        } else {
+          addClass();
+        }
+      });
+    });
+
+    // Open modal for adding new class
+    function openAddModal() {
+      isEditMode = false;
+      $('#modal-title-text').text('Add New Class');
+      $('#modal-submit-text').text('Add Class');
+      $('#class-form')[0].reset();
+      $('#modal-class-id').val('');
+      
+      // Populate dropdowns
+      populateSubjectDropdown();
+      populateSectionDropdown();
+      populateFacultyDropdown();
+      populateTermDropdown();
+      
+      $('#class-modal').removeClass('hidden');
+      document.body.style.overflow = 'hidden';
+    }
+
+    // Open modal for editing class
+    function openEditModal(classId) {
+      const classItem = allClasses.find(c => c.section_id === classId);
+      if (!classItem) return;
+
+      isEditMode = true;
+      $('#modal-title-text').text('Edit Class');
+      $('#modal-submit-text').text('Update Class');
+      $('#modal-class-id').val(classId);
+      
+      // Populate dropdowns first
+      populateSubjectDropdown(classItem.subject_id);
+      populateSectionDropdown(classItem.section_ref_id);
+      populateFacultyDropdown(classItem.faculty_id);
+      populateTermDropdown(classItem.term_id);
+      
+      // Fill form fields
+      $('#modal-schedule').val(classItem.schedule || '');
+      $('#modal-room').val(classItem.room || '');
+      
+      $('#class-modal').removeClass('hidden');
+      document.body.style.overflow = 'hidden';
+    }
+
+    // Close modal
+    function closeModal() {
+      $('#class-modal').addClass('hidden');
+      document.body.style.overflow = 'auto';
+      $('#class-form')[0].reset();
+      isEditMode = false;
+    }
+
+    // Populate dropdowns
+    function populateSubjectDropdown(selectedId = null) {
+      const dropdown = $('#modal-subject');
+      dropdown.empty();
+      dropdown.append('<option value="">Select Subject</option>');
+      
+      allSubjects.forEach(function(subject) {
+        const selected = selectedId && subject.subject_id == selectedId ? 'selected' : '';
+        dropdown.append(`<option value="${subject.subject_id}" ${selected}>${subject.subject_code} - ${subject.title}</option>`);
+      });
+    }
+
+    function populateSectionDropdown(selectedId = null) {
+      const dropdown = $('#modal-section');
+      dropdown.empty();
+      dropdown.append('<option value="">Select Section</option>');
+      
+      allSections.forEach(function(section) {
+        const selected = selectedId && section.section_id == selectedId ? 'selected' : '';
+        const yearLabel = section.year_level ? ` (Year ${section.year_level})` : '';
+        dropdown.append(`<option value="${section.section_id}" ${selected}>${section.section_code}${yearLabel} - ${section.program_code || ''}</option>`);
+      });
+    }
+
+    function populateFacultyDropdown(selectedId = null) {
+      const dropdown = $('#modal-faculty');
+      dropdown.empty();
+      dropdown.append('<option value="">Select Faculty</option>');
+      
+      allFaculty.forEach(function(faculty) {
+        const selected = selectedId && faculty.faculty_id == selectedId ? 'selected' : '';
+        dropdown.append(`<option value="${faculty.faculty_id}" ${selected}>${faculty.first_name} ${faculty.last_name}</option>`);
+      });
+    }
+
+    function populateTermDropdown(selectedId = null) {
+      const dropdown = $('#modal-term');
+      dropdown.empty();
+      dropdown.append('<option value="">Select Term</option>');
+      
+      allTerms.forEach(function(term) {
+        const current = term.is_current ? ' (Current)' : '';
+        const selected = selectedId && term.term_id == selectedId ? 'selected' : '';
+        dropdown.append(`<option value="${term.term_id}" ${selected}>${term.title}${current}</option>`);
+      });
+    }
+
+    // Load classes from API
+    function loadClasses() {
+      $.ajax({
+        url: '/api/classes',
+        method: 'GET',
+        success: function(response) {
+          if (response.success) {
+            allClasses = response.data;
+            updateStatistics(response.stats);
+            displayClasses(allClasses);
+          }
+        },
+        error: function(xhr) {
+          console.error('Error loading classes:', xhr);
+          showNotification('Error loading classes', 'error');
+        }
+      });
+    }
+
+    // Display classes in table
+    function displayClasses(classes) {
+      const tbody = $('#classes-tbody');
+      tbody.empty();
+
+      if (classes.length === 0) {
+        tbody.append(`
+          <tr>
+            <td colspan="8" class="px-6 py-12 text-center">
+              <div class="flex flex-col items-center">
+                <i class="fas fa-inbox text-4xl text-gray-300 mb-3"></i>
+                <p class="text-gray-500">No classes found</p>
+              </div>
+            </td>
+          </tr>
+        `);
+        return;
+      }
+
+      classes.forEach(function(classItem) {
+        const termBadge = classItem.is_current_term 
+          ? '<span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-green-100 text-green-800">Current</span>'
+          : '<span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-gray-100 text-gray-800">Past</span>';
+
+        const row = `
+          <tr class="hover:bg-gray-50 transition-colors">
+            <td class="px-6 py-4 whitespace-nowrap">
+              <div class="text-sm font-medium text-gray-900">${classItem.subject_code || 'N/A'}</div>
+              <div class="text-xs text-gray-500">${classItem.subject_title || ''}</div>
+            </td>
+            <td class="px-6 py-4 whitespace-nowrap">
+              <span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-blue-100 text-blue-800">
+                ${classItem.section_code || classItem.section_name || 'N/A'}
+              </span>
+            </td>
+            <td class="px-6 py-4 whitespace-nowrap">
+              <div class="text-sm text-gray-900">${classItem.faculty_name || 'N/A'}</div>
+            </td>
+            <td class="px-6 py-4 whitespace-nowrap">
+              <div class="text-sm text-gray-900 mb-1">${classItem.term_name || 'N/A'}</div>
+              ${termBadge}
+            </td>
+            <td class="px-6 py-4">
+              <div class="text-sm text-gray-900">${classItem.schedule || '-'}</div>
+            </td>
+            <td class="px-6 py-4 whitespace-nowrap">
+              <div class="text-sm text-gray-900">${classItem.room || '-'}</div>
+            </td>
+            <td class="px-6 py-4 whitespace-nowrap">
+              <span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-purple-100 text-purple-800">
+                ${classItem.enrolled_students || 0}
+              </span>
+            </td>
+            <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+              <button onclick="openEditModal(${classItem.section_id})" class="text-primary-600 hover:text-primary-900 mr-3" title="Edit">
+                <i class="fas fa-edit"></i>
+              </button>
+              <button onclick="deleteClass(${classItem.section_id}, '${escapeHtml(classItem.subject_code)}')" class="text-red-600 hover:text-red-900" title="Delete">
+                <i class="fas fa-trash"></i>
+              </button>
+            </td>
+          </tr>
+        `;
+        tbody.append(row);
+      });
+    }
+
+    // Update statistics
+    function updateStatistics(stats) {
+      $('#total-classes').text(stats.total_classes || 0);
+      $('#total-subjects').text(stats.unique_subjects || 0);
+      $('#active-faculty').text(stats.active_faculty || 0);
+      $('#total-students').text(stats.current_term_classes || 0);
+    }
+
+    // Filter classes
+    function filterClasses() {
+      const searchTerm = $('#search-classes').val().toLowerCase();
+      const sectionFilter = $('#section-filter').val();
+      const termFilter = $('#term-filter').val();
+
+      const filtered = allClasses.filter(function(classItem) {
+        const matchesSearch = !searchTerm || 
+          (classItem.subject_code && classItem.subject_code.toLowerCase().includes(searchTerm)) ||
+          (classItem.subject_title && classItem.subject_title.toLowerCase().includes(searchTerm)) ||
+          (classItem.faculty_name && classItem.faculty_name.toLowerCase().includes(searchTerm)) ||
+          (classItem.section_code && classItem.section_code.toLowerCase().includes(searchTerm));
+
+        const matchesSection = !sectionFilter || classItem.section_ref_id == sectionFilter;
+        const matchesTerm = !termFilter || classItem.term_id == termFilter;
+
+        return matchesSearch && matchesSection && matchesTerm;
+      });
+
+      displayClasses(filtered);
+    }
+
+    // Reset filters
+    function resetFilters() {
+      $('#search-classes').val('');
+      $('#section-filter').val('');
+      $('#term-filter').val('');
+      displayClasses(allClasses);
+    }
+
+    // Load data for dropdowns
+    function loadSubjects() {
+      $.ajax({
+        url: '/api/subjects',
+        method: 'GET',
+        success: function(response) {
+          if (response.success) {
+            allSubjects = response.data;
+          }
+        }
+      });
+    }
+
+    function loadSections() {
+      $.ajax({
+        url: '/api/sections-master',
+        method: 'GET',
+        success: function(response) {
+          if (response.success) {
+            allSections = response.data;
+            const filter = $('#section-filter');
+            filter.find('option:not(:first)').remove();
+            response.data.forEach(function(section) {
+              filter.append(`<option value="${section.section_id}">${section.section_code}</option>`);
+            });
+          }
+        }
+      });
+    }
+
+    function loadFaculty() {
+      $.ajax({
+        url: '/api/faculty',
+        method: 'GET',
+        success: function(response) {
+          if (response.success) {
+            allFaculty = response.data.filter(f => !f.is_archived);
+          }
+        }
+      });
+    }
+
+    function loadTerms() {
+      $.ajax({
+        url: '/api/terms',
+        method: 'GET',
+        success: function(response) {
+          if (response.success) {
+            allTerms = response.data;
+            const filter = $('#term-filter');
+            filter.find('option:not(:first)').remove();
+            response.data.forEach(function(term) {
+              const current = term.is_current ? ' (Current)' : '';
+              filter.append(`<option value="${term.term_id}">${term.title}${current}</option>`);
+            });
+          }
+        }
+      });
+    }
+
+    // Add class
+    function addClass() {
+      const data = {
+        subject_id: $('#modal-subject').val(),
+        section_ref_id: $('#modal-section').val(),
+        faculty_id: $('#modal-faculty').val(),
+        term_id: $('#modal-term').val(),
+        schedule: $('#modal-schedule').val(),
+        room: $('#modal-room').val()
+      };
+
+      if (!data.subject_id || !data.section_ref_id || !data.faculty_id || !data.term_id) {
+        showNotification('Please fill in all required fields', 'error');
+        return;
+      }
+
+      $.ajax({
+        url: '/api/classes',
+        method: 'POST',
+        contentType: 'application/json',
+        data: JSON.stringify(data),
+        success: function(response) {
+          if (response.success) {
+            showNotification('Class added successfully', 'success');
+            closeModal();
+            loadClasses();
+          } else {
+            showNotification(response.error || 'Failed to add class', 'error');
+          }
+        },
+        error: function(xhr) {
+          showNotification(xhr.responseJSON?.error || 'Failed to add class', 'error');
+        }
+      });
+    }
+
+    // Update class
+    function updateClass() {
+      const classId = $('#modal-class-id').val();
+      const data = {
+        subject_id: $('#modal-subject').val(),
+        section_ref_id: $('#modal-section').val(),
+        faculty_id: $('#modal-faculty').val(),
+        term_id: $('#modal-term').val(),
+        schedule: $('#modal-schedule').val(),
+        room: $('#modal-room').val()
+      };
+
+      $.ajax({
+        url: `/api/classes/${classId}`,
+        method: 'PUT',
+        contentType: 'application/json',
+        data: JSON.stringify(data),
+        success: function(response) {
+          if (response.success) {
+            showNotification('Class updated successfully', 'success');
+            closeModal();
+            loadClasses();
+          } else {
+            showNotification(response.error || 'Failed to update class', 'error');
+          }
+        },
+        error: function(xhr) {
+          showNotification(xhr.responseJSON?.error || 'Failed to update class', 'error');
+        }
+      });
+    }
+
+    // Delete class
+    function deleteClass(classId, subjectCode) {
+      Swal.fire({
+        title: 'Delete Class?',
+        text: `Are you sure you want to delete the class for ${subjectCode}? This action cannot be undone.`,
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#dc2626',
+        cancelButtonColor: '#6b7280',
+        confirmButtonText: 'Yes, delete it',
+        cancelButtonText: 'Cancel'
+      }).then((result) => {
+        if (result.isConfirmed) {
+          $.ajax({
+            url: `/api/classes/${classId}`,
+            method: 'DELETE',
+            success: function(response) {
+              if (response.success) {
+                showNotification('Class deleted successfully', 'success');
+                loadClasses();
+              } else {
+                showNotification(response.error || 'Failed to delete class', 'error');
+              }
+            },
+            error: function(xhr) {
+              showNotification(xhr.responseJSON?.error || 'Failed to delete class', 'error');
+            }
+          });
+        }
+      });
+    }
+
+    // Show notification
+    function showNotification(message, type) {
+      Swal.fire({
+        title: type === 'success' ? 'Success!' : 'Error',
+        text: message,
+        icon: type,
+        timer: 3000,
+        showConfirmButton: false,
+        toast: true,
+        position: 'top-end'
+      });
+    }
+
+    // Utility function to escape HTML
+    function escapeHtml(text) {
+      const map = {
+        '&': '&amp;',
+        '<': '&lt;',
+        '>': '&gt;',
+        '"': '&quot;',
+        "'": '&#039;'
+      };
+      return text ? text.replace(/[&<>"']/g, m => map[m]) : '';
+    }
+  </script>
+  
+  <!-- Include loading animation script -->
+    
+  <!-- Include loading animation script -->
+  <script src="{{ url_for('static', filename='js/loading-animation.js') }}"></script>
+  
+  <!-- Prevent logout on browser back button -->
+  <script src="{{ url_for('static', filename='js/prevent-back-logout.js') }}"></script>
+
+  <!-- Session Timeout Monitor (Auto-logout after 1 hour) -->
+  <script src="{{ url_for('static', filename='js/session-timeout.js') }}"></script>
+</body>
+</html>
+
+</body>
+</html>

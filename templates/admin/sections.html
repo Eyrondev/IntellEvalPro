@@ -1,0 +1,1270 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Section Management | IntellEvalPro</title>
+  
+  <!-- Favicon -->
+  <link rel="icon" type="image/png" href="{{ url_for('static', filename='images/nclogo.png') }}">
+  <link rel="shortcut icon" type="image/png" href="{{ url_for('static', filename='images/nclogo.png') }}">
+  <link rel="apple-touch-icon" href="{{ url_for('static', filename='images/nclogo.png') }}">
+  
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  
+  <!-- Font Awesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" integrity="sha512-SnH5WK+bZxgPHs44uWIX+LLJAJ9/2PkPKZ5QiAj6Ta86w+fsb2TkcmfRyVX3pBnMFcV7oQPJkl9QevSCWr3W6A==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+  
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  
+  <!-- jQuery -->
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  
+  <!-- SweetAlert2 -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11.7.12/dist/sweetalert2.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.7.12/dist/sweetalert2.all.min.js"></script>
+  
+  <script>
+    tailwind.config = {
+      theme: {
+        fontFamily: {
+          'sans': ['Inter', 'system-ui', 'sans-serif'],
+        },
+        extend: {
+          colors: {
+            primary: {
+              50: '#e6f0ff',
+              100: '#b3d1ff',
+              200: '#80b3ff',
+              300: '#4d94ff', 
+              400: '#1a75ff',
+              500: '#0059cc',
+              600: '#004db3',
+              700: '#004099',
+              800: '#003380',
+              900: '#002766',
+            }
+          }
+        }
+      }
+    }
+  </script>
+  
+  <style>
+    /* Custom scrollbar */
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    
+    ::-webkit-scrollbar-track {
+      background: #f1f1f1;
+      border-radius: 10px;
+    }
+    
+    ::-webkit-scrollbar-thumb {
+      background: #c1c1c1;
+      border-radius: 10px;
+    }
+    
+    ::-webkit-scrollbar-thumb:hover {
+      background: #a8a8a8;
+    }
+    
+    /* Active nav link */
+    .nav-link.active {
+      position: relative;
+    }
+    
+    .nav-link.active::after {
+      content: '';
+      position: absolute;
+      left: 0;
+      width: 4px;
+      height: 100%;
+      background-color: #0059cc;
+      border-radius: 0 2px 2px 0;
+    }
+  </style>
+</head>
+<body class="bg-gray-50 font-sans overflow-x-hidden">
+  
+  <!-- Loading overlay -->
+  <div id="loader-overlay" class="fixed inset-0 z-50 flex flex-col items-center justify-center bg-white bg-opacity-90 backdrop-blur-sm transition-opacity duration-300">
+    <img src="{{ url_for('static', filename='images/nclogo.png') }}" alt="Logo" class="w-32 h-auto mb-6 animate-bounce">
+    <div class="flex items-center space-x-2">
+      <div class="w-3 h-3 rounded-full bg-primary-500 animate-pulse"></div>
+      <div class="w-3 h-3 rounded-full bg-primary-500 animate-pulse" style="animation-delay: 0.2s"></div>
+      <div class="w-3 h-3 rounded-full bg-primary-500 animate-pulse" style="animation-delay: 0.4s"></div>
+    </div>
+  </div>
+
+  <div class="flex h-screen bg-gray-50">
+    <!-- Admin Sidebar -->
+    <div id="admin-sidebar"></div>
+    
+    <!-- Main content -->
+    <div class="lg:ml-64 flex flex-col flex-1 min-h-screen">
+      <!-- Admin Header -->
+      <div id="admin-header"></div>
+
+      <!-- Main content area -->
+      <main id="main-content" class="flex-1 overflow-auto p-4 md:p-6 bg-gray-50">
+        
+        <!-- Page header -->
+        <div class="mb-6">
+          <div class="flex flex-col md:flex-row md:items-center md:justify-between">
+            <div>
+              <h1 class="text-2xl font-bold text-gray-800">Section Management</h1>
+              <p class="text-gray-500 mt-1">Manage all sections (BSCS-4A, BSIT-3B, etc.)</p>
+            </div>
+            <div class="mt-4 md:mt-0 flex gap-2">
+              <button type="button" id="view-disabled-btn" class="inline-flex items-center px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 text-sm font-medium rounded-lg shadow-sm transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500">
+                <i class="fas fa-eye-slash mr-2"></i>
+                View Disabled
+              </button>
+              <button type="button" id="add-section-btn" class="inline-flex items-center px-4 py-2 bg-primary-600 hover:bg-primary-700 text-white text-sm font-medium rounded-lg shadow-sm transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500">
+                <i class="fas fa-plus mr-2"></i>
+                Add Section
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Statistics Cards -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
+          <div class="bg-white rounded-lg shadow-sm p-6 hover:shadow-md transition-all">
+            <div class="flex items-center">
+              <div class="p-3 rounded-full bg-blue-100">
+                <i class="fas fa-chalkboard-teacher text-blue-600 text-xl"></i>
+              </div>
+              <div class="ml-4">
+                <h3 class="text-2xl font-bold text-gray-800" id="total-sections">0</h3>
+                <p class="text-gray-600 text-sm">Total Sections</p>
+              </div>
+            </div>
+          </div>
+          <div class="bg-white rounded-lg shadow-sm p-6 hover:shadow-md transition-all">
+            <div class="flex items-center">
+              <div class="p-3 rounded-full bg-green-100">
+                <i class="fas fa-book-open text-green-600 text-xl"></i>
+              </div>
+              <div class="ml-4">
+                <h3 class="text-2xl font-bold text-gray-800" id="total-programs">0</h3>
+                <p class="text-gray-600 text-sm">Departments</p>
+              </div>
+            </div>
+          </div>
+          <div class="bg-white rounded-lg shadow-sm p-6 hover:shadow-md transition-all">
+            <div class="flex items-center">
+              <div class="p-3 rounded-full bg-purple-100">
+                <i class="fas fa-door-open text-purple-600 text-xl"></i>
+              </div>
+              <div class="ml-4">
+                <h3 class="text-2xl font-bold text-gray-800" id="active-classes">0</h3>
+                <p class="text-gray-600 text-sm">Active Classes</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Filters and search section -->
+        <div class="bg-white rounded-lg shadow-sm p-4 mb-6">
+          <div class="flex flex-col md:flex-row gap-4">
+            <div class="flex-grow">
+              <div class="relative">
+                <input type="text" id="search-sections" placeholder="Search sections (e.g., BSCS-4A)..." class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500">
+                <i class="fas fa-search absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
+              </div>
+            </div>
+            <div class="flex flex-wrap gap-2">
+              <select id="program-filter" class="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500">
+                <option value="">All Departments</option>
+              </select>
+              <select id="year-filter" class="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500">
+                <option value="">All Years</option>
+                <option value="1">1st Year</option>
+                <option value="2">2nd Year</option>
+                <option value="3">3rd Year</option>
+                <option value="4">4th Year</option>
+              </select>
+              <button type="button" id="reset-filters" class="px-4 py-2 bg-gray-100 text-gray-600 rounded-lg hover:bg-gray-200 transition-colors" title="Refresh Data">
+                <i class="fas fa-sync-alt" id="refresh-icon"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Sections Table -->
+        <div class="bg-white rounded-lg shadow-sm overflow-hidden">
+          <div class="overflow-x-auto">
+            <table class="min-w-full divide-y divide-gray-200">
+              <thead class="bg-gray-50">
+                <tr>
+                  <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Section Code</th>
+                  <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Department</th>
+                  <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Year Level</th>
+                  <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Classes</th>
+                  <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Students</th>
+                  <th scope="col" class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                </tr>
+              </thead>
+              <tbody id="sections-tbody" class="bg-white divide-y divide-gray-200">
+                <tr>
+                  <td colspan="6" class="px-6 py-12 text-center">
+                    <div class="flex flex-col items-center">
+                      <i class="fas fa-spinner fa-spin text-4xl text-gray-300 mb-3"></i>
+                      <p class="text-gray-500">Loading sections...</p>
+                    </div>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <!-- Pagination -->
+          <div class="bg-gray-50 px-4 py-4 border-t border-gray-200">
+            <div class="flex flex-col sm:flex-row items-center justify-between gap-3">
+              <div class="text-sm text-gray-700 text-center sm:text-left">
+                Showing <span class="font-medium" id="showing-start">0</span> to <span class="font-medium" id="showing-end">0</span> of <span class="font-medium" id="showing-total">0</span> sections
+              </div>
+              <div id="pagination-controls" class="flex gap-2 flex-wrap justify-center">
+                <!-- Pagination buttons will be inserted here -->
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </main>
+    </div>
+  </div>
+
+  <!-- Add/Edit Section Modal -->
+  <div id="section-modal" class="hidden fixed inset-0 z-50 overflow-y-auto" aria-labelledby="modal-title" role="dialog" aria-modal="true">
+    <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+      <!-- Background overlay -->
+      <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" aria-hidden="true"></div>
+
+      <!-- Modal panel -->
+      <div class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
+        <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
+          <div class="sm:flex sm:items-start">
+            <div class="mt-3 text-center sm:mt-0 sm:text-left w-full">
+              <h3 class="text-lg leading-6 font-medium text-gray-900" id="modal-title">
+                <span id="modal-title-text">Add New Section</span>
+              </h3>
+              <div class="mt-4">
+                <form id="section-form" class="space-y-4">
+                  <!-- Hidden field for section ID (used in edit mode) -->
+                  <input type="hidden" id="modal-section-id">
+
+                  <!-- Section Code -->
+                  <div>
+                    <label for="modal-section-code" class="block text-sm font-medium text-gray-700">
+                      Section Code <span class="text-red-500">*</span>
+                    </label>
+                    <input type="text" id="modal-section-code" required placeholder="e.g., BSCS-4A" 
+                           class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-primary-500 focus:border-primary-500 sm:text-sm">
+                  </div>
+
+                  <!-- Section Name -->
+                  <div>
+                    <label for="modal-section-name" class="block text-sm font-medium text-gray-700">
+                      Section Name <span class="text-red-500">*</span>
+                    </label>
+                    <input type="text" id="modal-section-name" required placeholder="e.g., BSCS 4th Year Section A" 
+                           class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-primary-500 focus:border-primary-500 sm:text-sm">
+                  </div>
+
+                  <!-- Program and Year Level in a grid -->
+                  <div class="grid grid-cols-2 gap-4">
+                    <!-- Program Selection -->
+                    <div>
+                      <label for="modal-program" class="block text-sm font-medium text-gray-700">
+                        Department <span class="text-red-500">*</span>
+                      </label>
+                      <select id="modal-program" required 
+                              class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-primary-500 focus:border-primary-500 sm:text-sm">
+                        <option value="">Select Department</option>
+                      </select>
+                    </div>
+
+                    <!-- Year Level -->
+                    <div>
+                      <label for="modal-year-level" class="block text-sm font-medium text-gray-700">
+                        Year Level <span class="text-red-500">*</span>
+                      </label>
+                      <select id="modal-year-level" required 
+                              class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-primary-500 focus:border-primary-500 sm:text-sm">
+                        <option value="">Select Year</option>
+                        <option value="1">1st Year</option>
+                        <option value="2">2nd Year</option>
+                        <option value="3">3rd Year</option>
+                        <option value="4">4th Year</option>
+                      </select>
+                    </div>
+                  </div>
+
+                  <!-- Student Assignment Section (Only shown in edit mode) -->
+                  <div id="students-section" class="hidden">
+                    <div class="border-t border-gray-200 pt-4 mt-4">
+                      <div class="flex items-center justify-between mb-3">
+                        <label class="block text-sm font-medium text-gray-700">
+                          Assign Students to Section
+                        </label>
+                        <button type="button" id="refresh-students-btn" class="text-primary-600 hover:text-primary-700 text-sm">
+                          <i class="fas fa-sync-alt mr-1"></i> Refresh
+                        </button>
+                      </div>
+                      
+                      <!-- Add Student Section -->
+                      <div class="mb-3 p-3 bg-gray-50 rounded-md">
+                        <div class="flex gap-2">
+                          <div class="flex-grow">
+                            <select id="student-select" class="w-full border-gray-300 rounded-md shadow-sm focus:ring-primary-500 focus:border-primary-500 text-sm">
+                              <option value="">Select a student...</option>
+                            </select>
+                          </div>
+                          <button type="button" id="add-student-btn" class="px-4 py-2 bg-primary-600 text-white text-sm rounded-md hover:bg-primary-700 focus:outline-none">
+                            <i class="fas fa-plus mr-1"></i> Add
+                          </button>
+                        </div>
+                      </div>
+
+                      <!-- Assigned Students List -->
+                      <div>
+                        <label class="block text-xs font-medium text-gray-600 mb-2">
+                          Students in Section (<span id="assigned-students-count">0</span>)
+                        </label>
+                        <div class="border border-primary-300 rounded-md max-h-64 overflow-y-auto bg-white">
+                          <div id="assigned-students-list" class="divide-y divide-gray-200">
+                            <div class="p-3 text-sm text-gray-500 text-center">
+                              <i class="fas fa-spinner fa-spin mr-2"></i>Loading students...
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+
+                      <!-- Info Box -->
+                      <div class="mt-3 p-3 bg-green-50 border border-green-200 rounded-md">
+                        <div class="flex items-start">
+                          <i class="fas fa-info-circle text-green-600 mt-0.5 mr-2"></i>
+                          <div class="text-xs text-green-800">
+                            <p class="font-medium">Simple Student Assignment</p>
+                            <p class="mt-1">Students are directly assigned to this section. Each student can only belong to ONE section at a time.</p>
+                            <p class="mt-1 text-gray-600"><em>Note: Students already assigned to other sections won't appear in the dropdown.</em></p>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </form>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
+          <button type="submit" form="section-form" id="submit-section-btn"
+                  class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-primary-600 text-base font-medium text-white hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 sm:ml-3 sm:w-auto sm:text-sm">
+            <span id="modal-submit-text">Add Section</span>
+          </button>
+          <button type="button" onclick="closeModal()" id="cancel-section-btn"
+                  class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm">
+            Cancel
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Scripts -->
+  <script src="{{ url_for('static', filename='js/admin-navigation.js') }}"></script>
+  
+  <script>
+    let allSections = [];
+    let allPrograms = [];
+    let allStudents = [];
+    let assignedStudents = [];
+    let isEditMode = false;
+    let filteredSections = [];
+    let currentPage = 1;
+    const sectionsPerPage = 10;
+
+    $(document).ready(function() {
+      loadSections();
+      loadPrograms();
+
+      // Make removeStudentFromSection globally accessible
+      window.removeStudentFromSection = removeStudentFromSection;
+
+      // Event listeners
+      $('#add-section-btn').click(function() {
+        openAddModal();
+      });
+
+      $('#view-disabled-btn').click(function() {
+        viewDisabledSections();
+      });
+
+      $('#search-sections').on('keyup', filterSections);
+      $('#program-filter').on('change', filterSections);
+      $('#year-filter').on('change', filterSections);
+      $('#reset-filters').on('click', refreshSections);
+
+      // Form submission
+      $('#section-form').on('submit', function(e) {
+        e.preventDefault();
+        if (isEditMode) {
+          updateSection();
+        } else {
+          addSection();
+        }
+      });
+
+      // Refresh students button
+      $('#refresh-students-btn').on('click', function() {
+        const sectionId = $('#modal-section-id').val();
+        if (sectionId) {
+          loadStudentsForSection(sectionId);
+        }
+      });
+
+      // Add student button
+      $('#add-student-btn').on('click', function() {
+        addStudentToSection();
+      });
+
+      // Remove student button - using event delegation for dynamically added buttons
+      $(document).on('click', '.remove-student-btn', function() {
+        const studentId = $(this).data('student-id');
+        if (studentId) {
+          removeStudentFromSection(studentId);
+        } else {
+          console.error('No student ID found on button');
+          showNotification('Error: Student ID not found', 'error');
+        }
+      });
+    });
+
+    // Open modal for adding new section
+    function openAddModal() {
+      isEditMode = false;
+      $('#modal-title-text').text('Add New Section');
+      $('#modal-submit-text').text('Add Section');
+      $('#section-form')[0].reset();
+      $('#modal-section-id').val('');
+      assignedStudents = [];
+      
+      // Hide students section in add mode
+      $('#students-section').addClass('hidden');
+      
+      // Populate program dropdown
+      populateProgramDropdown();
+      
+      $('#section-modal').removeClass('hidden');
+      document.body.style.overflow = 'hidden';
+    }
+
+    // Open modal for editing section
+    function openEditModal(sectionId) {
+      const section = allSections.find(s => s.section_id === sectionId);
+      if (!section) return;
+
+      isEditMode = true;
+      $('#modal-title-text').text('Edit Section');
+      $('#modal-submit-text').text('Update Section');
+      $('#modal-section-id').val(sectionId);
+      assignedStudents = [];
+      
+      // Populate dropdown first
+      populateProgramDropdown(section.program_id);
+      
+      // Fill form fields
+      $('#modal-section-code').val(section.section_code || '');
+      $('#modal-section-name').val(section.section_name || '');
+      $('#modal-year-level').val(section.year_level || '');
+      
+      // Show students section in edit mode
+      $('#students-section').removeClass('hidden');
+      
+      // Load students for this section
+      loadStudentsForSection(sectionId);
+      
+      $('#section-modal').removeClass('hidden');
+      document.body.style.overflow = 'hidden';
+    }
+
+    // Close modal
+    function closeModal() {
+      $('#section-modal').addClass('hidden');
+      document.body.style.overflow = 'auto';
+      $('#section-form')[0].reset();
+      assignedStudents = [];
+      isEditMode = false;
+    }
+
+    // Load students for section
+    function loadStudentsForSection(sectionId) {
+      $('#assigned-students-list').html('<div class="p-3 text-sm text-gray-500 text-center"><i class="fas fa-spinner fa-spin mr-2"></i>Loading students...</div>');
+      $('#student-select').html('<option value="">Loading...</option>');
+      
+      // Load assigned students
+      $.ajax({
+        url: `/api/sections-master/${sectionId}/students`,
+        method: 'GET',
+        success: function(response) {
+          if (response.success) {
+            assignedStudents = response.students || [];
+            displayAssignedStudents();
+          } else {
+            $('#assigned-students-list').html(`<div class="p-3 text-sm text-red-500 text-center">${response.error || 'Error loading students'}</div>`);
+          }
+        },
+        error: function(xhr) {
+          console.error('Error loading assigned students:', xhr);
+          $('#assigned-students-list').html('<div class="p-3 text-sm text-red-500 text-center">Error loading students</div>');
+        }
+      });
+
+      // Load available students (exclude those already assigned to ANY section)
+      $.ajax({
+        url: `/api/students?status=Enrolled&exclude_assigned=true`,
+        method: 'GET',
+        success: function(response) {
+          if (response.success) {
+            allStudents = response.data || response.students || [];
+            populateStudentDropdown();
+          }
+        },
+        error: function(xhr) {
+          console.error('Error loading available students:', xhr);
+          $('#student-select').html('<option value="">Error loading students</option>');
+        }
+      });
+    }
+
+    // Display assigned students
+    function displayAssignedStudents() {
+      const list = $('#assigned-students-list');
+      list.empty();
+
+      if (assignedStudents.length === 0) {
+        list.html('<div class="p-3 text-sm text-gray-500 text-center">No students assigned yet</div>');
+      } else {
+        assignedStudents.forEach(function(student) {
+          // Handle both field name formats
+          const firstName = student.std_Firstname || student.first_name || '';
+          const lastName = student.std_Surname || student.last_name || '';
+          const studentNum = student.std_Number || student.student_number || '';
+          const level = student.std_Level || student.year_level || 'N/A';
+          
+          // Get student ID - this is the std_info.id field
+          const studentId = student.id;
+          
+          // Debug log to verify ID is present
+          console.log('Student ID for removal:', studentId, 'Student:', student);
+          
+          if (!studentId) {
+            console.error('Student missing ID field:', student);
+            return; // Skip this student if no ID
+          }
+          
+          const studentItem = `
+            <div class="p-3 hover:bg-gray-50 transition-colors">
+              <div class="flex items-center justify-between">
+                <div class="flex-1">
+                  <div class="text-sm font-medium text-gray-900">${escapeHtml(firstName)} ${escapeHtml(lastName)}</div>
+                  <div class="text-xs text-gray-500 mt-1">
+                    <i class="fas fa-id-card mr-1"></i>${escapeHtml(studentNum)}
+                    <span class="mx-2">•</span>
+                    <span>${escapeHtml(level)}</span>
+                  </div>
+                </div>
+                <button type="button" class="remove-student-btn text-red-600 hover:text-red-700 px-2 py-1 rounded" 
+                        data-student-id="${studentId}" 
+                        title="Remove student from section">
+                  <i class="fas fa-times-circle"></i>
+                </button>
+              </div>
+            </div>
+          `;
+          list.append(studentItem);
+        });
+      }
+
+      // Update count
+      $('#assigned-students-count').text(assignedStudents.length);
+    }
+
+    // Populate student dropdown
+    function populateStudentDropdown() {
+      const select = $('#student-select');
+      select.empty();
+      select.append('<option value="">Select a student...</option>');
+
+      // Filter out already assigned students (to this section)
+      const assignedIds = assignedStudents.map(s => s.id);
+      const availableStudents = allStudents.filter(s => !assignedIds.includes(s.id));
+
+      if (availableStudents.length === 0) {
+        select.append('<option value="">No unassigned students available</option>');
+      } else {
+        availableStudents.forEach(function(student) {
+          // Handle both field name formats (from different endpoints)
+          const firstName = student.first_name || student.std_Firstname || '';
+          const lastName = student.last_name || student.std_Surname || '';
+          const studentNum = student.student_number || student.std_Number || '';
+          const fullName = `${firstName} ${lastName}`.trim();
+          select.append(`<option value="${student.id}">${escapeHtml(studentNum)} - ${escapeHtml(fullName)}</option>`);
+        });
+      }
+    }
+
+    // Add student to section
+    function addStudentToSection() {
+      const studentId = $('#student-select').val();
+      if (!studentId) {
+        showNotification('Please select a student', 'error');
+        return;
+      }
+
+      const sectionId = $('#modal-section-id').val();
+      
+      $.ajax({
+        url: `/api/sections-master/${sectionId}/students`,
+        method: 'POST',
+        contentType: 'application/json',
+        data: JSON.stringify({ student_id: parseInt(studentId) }),
+        success: function(response) {
+          if (response.success) {
+            showNotification('Student added successfully', 'success');
+            loadStudentsForSection(sectionId);
+          } else {
+            showNotification(response.error || 'Failed to add student', 'error');
+          }
+        },
+        error: function(xhr) {
+          showNotification(xhr.responseJSON?.error || 'Failed to add student', 'error');
+        }
+      });
+    }
+
+    // Remove student from section
+    function removeStudentFromSection(studentId) {
+      const sectionId = $('#modal-section-id').val();
+      
+      // Validate inputs
+      if (!studentId) {
+        console.error('removeStudentFromSection called with invalid studentId:', studentId);
+        showNotification('Invalid student ID', 'error');
+        return;
+      }
+      
+      if (!sectionId) {
+        console.error('No section ID found');
+        showNotification('Section ID not found', 'error');
+        return;
+      }
+      
+      console.log('Removing student:', studentId, 'from section:', sectionId);
+      
+      Swal.fire({
+        title: 'Remove Student?',
+        text: 'Are you sure you want to remove this student from the section?',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#dc2626',
+        cancelButtonColor: '#6b7280',
+        confirmButtonText: 'Yes, remove',
+        cancelButtonText: 'Cancel'
+      }).then((result) => {
+        if (result.isConfirmed) {
+          $.ajax({
+            url: `/api/sections-master/${sectionId}/students/${studentId}`,
+            method: 'DELETE',
+            success: function(response) {
+              console.log('Remove student response:', response);
+              if (response.success) {
+                showNotification('Student removed successfully', 'success');
+                loadStudentsForSection(sectionId);
+              } else {
+                showNotification(response.error || 'Failed to remove student', 'error');
+              }
+            },
+            error: function(xhr) {
+              console.error('AJAX error removing student:', xhr);
+              const errorMsg = xhr.responseJSON?.error || 'Failed to remove student';
+              showNotification(errorMsg, 'error');
+            }
+          });
+        }
+      });
+    }
+
+    // Populate program dropdown
+    function populateProgramDropdown(selectedId = null) {
+      const dropdown = $('#modal-program');
+      dropdown.empty();
+      dropdown.append('<option value="">Select Department</option>');
+      
+      allPrograms.forEach(function(program) {
+        const selected = selectedId && program.program_id == selectedId ? 'selected' : '';
+        dropdown.append(`<option value="${program.program_id}" ${selected}>${program.name}</option>`);
+      });
+    }
+
+    // Load sections from API
+    function loadSections() {
+      $.ajax({
+        url: '/api/sections-master',
+        method: 'GET',
+        success: function(response) {
+          if (response.success) {
+            allSections = response.data;
+            filteredSections = allSections;
+            updateStatistics(response.stats);
+            currentPage = 1;
+            displaySections();
+          }
+        },
+        error: function(xhr) {
+          console.error('Error loading sections:', xhr);
+          showNotification('Error loading sections', 'error');
+        }
+      });
+    }
+
+    // Display sections in table
+    function displaySections() {
+      const tbody = $('#sections-tbody');
+      tbody.empty();
+
+      if (filteredSections.length === 0) {
+        tbody.append(`
+          <tr>
+            <td colspan="6" class="px-6 py-12 text-center">
+              <div class="flex flex-col items-center">
+                <i class="fas fa-inbox text-4xl text-gray-300 mb-3"></i>
+                <p class="text-gray-500">No sections found</p>
+              </div>
+            </td>
+          </tr>
+        `);
+        updatePaginationInfo();
+        return;
+      }
+
+      // Calculate pagination
+      const startIndex = (currentPage - 1) * sectionsPerPage;
+      const endIndex = startIndex + sectionsPerPage;
+      const paginatedSections = filteredSections.slice(startIndex, endIndex);
+
+      paginatedSections.forEach(function(section) {
+        const yearLevelBadge = getYearBadge(section.year_level);
+
+        const row = `
+          <tr class="hover:bg-gray-50 transition-colors">
+            <td class="px-6 py-4 whitespace-nowrap">
+              <div class="text-sm font-bold text-primary-600">${section.section_code || 'N/A'}</div>
+            </td>
+            <td class="px-6 py-4 whitespace-nowrap">
+              <div class="text-sm text-gray-900">${section.program_name || 'N/A'}</div>
+            </td>
+            <td class="px-6 py-4 whitespace-nowrap">
+              ${yearLevelBadge}
+            </td>
+            <td class="px-6 py-4 whitespace-nowrap">
+              <span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-purple-100 text-purple-800">
+                ${section.class_count || 0} classes
+              </span>
+            </td>
+            <td class="px-6 py-4 whitespace-nowrap">
+              <span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-green-100 text-green-800">
+                ${section.total_students || 0} students
+              </span>
+            </td>
+            <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+              <button onclick="openEditModal(${section.section_id})" class="text-primary-600 hover:text-primary-900 mr-3" title="Add Students">
+                <i class="fas fa-user-plus"></i>
+              </button>
+              <button onclick="disableSection(${section.section_id}, '${escapeHtml(section.section_code)}')" class="text-red-600 hover:text-red-900" title="Disable">
+                <i class="fas fa-ban"></i>
+              </button>
+            </td>
+          </tr>
+        `;
+        tbody.append(row);
+      });
+
+      updatePaginationInfo();
+    }
+
+    // Get year level badge
+    function getYearBadge(year) {
+      const badges = {
+        1: '<span class="inline-flex px-3 py-1 text-xs font-semibold rounded-full bg-yellow-100 text-yellow-800">1st Year</span>',
+        2: '<span class="inline-flex px-3 py-1 text-xs font-semibold rounded-full bg-green-100 text-green-800">2nd Year</span>',
+        3: '<span class="inline-flex px-3 py-1 text-xs font-semibold rounded-full bg-blue-100 text-blue-800">3rd Year</span>',
+        4: '<span class="inline-flex px-3 py-1 text-xs font-semibold rounded-full bg-purple-100 text-purple-800">4th Year</span>'
+      };
+      return badges[year] || '<span class="text-gray-500">-</span>';
+    }
+
+    // Update statistics
+    function updateStatistics(stats) {
+      $('#total-sections').text(stats.total_sections || 0);
+      $('#total-programs').text(stats.total_programs || 0);
+      $('#active-classes').text(stats.active_classes || 0);
+    }
+
+    // Filter sections
+    function filterSections() {
+      const searchTerm = $('#search-sections').val().toLowerCase();
+      const programFilter = $('#program-filter').val();
+      const yearFilter = $('#year-filter').val();
+
+      filteredSections = allSections.filter(function(section) {
+        const matchesSearch = !searchTerm || 
+          (section.section_code && section.section_code.toLowerCase().includes(searchTerm)) ||
+          (section.section_name && section.section_name.toLowerCase().includes(searchTerm)) ||
+          (section.program_name && section.program_name.toLowerCase().includes(searchTerm));
+
+        const matchesProgram = !programFilter || section.program_id == programFilter;
+        const matchesYear = !yearFilter || section.year_level == yearFilter;
+
+        return matchesSearch && matchesProgram && matchesYear;
+      });
+
+      currentPage = 1;
+      displaySections();
+    }
+
+    // Reset filters
+    function resetFilters() {
+      $('#search-sections').val('');
+      $('#program-filter').val('');
+      $('#year-filter').val('');
+      filteredSections = allSections;
+      currentPage = 1;
+      displaySections();
+    }
+
+    // Refresh sections (reload from server)
+    function refreshSections() {
+      const refreshIcon = $('#refresh-icon');
+      
+      // Add spinning animation
+      refreshIcon.addClass('fa-spin');
+      
+      // Reset filters first
+      $('#search-sections').val('');
+      $('#program-filter').val('');
+      $('#year-filter').val('');
+      
+      // Reload sections from server
+      $.ajax({
+        url: '/api/sections-master',
+        method: 'GET',
+        success: function(response) {
+          if (response.success) {
+            allSections = response.data;
+            filteredSections = allSections;
+            updateStatistics(response.stats);
+            currentPage = 1;
+            displaySections();
+            showNotification('Sections refreshed successfully', 'success');
+          } else {
+            showNotification('Failed to refresh sections', 'error');
+          }
+        },
+        error: function(xhr) {
+          console.error('Error refreshing sections:', xhr);
+          showNotification('Error refreshing sections', 'error');
+        },
+        complete: function() {
+          // Remove spinning animation after a short delay
+          setTimeout(() => {
+            refreshIcon.removeClass('fa-spin');
+          }, 500);
+        }
+      });
+    }
+
+    // Load programs for dropdown
+    function loadPrograms() {
+      $.ajax({
+        url: '/api/programs',
+        method: 'GET',
+        success: function(response) {
+          if (response.success) {
+            allPrograms = response.data;
+            const filter = $('#program-filter');
+            filter.find('option:not(:first)').remove();
+            response.data.forEach(function(program) {
+              filter.append(`<option value="${program.program_id}">${program.name}</option>`);
+            });
+          }
+        }
+      });
+    }
+
+    // Add section
+    function addSection() {
+      const data = {
+        section_code: $('#modal-section-code').val(),
+        section_name: $('#modal-section-name').val(),
+        program_id: $('#modal-program').val(),
+        year_level: $('#modal-year-level').val()
+      };
+
+      if (!data.section_code || !data.section_name || !data.program_id || !data.year_level) {
+        showNotification('Please fill in all required fields', 'error');
+        return;
+      }
+
+      $.ajax({
+        url: '/api/sections-master',
+        method: 'POST',
+        contentType: 'application/json',
+        data: JSON.stringify(data),
+        success: function(response) {
+          if (response.success) {
+            showNotification('Section added successfully', 'success');
+            closeModal();
+            loadSections();
+          } else {
+            showNotification(response.error || 'Failed to add section', 'error');
+          }
+        },
+        error: function(xhr) {
+          showNotification(xhr.responseJSON?.error || 'Failed to add section', 'error');
+        }
+      });
+    }
+
+    // Update section
+    function updateSection() {
+      const sectionId = $('#modal-section-id').val();
+      const data = {
+        section_code: $('#modal-section-code').val(),
+        section_name: $('#modal-section-name').val(),
+        program_id: $('#modal-program').val(),
+        year_level: $('#modal-year-level').val()
+      };
+
+      $.ajax({
+        url: `/api/sections-master/${sectionId}`,
+        method: 'PUT',
+        contentType: 'application/json',
+        data: JSON.stringify(data),
+        success: function(response) {
+          if (response.success) {
+            showNotification('Section updated successfully!', 'success');
+            closeModal();
+            loadSections();
+          } else {
+            showNotification(response.error || 'Failed to update section', 'error');
+          }
+        },
+        error: function(xhr) {
+          showNotification(xhr.responseJSON?.error || 'Failed to update section', 'error');
+        }
+      });
+    }
+
+    // Disable section
+    function disableSection(sectionId, sectionCode) {
+      Swal.fire({
+        title: 'Disable Section?',
+        text: `Are you sure you want to disable ${sectionCode}? This section will be hidden from active lists.`,
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#dc2626',
+        cancelButtonColor: '#6b7280',
+        confirmButtonText: 'Yes, disable it',
+        cancelButtonText: 'Cancel'
+      }).then((result) => {
+        if (result.isConfirmed) {
+          $.ajax({
+            url: `/api/sections-master/${sectionId}`,
+            method: 'DELETE',
+            success: function(response) {
+              if (response.success) {
+                showNotification('Section disabled successfully', 'success');
+                loadSections();
+              } else {
+                showNotification(response.error || 'Failed to disable section', 'error');
+              }
+            },
+            error: function(xhr) {
+              showNotification(xhr.responseJSON?.error || 'Failed to disable section', 'error');
+            }
+          });
+        }
+      });
+    }
+
+    // View disabled sections
+    function viewDisabledSections() {
+      // Show SweetAlert modal with disabled sections
+      Swal.fire({
+        title: '<i class="fas fa-eye-slash text-red-600"></i> Disabled Sections',
+        html: '<div class="text-center"><i class="fas fa-spinner fa-spin text-2xl text-gray-400"></i><p class="mt-2">Loading disabled sections...</p></div>',
+        width: '800px',
+        showConfirmButton: false,
+        showCloseButton: true,
+        allowOutsideClick: true
+      });
+
+      // Fetch disabled sections
+      $.ajax({
+        url: '/api/sections-master/disabled',
+        method: 'GET',
+        success: function(response) {
+          if (response.success && response.data.length > 0) {
+            let html = '<div class="max-h-96 overflow-y-auto">';
+            html += '<table class="min-w-full divide-y divide-gray-200 text-sm">';
+            html += '<thead class="bg-gray-100 sticky top-0">';
+            html += '<tr>';
+            html += '<th class="px-4 py-2 text-left font-semibold text-gray-700">Section Code</th>';
+            html += '<th class="px-4 py-2 text-left font-semibold text-gray-700">Department</th>';
+            html += '<th class="px-4 py-2 text-left font-semibold text-gray-700">Year</th>';
+            html += '<th class="px-4 py-2 text-left font-semibold text-gray-700">Disabled Date</th>';
+            html += '<th class="px-4 py-2 text-center font-semibold text-gray-700">Actions</th>';
+            html += '</tr>';
+            html += '</thead>';
+            html += '<tbody class="divide-y divide-gray-200">';
+            
+            response.data.forEach(function(section) {
+              const yearBadge = section.year_level ? `${section.year_level}${['st', 'nd', 'rd', 'th'][Math.min(section.year_level - 1, 3)]} Year` : 'N/A';
+              const disabledDate = section.updated_at ? new Date(section.updated_at).toLocaleDateString() : 'N/A';
+              
+              html += '<tr class="hover:bg-gray-50">';
+              html += `<td class="px-4 py-3 font-medium text-gray-900">${escapeHtml(section.section_code || 'N/A')}</td>`;
+              html += `<td class="px-4 py-3 text-gray-600">${escapeHtml(section.program_name || 'N/A')}</td>`;
+              html += `<td class="px-4 py-3 text-gray-600">${yearBadge}</td>`;
+              html += `<td class="px-4 py-3 text-gray-600">${disabledDate}</td>`;
+              html += `<td class="px-4 py-3 text-center">`;
+              html += `<button onclick="enableSection(${section.section_id}, '${escapeHtml(section.section_code)}')" class="text-green-600 hover:text-green-700 font-medium" title="Enable">`;
+              html += '<i class="fas fa-check-circle mr-1"></i>Enable';
+              html += '</button>';
+              html += '</td>';
+              html += '</tr>';
+            });
+            
+            html += '</tbody>';
+            html += '</table>';
+            html += '</div>';
+            
+            Swal.update({
+              html: html,
+              showConfirmButton: true,
+              confirmButtonText: 'Close',
+              confirmButtonColor: '#6b7280'
+            });
+          } else {
+            Swal.update({
+              html: '<div class="text-center py-8"><i class="fas fa-inbox text-4xl text-gray-300 mb-3"></i><p class="text-gray-500">No disabled sections found</p></div>',
+              showConfirmButton: true,
+              confirmButtonText: 'Close',
+              confirmButtonColor: '#6b7280'
+            });
+          }
+        },
+        error: function(xhr) {
+          Swal.update({
+            icon: 'error',
+            title: 'Error',
+            html: 'Failed to load disabled sections',
+            showConfirmButton: true,
+            confirmButtonText: 'Close',
+            confirmButtonColor: '#dc2626'
+          });
+        }
+      });
+    }
+
+    // Enable (restore) a section
+    function enableSection(sectionId, sectionCode) {
+      Swal.fire({
+        title: 'Enable Section?',
+        text: `Are you sure you want to enable ${sectionCode}? This section will be moved back to active sections.`,
+        icon: 'question',
+        showCancelButton: true,
+        confirmButtonColor: '#16a34a',
+        cancelButtonColor: '#6b7280',
+        confirmButtonText: 'Yes, enable it',
+        cancelButtonText: 'Cancel'
+      }).then((result) => {
+        if (result.isConfirmed) {
+          $.ajax({
+            url: `/api/sections-master/${sectionId}/enable`,
+            method: 'PUT',
+            success: function(response) {
+              if (response.success) {
+                showNotification('Section enabled successfully', 'success');
+                viewDisabledSections(); // Refresh the disabled view
+                loadSections(); // Refresh the main sections list
+              } else {
+                showNotification(response.error || 'Failed to enable section', 'error');
+              }
+            },
+            error: function(xhr) {
+              showNotification(xhr.responseJSON?.error || 'Failed to enable section', 'error');
+            }
+          });
+        }
+      });
+    }
+
+    // Show notification
+    function showNotification(message, type) {
+      const icon = type === 'success' ? 'check-circle' : 'exclamation-circle';
+      const bgColor = type === 'success' ? 'bg-green-500' : 'bg-red-500';
+      
+      Swal.fire({
+        title: type === 'success' ? 'Success!' : 'Error',
+        text: message,
+        icon: type,
+        timer: 3000,
+        showConfirmButton: false,
+        toast: true,
+        position: 'top-end'
+      });
+    }
+
+    // Utility function to escape HTML
+    function escapeHtml(text) {
+      const map = {
+        '&': '&amp;',
+        '<': '&lt;',
+        '>': '&gt;',
+        '"': '&quot;',
+        "'": '&#039;'
+      };
+      return text ? text.replace(/[&<>"']/g, m => map[m]) : '';
+    }
+
+    // Update pagination info and controls
+    function updatePaginationInfo() {
+      const totalSections = filteredSections.length;
+      const totalPages = Math.ceil(totalSections / sectionsPerPage);
+      const startIndex = (currentPage - 1) * sectionsPerPage + 1;
+      const endIndex = Math.min(currentPage * sectionsPerPage, totalSections);
+
+      // Update showing text
+      $('#showing-start').text(totalSections > 0 ? startIndex : 0);
+      $('#showing-end').text(endIndex);
+      $('#showing-total').text(totalSections);
+
+      // Generate pagination controls
+      renderPaginationControls(totalPages);
+    }
+
+    // Render pagination controls
+    function renderPaginationControls(totalPages) {
+      const controls = $('#pagination-controls');
+      controls.empty();
+
+      if (totalPages <= 1) return;
+
+      let html = '';
+
+      // Previous button
+      html += `
+        <button onclick="changePage(${currentPage - 1})" ${currentPage === 1 ? 'disabled' : ''} 
+                class="px-3 py-2 border border-gray-300 rounded-md text-sm min-w-[44px] min-h-[44px] md:min-w-0 md:min-h-0 md:py-1 ${currentPage === 1 ? 'text-gray-400 cursor-not-allowed bg-gray-50' : 'text-gray-700 hover:bg-gray-50'}">
+          <i class="fas fa-chevron-left"></i>
+        </button>
+      `;
+
+      // Page numbers
+      if (totalPages <= 7) {
+        // Show all pages if 7 or fewer
+        for (let i = 1; i <= totalPages; i++) {
+          html += `
+            <button onclick="changePage(${i})" 
+                    class="px-3 py-2 border border-gray-300 rounded-md text-sm min-w-[44px] min-h-[44px] md:min-w-0 md:min-h-0 md:py-1 ${i === currentPage ? 'bg-primary-600 text-white border-primary-600' : 'text-gray-700 hover:bg-gray-50'}">
+              ${i}
+            </button>
+          `;
+        }
+      } else {
+        // Show condensed pagination for many pages
+        if (currentPage > 2) {
+          html += `
+            <button onclick="changePage(1)" 
+                    class="px-3 py-2 border border-gray-300 rounded-md text-sm min-w-[44px] min-h-[44px] md:min-w-0 md:min-h-0 md:py-1 text-gray-700 hover:bg-gray-50">
+              1
+            </button>
+          `;
+          if (currentPage > 3) {
+            html += `<span class="px-2 py-1 text-gray-500">...</span>`;
+          }
+        }
+
+        // Current page and neighbors
+        for (let i = Math.max(1, currentPage - 1); i <= Math.min(totalPages, currentPage + 1); i++) {
+          html += `
+            <button onclick="changePage(${i})" 
+                    class="px-3 py-2 border border-gray-300 rounded-md text-sm min-w-[44px] min-h-[44px] md:min-w-0 md:min-h-0 md:py-1 ${i === currentPage ? 'bg-primary-600 text-white border-primary-600' : 'text-gray-700 hover:bg-gray-50'}">
+              ${i}
+            </button>
+          `;
+        }
+
+        if (currentPage < totalPages - 1) {
+          if (currentPage < totalPages - 2) {
+            html += `<span class="px-2 py-1 text-gray-500">...</span>`;
+          }
+          html += `
+            <button onclick="changePage(${totalPages})" 
+                    class="px-3 py-2 border border-gray-300 rounded-md text-sm min-w-[44px] min-h-[44px] md:min-w-0 md:min-h-0 md:py-1 text-gray-700 hover:bg-gray-50">
+              ${totalPages}
+            </button>
+          `;
+        }
+      }
+
+      // Next button
+      html += `
+        <button onclick="changePage(${currentPage + 1})" ${currentPage === totalPages ? 'disabled' : ''} 
+                class="px-3 py-2 border border-gray-300 rounded-md text-sm min-w-[44px] min-h-[44px] md:min-w-0 md:min-h-0 md:py-1 ${currentPage === totalPages ? 'text-gray-400 cursor-not-allowed bg-gray-50' : 'text-gray-700 hover:bg-gray-50'}">
+          <i class="fas fa-chevron-right"></i>
+        </button>
+      `;
+
+      controls.html(html);
+    }
+
+    // Change page
+    function changePage(page) {
+      const totalPages = Math.ceil(filteredSections.length / sectionsPerPage);
+      if (page < 1 || page > totalPages) return;
+      currentPage = page;
+      displaySections();
+      
+      // Scroll to top of table
+      document.getElementById('sections-tbody').scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  </script>
+  
+  <!-- Include loading animation script -->
+      
+    <!-- Include loading animation script -->
+    <script src="{{ url_for('static', filename='js/loading-animation.js') }}"></script>
+    
+    <!-- Prevent logout on browser back button -->
+  <script src="{{ url_for('static', filename='js/prevent-back-logout.js') }}"></script>
+
+  <!-- Session Timeout Monitor (Auto-logout after 1 hour) -->
+    <script src="{{ url_for('static', filename='js/session-timeout.js') }}"></script>
+  </body>
+</html>
+
+</body>
+</html>

@@ -1,0 +1,1501 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+  <title>Evaluation Periods | IntellEvalPro</title>
+  
+  <!-- Favicon -->
+  <link rel="icon" type="image/png" href="{{ url_for('static', filename='images/nclogo.png') }}">
+  <link rel="shortcut icon" type="image/png" href="{{ url_for('static', filename='images/nclogo.png') }}">
+  <link rel="apple-touch-icon" href="{{ url_for('static', filename='images/nclogo.png') }}">
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  
+  <!-- Font Awesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"/>
+  
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  
+  <!-- jQuery -->
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  
+  <!-- SweetAlert2 -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11.7.12/dist/sweetalert2.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.7.12/dist/sweetalert2.all.min.js"></script>
+  
+  <!-- Load Guidance Navigation JS -->
+  <script src="{{ url_for('static', filename='js/guidance-navigation.js') }}"></script>
+  
+  <script>
+    tailwind.config = {
+      theme: {
+        fontFamily: {
+          'sans': ['Inter', 'system-ui', 'sans-serif'],
+        },
+        extend: {
+          colors: {
+            primary: {
+              50: '#e6f0ff',
+              100: '#b3d1ff',
+              200: '#80b3ff',
+              300: '#4d94ff', 
+              400: '#1a75ff',
+              500: '#0059cc',
+              600: '#004799',
+              700: '#003566',
+              800: '#002233',
+              900: '#001019'
+            },
+            secondary: {
+              50: '#f8f9fa',
+              100: '#e9ecef',
+              200: '#dee2e6',
+              300: '#ced4da',
+              400: '#adb5bd',
+              500: '#6c757d',
+              600: '#495057',
+              700: '#343a40',
+              800: '#212529',
+              900: '#0d1117'
+            }
+          }
+        }
+      }
+    }
+  </script>
+  
+  <style>
+    /* Global styles */
+    * {
+      box-sizing: border-box;
+    }
+    
+    body {
+      font-family: 'Inter', sans-serif;
+      overflow-x: hidden;
+      width: 100%;
+      margin: 0;
+      padding: 0;
+    }
+    
+    /* Ensure no content goes beyond viewport */
+    html {
+      overflow-x: hidden;
+      width: 100%;
+    }
+    
+    .active-nav {
+      background-color: #e6f0ff;
+      color: #0059cc;
+      border-left: 4px solid #0059cc;
+    }
+    
+    /* Custom scrollbar */
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    
+    ::-webkit-scrollbar-track {
+      background: #f1f1f1;
+      border-radius: 10px;
+    }
+    
+    ::-webkit-scrollbar-thumb {
+      background: #c1c1c1;
+      border-radius: 10px;
+    }
+    
+    ::-webkit-scrollbar-thumb:hover {
+      background: #a8a8a8;
+    }
+    
+    /* Active nav link */
+    .nav-link.active {
+      position: relative;
+    }
+    
+    .nav-link.active::after {
+      content: '';
+      position: absolute;
+      left: 0;
+      width: 4px;
+      height: 100%;
+      background-color: #0059cc;
+    }
+
+    /* Responsive improvements */
+    @media (max-width: 640px) {
+      /* Ensure modals don't overflow */
+      .swal2-popup {
+        width: 90% !important;
+        padding: 1rem !important;
+      }
+      
+      /* Better spacing on mobile */
+      main {
+        padding: 1rem !important;
+      }
+      
+      /* Improve touch targets */
+      button, a {
+        min-height: 44px;
+      }
+      
+      /* Better form inputs on mobile */
+      input, select, textarea {
+        font-size: 16px !important; /* Prevents zoom on iOS */
+      }
+    }
+
+    /* Smooth transitions */
+    .transition-colors {
+      transition-property: color, background-color, border-color;
+      transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+      transition-duration: 200ms;
+    }
+  </style>
+</head>
+
+<body class="bg-gray-50">
+  <!-- Loading overlay -->
+  <div id="loader-overlay" class="fixed inset-0 z-50 flex flex-col items-center justify-center bg-white bg-opacity-90 backdrop-blur-sm transition-opacity duration-300">
+    <img src="{{ url_for('static', filename='images/nclogo.png') }}" alt="Logo" class="w-32 h-auto mb-6 animate-bounce">
+    <div class="flex items-center space-x-2">
+      <div class="w-3 h-3 rounded-full bg-primary-500 animate-pulse"></div>
+      <div class="w-3 h-3 rounded-full bg-primary-500 animate-pulse" style="animation-delay: 0.2s"></div>
+      <div class="w-3 h-3 rounded-full bg-primary-500 animate-pulse" style="animation-delay: 0.4s"></div>
+    </div>
+  </div>
+
+  <div class="flex h-screen bg-gray-50">
+    <!-- Sidebar (will be loaded dynamically) -->
+    <div id="sidebar-container"></div>
+    
+    <!-- Main content -->
+    <div class="lg:ml-64 flex flex-col flex-1 min-h-screen">
+      <!-- Top Navigation (will be loaded dynamically) -->
+      <div id="header-container"></div>
+
+      <!-- Main content area -->
+      <main class="flex-1 overflow-auto p-4 md:p-6 bg-gray-50">
+        <!-- Page Header -->
+        <div class="mb-6">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div>
+              <h1 class="text-xl sm:text-2xl font-bold text-gray-900">Evaluation Periods</h1>
+              <p class="mt-1 text-sm text-gray-600">Manage and configure evaluation time periods</p>
+            </div>
+            <button onclick="showAddPeriodModal()" class="inline-flex items-center justify-center px-4 py-2 bg-primary-600 text-white text-sm font-medium rounded-lg hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 transition-colors duration-200 w-full sm:w-auto">
+              <i class="fas fa-plus mr-2"></i>
+              <span class="hidden sm:inline">Create Evaluation Period</span>
+              <span class="sm:hidden">Create Period</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Current Period Status -->
+        <div id="current-period-card" class="bg-white rounded-lg shadow-sm border border-gray-200 mb-6 hidden">
+          <div class="p-4 md:p-6">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+              <div class="flex-1">
+                <h3 class="text-base sm:text-lg font-medium text-gray-900">Current Evaluation Period</h3>
+                <p id="current-period-name" class="mt-1 text-sm text-gray-600"></p>
+              </div>
+              <div class="flex items-center gap-4 sm:gap-6">
+                <div class="text-center sm:text-right">
+                  <div class="text-xs sm:text-sm text-gray-500">Status</div>
+                  <span id="current-status-badge" class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800 mt-1">
+                    Active
+                  </span>
+                </div>
+                <div class="text-center sm:text-right">
+                  <div class="text-xs sm:text-sm text-gray-500">Days Remaining</div>
+                  <div id="current-days-remaining" class="text-base sm:text-lg font-semibold text-gray-900 mt-1"></div>
+                </div>
+              </div>
+            </div>
+            
+            <!-- Progress Bar -->
+            <div class="mt-4">
+              <div class="flex justify-between text-xs sm:text-sm text-gray-600 mb-1">
+                <span>Progress</span>
+                <span id="current-progress-text"></span>
+              </div>
+              <div class="w-full bg-gray-200 rounded-full h-2">
+                <div id="current-progress-bar" class="bg-primary-600 h-2 rounded-full transition-all duration-300" style="width: 0%"></div>
+              </div>
+            </div>
+            
+            <!-- Period Details -->
+            <div class="mt-4 grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4">
+              <div class="bg-gray-50 p-3 rounded-md">
+                <div class="text-xs sm:text-sm text-gray-500">Start Date</div>
+                <div id="current-start-date" class="text-sm font-medium text-gray-900 mt-1"></div>
+              </div>
+              <div class="bg-gray-50 p-3 rounded-md">
+                <div class="text-xs sm:text-sm text-gray-500">End Date</div>
+                <div id="current-end-date" class="text-sm font-medium text-gray-900 mt-1"></div>
+              </div>
+              <div class="bg-gray-50 p-3 rounded-md">
+                <div class="text-xs sm:text-sm text-gray-500">Responses</div>
+                <div id="current-responses" class="text-sm font-medium text-gray-900 mt-1"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- No Active Period Warning -->
+        <div id="no-active-period" class="bg-yellow-50 border-l-4 border-yellow-400 p-4 mb-6 hidden">
+          <div class="flex">
+            <div class="flex-shrink-0">
+              <i class="fas fa-exclamation-triangle text-yellow-400"></i>
+            </div>
+            <div class="ml-3">
+              <p class="text-sm text-yellow-700">
+                <strong>No Active Evaluation Period</strong> - There is currently no ongoing evaluation period.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Timer Configuration Card -->
+        <div class="bg-white rounded-lg shadow-sm border border-gray-200 mb-6">
+          <div class="px-4 py-5 sm:px-6 border-b border-gray-200 bg-gradient-to-r from-orange-50 to-orange-100">
+            <div class="flex items-center gap-3">
+              <div class="flex-shrink-0 w-10 h-10 bg-orange-600 rounded-lg flex items-center justify-center">
+                <i class="fas fa-clock text-white text-lg"></i>
+              </div>
+              <div class="flex-1">
+                <h3 class="text-base sm:text-lg font-semibold text-gray-900">Evaluation Timer Settings</h3>
+                <p class="mt-1 text-xs sm:text-sm text-gray-600">Configure time limits for student evaluations</p>
+              </div>
+              <button id="toggle-timer-settings" class="text-gray-500 hover:text-gray-700 focus:outline-none">
+                <i class="fas fa-chevron-down text-xl transition-transform duration-200"></i>
+              </button>
+            </div>
+          </div>
+          
+          <div id="timer-settings-content" class="p-4 md:p-6">
+            <!-- Timer Status Bar -->
+            <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6 p-4 bg-gray-50 rounded-lg border border-gray-200">
+              <div class="flex items-center gap-3">
+                <div id="timer-status-indicator" class="flex-shrink-0 w-3 h-3 rounded-full bg-green-500 animate-pulse"></div>
+                <div>
+                  <div class="text-sm font-medium text-gray-900">Timer Status</div>
+                  <div id="timer-status-text" class="text-xs text-gray-600 mt-0.5">Active - 30 minutes per evaluation</div>
+                </div>
+              </div>
+              <div class="flex items-center gap-2">
+                <span class="text-sm text-gray-600">Enable Timer</span>
+                <label class="relative inline-flex items-center cursor-pointer">
+                  <input type="checkbox" id="timer-enabled" class="sr-only peer" checked>
+                  <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-orange-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-orange-600"></div>
+                </label>
+              </div>
+            </div>
+
+            <!-- Timer Configuration Form -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <!-- Time Limit Setting -->
+              <div>
+                <label for="timer-limit" class="block text-sm font-medium text-gray-700 mb-2">
+                  <i class="fas fa-hourglass-half text-orange-600 mr-2"></i>Time Limit (minutes)
+                </label>
+                <div class="flex items-center gap-3">
+                  <input type="range" id="timer-limit-slider" min="5" max="120" step="5" value="30" 
+                         class="flex-1 h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-orange-600">
+                  <input type="number" id="timer-limit" min="5" max="120" value="30" 
+                         class="w-20 px-3 py-2 border border-gray-300 rounded-md text-center font-semibold text-gray-900 focus:ring-2 focus:ring-orange-500 focus:border-orange-500">
+                </div>
+                <p class="mt-2 text-xs text-gray-500">Students will have this much time to complete each evaluation</p>
+              </div>
+
+              <!-- Warning Times -->
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-2">
+                  <i class="fas fa-bell text-orange-600 mr-2"></i>Warning Alerts
+                </label>
+                <div class="space-y-3">
+                  <div class="flex items-center justify-between p-3 bg-yellow-50 border border-yellow-200 rounded-md">
+                    <div class="flex items-center gap-2">
+                      <i class="fas fa-exclamation-triangle text-yellow-600"></i>
+                      <span class="text-sm text-gray-700">First Warning</span>
+                    </div>
+                    <div class="flex items-center gap-2">
+                      <input type="number" id="warning-1" min="1" max="30" value="5" 
+                             class="w-16 px-2 py-1 border border-yellow-300 rounded text-sm text-center font-medium focus:ring-2 focus:ring-yellow-500">
+                      <span class="text-sm text-gray-600">min</span>
+                    </div>
+                  </div>
+                  <div class="flex items-center justify-between p-3 bg-red-50 border border-red-200 rounded-md">
+                    <div class="flex items-center gap-2">
+                      <i class="fas fa-exclamation-circle text-red-600"></i>
+                      <span class="text-sm text-gray-700">Final Warning</span>
+                    </div>
+                    <div class="flex items-center gap-2">
+                      <input type="number" id="warning-2" min="1" max="10" value="1" 
+                             class="w-16 px-2 py-1 border border-red-300 rounded text-sm text-center font-medium focus:ring-2 focus:ring-red-500">
+                      <span class="text-sm text-gray-600">min</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Timer Features Info -->
+            <div class="mt-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+              <div class="flex items-start gap-3 p-3 bg-blue-50 border border-blue-200 rounded-lg">
+                <i class="fas fa-sync-alt text-blue-600 mt-1"></i>
+                <div>
+                  <div class="text-sm font-medium text-blue-900">Persistent</div>
+                  <div class="text-xs text-blue-700 mt-0.5">Survives refresh & logout</div>
+                </div>
+              </div>
+              <div class="flex items-start gap-3 p-3 bg-purple-50 border border-purple-200 rounded-lg">
+                <i class="fas fa-shield-alt text-purple-600 mt-1"></i>
+                <div>
+                  <div class="text-sm font-medium text-purple-900">Secure</div>
+                  <div class="text-xs text-purple-700 mt-0.5">Server-side validation</div>
+                </div>
+              </div>
+              <div class="flex items-start gap-3 p-3 bg-green-50 border border-green-200 rounded-lg">
+                <i class="fas fa-paper-plane text-green-600 mt-1"></i>
+                <div>
+                  <div class="text-sm font-medium text-green-900">Auto-Submit</div>
+                  <div class="text-xs text-green-700 mt-0.5">When time expires</div>
+                </div>
+              </div>
+              <div class="flex items-start gap-3 p-3 bg-orange-50 border border-orange-200 rounded-lg">
+                <i class="fas fa-mobile-alt text-orange-600 mt-1"></i>
+                <div>
+                  <div class="text-sm font-medium text-orange-900">Responsive</div>
+                  <div class="text-xs text-orange-700 mt-0.5">Works on all devices</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Active Sessions Preview -->
+            <div class="mt-6 p-4 bg-gradient-to-r from-gray-50 to-gray-100 border border-gray-200 rounded-lg">
+              <div class="flex items-center justify-between mb-3">
+                <h4 class="text-sm font-semibold text-gray-900">
+                  <i class="fas fa-users text-gray-600 mr-2"></i>Active Evaluation Sessions
+                </h4>
+                <button onclick="refreshActiveSessions()" class="text-xs text-orange-600 hover:text-orange-700 font-medium">
+                  <i class="fas fa-sync-alt mr-1"></i>Refresh
+                </button>
+              </div>
+              <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                <div class="bg-white p-3 rounded-md border border-gray-200 text-center">
+                  <div class="text-2xl font-bold text-gray-900" id="active-sessions-count">0</div>
+                  <div class="text-xs text-gray-600 mt-1">Active Now</div>
+                </div>
+                <div class="bg-white p-3 rounded-md border border-gray-200 text-center">
+                  <div class="text-2xl font-bold text-green-600" id="completed-today-count">0</div>
+                  <div class="text-xs text-gray-600 mt-1">Completed Today</div>
+                </div>
+                <div class="bg-white p-3 rounded-md border border-gray-200 text-center">
+                  <div class="text-2xl font-bold text-red-600" id="expired-sessions-count">0</div>
+                  <div class="text-xs text-gray-600 mt-1">Expired</div>
+                </div>
+                <div class="bg-white p-3 rounded-md border border-gray-200 text-center">
+                  <div class="text-2xl font-bold text-blue-600" id="avg-completion-time">0</div>
+                  <div class="text-xs text-gray-600 mt-1">Avg. Time (min)</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="mt-6 flex flex-col sm:flex-row gap-3 pt-4 border-t border-gray-200">
+              <button onclick="saveTimerSettings()" class="flex-1 sm:flex-initial inline-flex items-center justify-center px-6 py-2.5 bg-orange-600 text-white text-sm font-medium rounded-lg hover:bg-orange-700 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2 transition-colors">
+                <i class="fas fa-save mr-2"></i>
+                Save Timer Settings
+              </button>
+              <button onclick="viewTimerLogs()" class="flex-1 sm:flex-initial inline-flex items-center justify-center px-6 py-2.5 bg-white border border-gray-300 text-gray-700 text-sm font-medium rounded-lg hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2 transition-colors">
+                <i class="fas fa-history mr-2"></i>
+                View Session History
+              </button>
+              <button onclick="resetTimerDefaults()" class="flex-1 sm:flex-initial inline-flex items-center justify-center px-6 py-2.5 bg-white border border-gray-300 text-gray-700 text-sm font-medium rounded-lg hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-orange-500 focus:ring-offset-2 transition-colors">
+                <i class="fas fa-undo mr-2"></i>
+                Reset to Defaults
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Evaluation Periods List -->
+        <div class="bg-white shadow-sm overflow-hidden rounded-lg border border-gray-200">
+          <div class="px-4 py-5 sm:px-6 border-b border-gray-200">
+            <h3 class="text-base sm:text-lg leading-6 font-medium text-gray-900">All Evaluation Periods</h3>
+            <p class="mt-1 text-xs sm:text-sm text-gray-500">Manage past and upcoming evaluation periods</p>
+          </div>
+          
+          <!-- Desktop Table View -->
+          <div class="hidden md:block overflow-x-auto">
+            <table class="min-w-full divide-y divide-gray-200">
+              <thead class="bg-gray-50">
+                <tr>
+                  <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Period Name</th>
+                  <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Academic Year</th>
+                  <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Duration</th>
+                  <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Responses</th>
+                  <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                  <th scope="col" class="relative px-6 py-3"><span class="sr-only">Actions</span></th>
+                </tr>
+              </thead>
+              <tbody id="periods-table-body" class="bg-white divide-y divide-gray-200">
+                <!-- Loading state -->
+                <tr>
+                  <td colspan="6" class="px-6 py-8 text-center">
+                    <div class="flex justify-center items-center">
+                      <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-primary-600"></div>
+                      <span class="ml-3 text-gray-600">Loading evaluation periods...</span>
+                    </div>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <!-- Mobile Card View -->
+          <div id="periods-mobile-view" class="md:hidden divide-y divide-gray-200">
+            <!-- Will be populated by JavaScript -->
+          </div>
+            
+          <!-- Empty state -->
+          <div id="empty-state" class="hidden px-6 py-12 text-center">
+            <i class="fas fa-calendar-times text-4xl sm:text-5xl text-gray-400 mb-4"></i>
+            <h3 class="text-base sm:text-lg font-medium text-gray-900 mb-2">No Evaluation Periods Found</h3>
+            <p class="text-sm text-gray-500">Click "Create Period" to get started.</p>
+          </div>
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <!-- Add/Edit Evaluation Period Modal -->
+  <div id="period-modal" class="hidden fixed inset-0 z-50 overflow-y-auto" aria-labelledby="modal-title" role="dialog" aria-modal="true">
+    <div class="flex items-center justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+      <!-- Background overlay -->
+      <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" aria-hidden="true" onclick="closePeriodModal()"></div>
+
+      <!-- Modal panel -->
+      <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
+      <div class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg w-full mx-4 sm:mx-0">
+        <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
+          <div class="sm:flex sm:items-start">
+            <div class="mt-3 text-center sm:mt-0 sm:text-left w-full">
+              <h3 class="text-base sm:text-lg leading-6 font-medium text-gray-900" id="modal-title">
+                Add Evaluation Period
+              </h3>
+              <div class="mt-4">
+                <form id="period-form" class="space-y-4">
+                  <input type="hidden" id="period-id">
+                  
+                  <!-- Academic Term Selection -->
+                  <div>
+                    <label for="acad-term-id" class="block text-sm font-medium text-gray-700">
+                      Academic Semester <span class="text-red-500">*</span>
+                    </label>
+                    <select id="acad-term-id" required class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-primary-500 focus:border-primary-500 text-sm sm:text-base">
+                      <option value="">Select Semester</option>
+                    </select>
+                    <p class="mt-1 text-xs text-gray-500">Choose the semester for this evaluation period</p>
+                  </div>
+                  
+                  <!-- Period Title -->
+                  <div>
+                    <label for="period-title" class="block text-sm font-medium text-gray-700">
+                      Period Title <span class="text-red-500">*</span>
+                    </label>
+                    <input type="text" id="period-title" required placeholder="e.g., Midterm Faculty Evaluation" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-primary-500 focus:border-primary-500 text-sm sm:text-base">
+                  </div>
+                  
+                  <!-- Date Range -->
+                  <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                      <label for="period-start-date" class="block text-sm font-medium text-gray-700">
+                        Start Date <span class="text-red-500">*</span>
+                      </label>
+                      <input type="date" id="period-start-date" required class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-primary-500 focus:border-primary-500 text-sm sm:text-base">
+                    </div>
+                    <div>
+                      <label for="period-num-days" class="block text-sm font-medium text-gray-700">
+                        Number of Days <span class="text-red-500">*</span>
+                      </label>
+                      <input type="number" id="period-num-days" min="1" required placeholder="e.g., 30" class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-primary-500 focus:border-primary-500 text-sm sm:text-base">
+                      <p class="mt-1 text-xs text-gray-500">Duration of the evaluation period</p>
+                    </div>
+                  </div>
+                  
+                  <!-- End Date (Auto-calculated, Read-only) -->
+                  <div>
+                    <label for="period-end-date" class="block text-sm font-medium text-gray-700">
+                      End Date <span class="text-red-500">*</span>
+                    </label>
+                    <input type="date" id="period-end-date" required readonly class="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm bg-gray-50 text-gray-600 cursor-not-allowed text-sm sm:text-base">
+                    <p class="mt-1 text-xs text-gray-500">Automatically calculated from start date + number of days</p>
+                  </div>
+                  
+                  <!-- Duration Info -->
+                  <div id="duration-info" class="hidden bg-blue-50 border border-blue-200 rounded-md p-3">
+                    <div class="flex items-center gap-2 text-blue-800 text-sm">
+                      <i class="fas fa-info-circle"></i>
+                      <span class="font-medium">Duration: <span id="duration-text"></span></span>
+                    </div>
+                    <div class="text-sm text-blue-600 mt-1" id="status-preview"></div>
+                  </div>
+                </form>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="bg-gray-50 px-4 py-3 sm:px-6 flex flex-col-reverse sm:flex-row sm:justify-end gap-2 sm:gap-3">
+          <button type="button" onclick="closePeriodModal()" class="w-full sm:w-auto inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500">
+            Cancel
+          </button>
+          <button type="submit" form="period-form" id="submit-button" class="w-full sm:w-auto inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-primary-600 text-sm font-medium text-white hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500">
+            <span id="submit-button-text">Create Period</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let periodsData = [];
+    let allTerms = [];
+    let editingPeriodId = null;
+    
+    $(document).ready(function() {
+      // Load navigation and header
+      loadGuidanceNavigation('evaluation-periods');
+      
+      // Load academic terms first
+      loadAcademicTerms();
+      
+      // Load evaluation periods
+      loadEvaluationPeriods();
+      
+      // Load timer settings
+      loadTimerSettings();
+      
+      // Load active sessions stats
+      loadActiveSessionsStats();
+      
+      // Date change listeners for auto-calculating end date
+      $('#period-start-date, #period-num-days').on('change input', calculateEndDate);
+      
+      // Date change listeners for duration calculation
+      $('#period-start-date, #period-end-date').on('change', calculateDuration);
+      
+      // Form submit handler
+      $('#period-form').on('submit', handleFormSubmit);
+      
+      // Timer settings toggle
+      $('#toggle-timer-settings').on('click', function() {
+        const content = $('#timer-settings-content');
+        const icon = $(this).find('i');
+        
+        if (content.is(':visible')) {
+          content.slideUp(300);
+          icon.removeClass('fa-chevron-up').addClass('fa-chevron-down');
+        } else {
+          content.slideDown(300);
+          icon.removeClass('fa-chevron-down').addClass('fa-chevron-up');
+        }
+      });
+      
+      // Timer limit slider sync
+      $('#timer-limit-slider').on('input', function() {
+        $('#timer-limit').val($(this).val());
+        updateTimerStatusText();
+      });
+      
+      $('#timer-limit').on('input', function() {
+        const value = Math.max(5, Math.min(120, parseInt($(this).val()) || 30));
+        $(this).val(value);
+        $('#timer-limit-slider').val(value);
+        updateTimerStatusText();
+      });
+      
+      // Timer enabled toggle
+      $('#timer-enabled').on('change', function() {
+        updateTimerStatusIndicator($(this).is(':checked'));
+      });
+      
+      // Warning time validation
+      $('#warning-1').on('change', function() {
+        const value = Math.max(1, Math.min(30, parseInt($(this).val()) || 5));
+        $(this).val(value);
+      });
+      
+      $('#warning-2').on('change', function() {
+        const value = Math.max(1, Math.min(10, parseInt($(this).val()) || 1));
+        $(this).val(value);
+      });
+      
+      // Hide loader once everything is loaded
+      setTimeout(function() {
+        $('#loader-overlay').fadeOut(300);
+      }, 1000);
+    });
+    
+    /**
+     * Load evaluation periods from API
+     */
+    function loadEvaluationPeriods() {
+      fetch('/api/guidance/evaluation-periods')
+        .then(response => response.json())
+        .then(data => {
+          if (data.success) {
+            periodsData = data.periods;
+            
+            // Update current period card
+            updateCurrentPeriod(data.current_period);
+            
+            // Display all periods
+            displayPeriods(periodsData);
+          } else {
+            showError('Failed to load evaluation periods');
+          }
+        })
+        .catch(error => {
+          console.error('Error loading evaluation periods:', error);
+          showError('Error loading evaluation periods');
+          document.getElementById('periods-table-body').innerHTML = `
+            <tr>
+              <td colspan="6" class="px-6 py-8 text-center text-red-600">
+                <i class="fas fa-exclamation-triangle mb-2"></i><br>
+                Error loading data. Please refresh the page.
+              </td>
+            </tr>
+          `;
+        });
+    }
+    
+    /**
+     * Update current period card
+     */
+    function updateCurrentPeriod(period) {
+      if (period) {
+        document.getElementById('current-period-card').classList.remove('hidden');
+        document.getElementById('no-active-period').classList.add('hidden');
+        
+        document.getElementById('current-period-name').textContent = period.period_name || 'Unknown';
+        document.getElementById('current-days-remaining').textContent = period.days_remaining || 0;
+        document.getElementById('current-progress-text').textContent = (period.progress_percent || 0) + '% Complete';
+        document.getElementById('current-progress-bar').style.width = (period.progress_percent || 0) + '%';
+        
+        const startDate = formatDate(period.start_date);
+        const endDate = formatDate(period.end_date);
+        document.getElementById('current-start-date').textContent = startDate;
+        document.getElementById('current-end-date').textContent = endDate;
+        
+        const responses = `${period.completed_evaluations || 0} of ${period.total_evaluations || 0}`;
+        document.getElementById('current-responses').textContent = responses;
+      } else {
+        document.getElementById('current-period-card').classList.add('hidden');
+        document.getElementById('no-active-period').classList.remove('hidden');
+      }
+    }
+    
+    /**
+     * Display periods in table
+     */
+    function displayPeriods(periods) {
+      const tbody = document.getElementById('periods-table-body');
+      const mobileView = document.getElementById('periods-mobile-view');
+      const emptyState = document.getElementById('empty-state');
+      
+      if (periods.length === 0) {
+        tbody.innerHTML = '';
+        mobileView.innerHTML = '';
+        emptyState.classList.remove('hidden');
+        return;
+      }
+      
+      emptyState.classList.add('hidden');
+      
+      // Desktop table view
+      tbody.innerHTML = periods.map(period => {
+        const statusBadge = getStatusBadge(period.status);
+        const dateRange = formatDateRange(period.start_date, period.end_date);
+        const responses = `${period.completed_evaluations || 0}/${period.total_evaluations || 0}`;
+        const actions = getActions(period);
+        
+        return `
+          <tr class="hover:bg-gray-50">
+            <td class="px-6 py-4 whitespace-nowrap">
+              <div class="text-sm font-medium text-gray-900">${period.period_name || 'Unnamed Period'}</div>
+              <div class="text-sm text-gray-500">${period.academic_year || 'N/A'}</div>
+            </td>
+            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${period.academic_year || 'N/A'}</td>
+            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+              <div>${dateRange}</div>
+              <div class="text-xs text-gray-500">${period.duration_days || 0} days</div>
+            </td>
+            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${responses}</td>
+            <td class="px-6 py-4 whitespace-nowrap">
+              ${statusBadge}
+            </td>
+            <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+              <div class="flex justify-end space-x-2">
+                ${actions}
+              </div>
+            </td>
+          </tr>
+        `;
+      }).join('');
+
+      // Mobile card view
+      mobileView.innerHTML = periods.map(period => {
+        const statusBadge = getStatusBadge(period.status);
+        const dateRange = formatDateRange(period.start_date, period.end_date);
+        const responses = `${period.completed_evaluations || 0}/${period.total_evaluations || 0}`;
+        
+        return `
+          <div class="p-4 hover:bg-gray-50 transition-colors">
+            <div class="flex items-start justify-between mb-3">
+              <div class="flex-1">
+                <h4 class="text-sm font-medium text-gray-900">${period.period_name || 'Unnamed Period'}</h4>
+                <p class="text-xs text-gray-500 mt-1">${period.academic_year || 'N/A'}</p>
+              </div>
+              ${statusBadge}
+            </div>
+            
+            <div class="space-y-2 text-sm">
+              <div class="flex justify-between">
+                <span class="text-gray-500">Duration:</span>
+                <span class="text-gray-900 font-medium">${dateRange}</span>
+              </div>
+              <div class="flex justify-between">
+                <span class="text-gray-500">Days:</span>
+                <span class="text-gray-900 font-medium">${period.duration_days || 0} days</span>
+              </div>
+              <div class="flex justify-between">
+                <span class="text-gray-500">Responses:</span>
+                <span class="text-gray-900 font-medium">${responses}</span>
+              </div>
+            </div>
+            
+            <div class="flex gap-2 mt-4 pt-3 border-t border-gray-200">
+              <button onclick="viewPeriod(${period.period_id})" class="flex-1 inline-flex items-center justify-center px-3 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500">
+                <i class="fas fa-eye mr-2"></i>
+                View
+              </button>
+              <button onclick="editPeriod(${period.period_id})" class="flex-1 inline-flex items-center justify-center px-3 py-2 border border-primary-300 text-sm font-medium rounded-md text-primary-700 bg-primary-50 hover:bg-primary-100 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500">
+                <i class="fas fa-edit mr-2"></i>
+                Edit
+              </button>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+    
+    /**
+     * Get status badge HTML
+     */
+    function getStatusBadge(status) {
+      const badges = {
+        'Active': '<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800"><i class="fas fa-circle mr-1 text-xs"></i>Active</span>',
+        'Closed': '<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800"><i class="fas fa-check-circle mr-1 text-xs"></i>Closed</span>',
+        'Pending': '<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800"><i class="fas fa-calendar mr-1 text-xs"></i>Pending</span>'
+      };
+      return badges[status] || '<span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-600">Unknown</span>';
+    }
+    
+    /**
+     * Get action buttons based on status
+     */
+    function getActions(period) {
+      return `
+        <button onclick="viewPeriod(${period.period_id})" class="text-blue-600 hover:text-blue-900" title="View Details">
+          <i class="fas fa-eye"></i>
+        </button>
+        <button onclick="editPeriod(${period.period_id})" class="text-primary-600 hover:text-primary-900" title="Edit Period">
+          <i class="fas fa-edit"></i>
+        </button>
+      `;
+    }
+    
+    /**
+     * Format date to readable string
+     */
+    function formatDate(dateString) {
+      if (!dateString) return 'N/A';
+      try {
+        const date = new Date(dateString);
+        return date.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+      } catch {
+        return 'Invalid Date';
+      }
+    }
+    
+    /**
+     * Format date range
+     */
+    function formatDateRange(startDate, endDate) {
+      if (!startDate || !endDate) return 'N/A';
+      try {
+        const start = new Date(startDate);
+        const end = new Date(endDate);
+        const startStr = start.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+        const endStr = end.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+        return `${startStr} - ${endStr}`;
+      } catch {
+        return 'Invalid Date Range';
+      }
+    }
+    
+    /**
+     * View period details
+     */
+    function viewPeriod(periodId) {
+      const period = periodsData.find(p => p.period_id === periodId);
+      if (!period) return;
+      
+      Swal.fire({
+        title: 'Period Details',
+        html: `
+          <div class="text-left space-y-2 sm:space-y-3 text-sm sm:text-base">
+            <div class="flex justify-between border-b pb-2">
+              <strong class="text-gray-600">Period Name:</strong> 
+              <span class="text-gray-900">${period.period_name || 'N/A'}</span>
+            </div>
+            <div class="flex justify-between border-b pb-2">
+              <strong class="text-gray-600">Academic Year:</strong> 
+              <span class="text-gray-900">${period.academic_year || 'N/A'}</span>
+            </div>
+            <div class="flex justify-between border-b pb-2">
+              <strong class="text-gray-600">Status:</strong> 
+              <span class="text-gray-900">${period.status}</span>
+            </div>
+            <div class="flex justify-between border-b pb-2">
+              <strong class="text-gray-600">Start Date:</strong> 
+              <span class="text-gray-900">${formatDate(period.start_date)}</span>
+            </div>
+            <div class="flex justify-between border-b pb-2">
+              <strong class="text-gray-600">End Date:</strong> 
+              <span class="text-gray-900">${formatDate(period.end_date)}</span>
+            </div>
+            <div class="flex justify-between border-b pb-2">
+              <strong class="text-gray-600">Duration:</strong> 
+              <span class="text-gray-900">${period.duration_days} days</span>
+            </div>
+            <div class="flex justify-between border-b pb-2">
+              <strong class="text-gray-600">Days Remaining:</strong> 
+              <span class="text-gray-900">${period.days_remaining}</span>
+            </div>
+            <div class="flex justify-between border-b pb-2">
+              <strong class="text-gray-600">Total Evaluations:</strong> 
+              <span class="text-gray-900">${period.total_evaluations || 0}</span>
+            </div>
+            <div class="flex justify-between border-b pb-2">
+              <strong class="text-gray-600">Completed:</strong> 
+              <span class="text-gray-900">${period.completed_evaluations || 0}</span>
+            </div>
+            <div class="flex justify-between">
+              <strong class="text-gray-600">Response Rate:</strong> 
+              <span class="text-gray-900">${period.response_rate || 0}%</span>
+            </div>
+          </div>
+        `,
+        width: '90%',
+        maxWidth: '500px',
+        confirmButtonText: 'Close',
+        confirmButtonColor: '#0059cc',
+        customClass: {
+          popup: 'text-sm sm:text-base'
+        }
+      });
+    }
+    
+    /**
+     * Show error message
+     */
+    function showError(message) {
+      Swal.fire({
+        icon: 'error',
+        title: 'Error',
+        text: message,
+        confirmButtonColor: '#0059cc'
+      });
+    }
+    
+    /**
+     * Load academic terms for dropdown
+     */
+    function loadAcademicTerms() {
+      fetch('/api/academic-years')
+        .then(response => response.json())
+        .then(data => {
+          if (data.success && data.data) {
+            // Extract all terms from all academic years
+            allTerms = [];
+            data.data.forEach(year => {
+              if (year.terms && year.terms.length > 0) {
+                year.terms.forEach(term => {
+                  allTerms.push({
+                    acad_term_id: term.acad_term_id,
+                    term_name: term.term_name,
+                    term_code: term.term_code,
+                    year_code: year.year_code,
+                    is_current: term.is_current
+                  });
+                });
+              }
+            });
+            populateTermDropdown();
+          }
+        })
+        .catch(error => {
+          console.error('Error loading academic terms:', error);
+        });
+    }
+    
+    /**
+     * Populate term dropdown
+     */
+    function populateTermDropdown() {
+      const select = $('#acad-term-id');
+      select.find('option:not(:first)').remove();
+      
+      if (allTerms.length === 0) {
+        select.append('<option value="" disabled>No semesters available</option>');
+        return;
+      }
+      
+      allTerms.forEach(term => {
+        const current = term.is_current ? ' (Current)' : '';
+        const yearInfo = term.year_code ? `${term.year_code} - ` : '';
+        select.append(`<option value="${term.acad_term_id}">${yearInfo}${term.term_name}${current}</option>`);
+      });
+    }
+    
+    /**
+     * Calculate end date based on start date + number of days
+     */
+    function calculateEndDate() {
+      const startDate = $('#period-start-date').val();
+      const numDays = parseInt($('#period-num-days').val());
+      
+      if (startDate && numDays > 0) {
+        const start = new Date(startDate);
+        start.setDate(start.getDate() + numDays);
+        
+        // Format to YYYY-MM-DD
+        const year = start.getFullYear();
+        const month = String(start.getMonth() + 1).padStart(2, '0');
+        const day = String(start.getDate()).padStart(2, '0');
+        const endDateStr = `${year}-${month}-${day}`;
+        
+        $('#period-end-date').val(endDateStr);
+        
+        // Trigger duration calculation
+        calculateDuration();
+      } else {
+        $('#period-end-date').val('');
+        $('#duration-info').addClass('hidden');
+      }
+    }
+    
+    /**
+     * Show add period modal
+     */
+    function showAddPeriodModal() {
+      editingPeriodId = null;
+      $('#modal-title').text('Create Evaluation Period');
+      $('#submit-button-text').text('Create Period');
+      $('#period-form')[0].reset();
+      $('#period-id').val('');
+      $('#period-num-days').val('');
+      $('#duration-info').addClass('hidden');
+      $('#period-modal').removeClass('hidden');
+    }
+    
+    /**
+     * Edit period
+     */
+    function editPeriod(periodId) {
+      const period = periodsData.find(p => p.period_id === periodId);
+      if (!period) {
+        console.error('Period not found:', periodId);
+        return;
+      }
+      
+      console.log('Editing period:', period);
+      
+      editingPeriodId = periodId;
+      $('#modal-title').text('Edit Evaluation Period');
+      $('#submit-button-text').text('Update Period');
+      $('#period-id').val(period.period_id);
+      $('#acad-term-id').val(period.acad_term_id);
+      $('#period-title').val(period.period_name);
+      
+      // Format dates to YYYY-MM-DD for input fields
+      let startDate = '';
+      let endDate = '';
+      
+      if (period.start_date) {
+        // Handle both "YYYY-MM-DD" and "YYYY-MM-DD HH:MM:SS" formats
+        startDate = period.start_date.split('T')[0].split(' ')[0];
+        console.log('Start date formatted:', startDate);
+      }
+      
+      if (period.end_date) {
+        // Handle both "YYYY-MM-DD" and "YYYY-MM-DD HH:MM:SS" formats
+        endDate = period.end_date.split('T')[0].split(' ')[0];
+        console.log('End date formatted:', endDate);
+      }
+      
+      $('#period-start-date').val(startDate);
+      $('#period-end-date').val(endDate);
+      
+      // Calculate number of days from start and end dates
+      if (startDate && endDate) {
+        const start = new Date(startDate);
+        const end = new Date(endDate);
+        const diffTime = end - start;
+        const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+        $('#period-num-days').val(diffDays);
+        console.log('Number of days calculated:', diffDays);
+      }
+      
+      // Small delay to ensure DOM is updated before calculating
+      setTimeout(() => {
+        calculateDuration();
+      }, 100);
+      
+      $('#period-modal').removeClass('hidden');
+    }
+    
+    /**
+     * Close period modal
+     */
+    function closePeriodModal() {
+      $('#period-modal').addClass('hidden');
+      $('#period-form')[0].reset();
+      editingPeriodId = null;
+    }
+    
+    /**
+     * Calculate duration when dates change
+     */
+    function calculateDuration() {
+      const startDate = $('#period-start-date').val();
+      const endDate = $('#period-end-date').val();
+      
+      if (startDate && endDate) {
+        const start = new Date(startDate);
+        const end = new Date(endDate);
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+        
+        if (end <= start) {
+          $('#duration-info').addClass('hidden');
+          return;
+        }
+        
+        const days = Math.ceil((end - start) / (1000 * 60 * 60 * 24));
+        $('#duration-text').text(`${days} days`);
+        
+        // Determine status
+        let statusText = '';
+        if (start > today) {
+          statusText = 'Status will be: <span class="font-semibold text-blue-700">Pending</span>';
+        } else if (start <= today && end >= today) {
+          statusText = 'Status will be: <span class="font-semibold text-green-700">Active</span>';
+        } else {
+          statusText = 'Status will be: <span class="font-semibold text-gray-700">Closed</span>';
+        }
+        
+        $('#status-preview').html(statusText);
+        $('#duration-info').removeClass('hidden');
+      } else {
+        $('#duration-info').addClass('hidden');
+      }
+    }
+    
+    /**
+     * Handle form submit
+     */
+    function handleFormSubmit(e) {
+      e.preventDefault();
+      
+      const periodId = $('#period-id').val();
+      const data = {
+        acad_term_id: parseInt($('#acad-term-id').val()),
+        title: $('#period-title').val(),
+        start_date: $('#period-start-date').val(),
+        end_date: $('#period-end-date').val()
+      };
+      
+      // Validate
+      if (!data.acad_term_id || !data.title || !data.start_date || !data.end_date) {
+        showError('Please fill in all required fields');
+        return;
+      }
+      
+      const url = periodId 
+        ? `/api/guidance/evaluation-periods/${periodId}`
+        : '/api/guidance/evaluation-periods';
+      
+      const method = periodId ? 'PUT' : 'POST';
+      
+      // Show loading
+      Swal.fire({
+        title: 'Saving...',
+        text: 'Please wait',
+        allowOutsideClick: false,
+        didOpen: () => {
+          Swal.showLoading();
+        }
+      });
+      
+      fetch(url, {
+        method: method,
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(data)
+      })
+      .then(response => response.json())
+      .then(data => {
+        if (data.success) {
+          Swal.fire({
+            icon: 'success',
+            title: 'Success!',
+            text: data.message,
+            confirmButtonColor: '#0059cc',
+            timer: 2000,
+            timerProgressBar: true
+          });
+          closePeriodModal();
+          loadEvaluationPeriods();
+        } else {
+          showError(data.error || 'Failed to save evaluation period');
+        }
+      })
+      .catch(error => {
+        console.error('Error:', error);
+        showError('An error occurred while saving');
+      });
+    }
+    
+    /**
+     * Load timer settings
+     */
+    function loadTimerSettings() {
+      fetch('/api/guidance/timer-settings')
+        .then(response => response.json())
+        .then(data => {
+          if (data.success && data.settings) {
+            const settings = data.settings;
+            $('#timer-enabled').prop('checked', settings.enabled !== false);
+            $('#timer-limit').val(settings.time_limit || 30);
+            $('#timer-limit-slider').val(settings.time_limit || 30);
+            $('#warning-1').val(settings.warning_1 || 5);
+            $('#warning-2').val(settings.warning_2 || 1);
+            
+            updateTimerStatusIndicator(settings.enabled !== false);
+            updateTimerStatusText();
+          }
+        })
+        .catch(error => {
+          console.error('Error loading timer settings:', error);
+          // Use defaults if API fails
+          $('#timer-enabled').prop('checked', true);
+          $('#timer-limit').val(30);
+          $('#timer-limit-slider').val(30);
+          $('#warning-1').val(5);
+          $('#warning-2').val(1);
+          updateTimerStatusText();
+        });
+    }
+    
+    /**
+     * Load active sessions statistics
+     */
+    function loadActiveSessionsStats() {
+      fetch('/api/guidance/timer-stats')
+        .then(response => response.json())
+        .then(data => {
+          if (data.success && data.stats) {
+            $('#active-sessions-count').text(data.stats.active_sessions || 0);
+            $('#completed-today-count').text(data.stats.completed_today || 0);
+            $('#expired-sessions-count').text(data.stats.expired_sessions || 0);
+            $('#avg-completion-time').text(data.stats.avg_completion_time || 0);
+          }
+        })
+        .catch(error => {
+          console.error('Error loading timer stats:', error);
+        });
+    }
+    
+    /**
+     * Update timer status indicator
+     */
+    function updateTimerStatusIndicator(enabled) {
+      const indicator = $('#timer-status-indicator');
+      if (enabled) {
+        indicator.removeClass('bg-gray-400').addClass('bg-green-500 animate-pulse');
+      } else {
+        indicator.removeClass('bg-green-500 animate-pulse').addClass('bg-gray-400');
+      }
+      updateTimerStatusText();
+    }
+    
+    /**
+     * Update timer status text
+     */
+    function updateTimerStatusText() {
+      const enabled = $('#timer-enabled').is(':checked');
+      const timeLimit = $('#timer-limit').val();
+      
+      if (enabled) {
+        $('#timer-status-text').text(`Active - ${timeLimit} minutes per evaluation`);
+      } else {
+        $('#timer-status-text').text('Disabled - Timer is currently turned off');
+      }
+    }
+    
+    /**
+     * Save timer settings
+     */
+    function saveTimerSettings() {
+      const settings = {
+        enabled: $('#timer-enabled').is(':checked'),
+        time_limit: parseInt($('#timer-limit').val()),
+        warning_1: parseInt($('#warning-1').val()),
+        warning_2: parseInt($('#warning-2').val())
+      };
+      
+      // Validate
+      if (settings.time_limit < 5 || settings.time_limit > 120) {
+        showError('Time limit must be between 5 and 120 minutes');
+        return;
+      }
+      
+      if (settings.warning_2 >= settings.warning_1) {
+        showError('Final warning must be less than first warning');
+        return;
+      }
+      
+      // Show loading
+      Swal.fire({
+        title: 'Saving Timer Settings...',
+        text: 'Please wait',
+        allowOutsideClick: false,
+        didOpen: () => {
+          Swal.showLoading();
+        }
+      });
+      
+      fetch('/api/guidance/timer-settings', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(settings)
+      })
+      .then(response => response.json())
+      .then(data => {
+        if (data.success) {
+          Swal.fire({
+            icon: 'success',
+            title: 'Settings Saved!',
+            html: `
+              <div class="text-left space-y-2">
+                <p class="text-sm text-gray-700">Timer settings have been updated successfully.</p>
+                <div class="mt-3 p-3 bg-blue-50 border border-blue-200 rounded-md">
+                  <p class="text-xs text-blue-800 font-medium mb-2">New Settings:</p>
+                  <ul class="text-xs text-blue-700 space-y-1">
+                    <li>• Status: <span class="font-semibold">${settings.enabled ? 'Enabled' : 'Disabled'}</span></li>
+                    <li>• Time Limit: <span class="font-semibold">${settings.time_limit} minutes</span></li>
+                    <li>• First Warning: <span class="font-semibold">${settings.warning_1} minutes</span></li>
+                    <li>• Final Warning: <span class="font-semibold">${settings.warning_2} minute</span></li>
+                  </ul>
+                </div>
+                <p class="text-xs text-gray-600 mt-3">Changes will apply to new evaluation sessions.</p>
+              </div>
+            `,
+            confirmButtonColor: '#ea580c',
+            confirmButtonText: 'Got it!'
+          });
+        } else {
+          showError(data.error || 'Failed to save timer settings');
+        }
+      })
+      .catch(error => {
+        console.error('Error:', error);
+        showError('An error occurred while saving timer settings');
+      });
+    }
+    
+    /**
+     * Refresh active sessions
+     */
+    function refreshActiveSessions() {
+      const button = event.target.closest('button');
+      const icon = button.querySelector('i');
+      
+      // Add spin animation
+      icon.classList.add('fa-spin');
+      
+      loadActiveSessionsStats();
+      
+      // Remove spin after 1 second
+      setTimeout(() => {
+        icon.classList.remove('fa-spin');
+        
+        // Show success feedback
+        Swal.fire({
+          icon: 'success',
+          title: 'Refreshed!',
+          text: 'Active session statistics updated',
+          timer: 1500,
+          showConfirmButton: false,
+          toast: true,
+          position: 'top-end'
+        });
+      }, 1000);
+    }
+    
+    /**
+     * View timer logs
+     */
+    function viewTimerLogs() {
+      Swal.fire({
+        title: 'Session History',
+        html: `
+          <div class="text-left">
+            <p class="text-sm text-gray-600 mb-4">Loading session history...</p>
+            <div class="flex justify-center py-8">
+              <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-orange-600"></div>
+            </div>
+          </div>
+        `,
+        confirmButtonText: 'Close',
+        confirmButtonColor: '#ea580c',
+        width: '90%',
+        maxWidth: '600px',
+        didOpen: () => {
+          // Load session history
+          fetch('/api/guidance/timer-sessions')
+            .then(response => response.json())
+            .then(data => {
+              if (data.success && data.sessions) {
+                const sessions = data.sessions.slice(0, 20); // Show last 20 sessions
+                
+                let html = '<div class="max-h-96 overflow-y-auto">';
+                
+                if (sessions.length === 0) {
+                  html += '<p class="text-center text-gray-500 py-8">No session history available</p>';
+                } else {
+                  html += '<div class="space-y-2">';
+                  sessions.forEach(session => {
+                    const statusBadge = session.status === 'completed' 
+                      ? '<span class="text-xs px-2 py-1 bg-green-100 text-green-800 rounded">Completed</span>'
+                      : session.status === 'expired'
+                      ? '<span class="text-xs px-2 py-1 bg-red-100 text-red-800 rounded">Expired</span>'
+                      : '<span class="text-xs px-2 py-1 bg-blue-100 text-blue-800 rounded">Active</span>';
+                    
+                    html += `
+                      <div class="p-3 border border-gray-200 rounded-md hover:bg-gray-50">
+                        <div class="flex justify-between items-start mb-1">
+                          <span class="text-sm font-medium text-gray-900">${session.student_name || 'Student'}</span>
+                          ${statusBadge}
+                        </div>
+                        <div class="text-xs text-gray-600 space-y-0.5">
+                          <div>Started: ${new Date(session.start_time).toLocaleString()}</div>
+                          ${session.completed_at ? `<div>Completed: ${new Date(session.completed_at).toLocaleString()}</div>` : ''}
+                          <div>Duration: ${session.duration_minutes || 0} minutes</div>
+                        </div>
+                      </div>
+                    `;
+                  });
+                  html += '</div>';
+                }
+                
+                html += '</div>';
+                
+                Swal.update({
+                  html: html
+                });
+              } else {
+                Swal.update({
+                  html: '<p class="text-center text-red-600">Failed to load session history</p>'
+                });
+              }
+            })
+            .catch(error => {
+              console.error('Error loading sessions:', error);
+              Swal.update({
+                html: '<p class="text-center text-red-600">Error loading session history</p>'
+              });
+            });
+        }
+      });
+    }
+    
+    /**
+     * Reset timer to defaults
+     */
+    function resetTimerDefaults() {
+      Swal.fire({
+        title: 'Reset to Defaults?',
+        html: `
+          <p class="text-sm text-gray-700 mb-3">This will reset all timer settings to default values:</p>
+          <div class="text-left bg-gray-50 p-3 rounded-md border border-gray-200">
+            <ul class="text-sm text-gray-700 space-y-1">
+              <li>• Status: <span class="font-semibold">Enabled</span></li>
+              <li>• Time Limit: <span class="font-semibold">30 minutes</span></li>
+              <li>• First Warning: <span class="font-semibold">5 minutes</span></li>
+              <li>• Final Warning: <span class="font-semibold">1 minute</span></li>
+            </ul>
+          </div>
+        `,
+        icon: 'question',
+        showCancelButton: true,
+        confirmButtonColor: '#ea580c',
+        cancelButtonColor: '#6b7280',
+        confirmButtonText: 'Yes, Reset',
+        cancelButtonText: 'Cancel'
+      }).then((result) => {
+        if (result.isConfirmed) {
+          $('#timer-enabled').prop('checked', true);
+          $('#timer-limit').val(30);
+          $('#timer-limit-slider').val(30);
+          $('#warning-1').val(5);
+          $('#warning-2').val(1);
+          
+          updateTimerStatusIndicator(true);
+          updateTimerStatusText();
+          
+          Swal.fire({
+            icon: 'success',
+            title: 'Reset Complete!',
+            text: 'Timer settings have been reset to defaults. Click "Save Timer Settings" to apply.',
+            confirmButtonColor: '#ea580c',
+            timer: 3000,
+            timerProgressBar: true
+          });
+        }
+      });
+    }
+  </script>
+  
+  <!-- Prevent logout on browser back button -->
+  <script src="{{ url_for('static', filename='js/prevent-back-logout.js') }}"></script>
+
+  <!-- Session Timeout Monitor (Auto-logout after 1 hour) -->
+  <script src="{{ url_for('static', filename='js/session-timeout.js') }}"></script>
+</body>
+</html>

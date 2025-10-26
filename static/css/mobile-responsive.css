@@ -1,0 +1,26 @@
+/* Minimal mobile responsive styles for IntellEvalPro */
+.mobile-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0,0,0,0.5);
+  display: none;
+  z-index: 50;
+}
+.mobile-overlay.show {
+  display: block;
+}
+.sidebar-mobile {
+  transform: translateX(-100%);
+  transition: transform 0.25s ease-in-out;
+}
+.sidebar-mobile.show {
+  transform: translateX(0);
+}
+/* ensure larger touch targets */
+button, .btn, .nav-link, a {
+  min-height: 44px;
+  min-width: 44px;
+}

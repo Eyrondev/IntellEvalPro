@@ -1,0 +1,2202 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+  <title>AI Analytics | IntellEvalPro</title>
+  
+  <!-- Favicon -->
+  <link rel="icon" type="image/png" href="{{ url_for('static', filename='images/nclogo.png') }}">
+  <link rel="shortcut icon" type="image/png" href="{{ url_for('static', filename='images/nclogo.png') }}">
+  <link rel="apple-touch-icon" href="{{ url_for('static', filename='images/nclogo.png') }}">
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  
+  <!-- Font Awesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"/>
+  
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  
+  <!-- Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  
+  <!-- jQuery -->
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  
+  <!-- SweetAlert2 -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11.7.12/dist/sweetalert2.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.7.12/dist/sweetalert2.all.min.js"></script>
+  
+  <!-- Load Guidance Navigation JS -->
+  <script src="{{ url_for('static', filename='js/guidance-navigation.js') }}"></script>
+  
+  <script>
+    tailwind.config = {
+      theme: {
+        fontFamily: {
+          'sans': ['Inter', 'system-ui', 'sans-serif'],
+        },
+        extend: {
+          colors: {
+            primary: {
+              50: '#e6f0ff',
+              100: '#b3d1ff',
+              200: '#80b3ff',
+              300: '#4d94ff', 
+              400: '#1a75ff',
+              500: '#0059cc', // Primary blue
+              600: '#004db3',
+              700: '#004099',
+              800: '#003380',
+              900: '#002766',
+            },
+            secondary: {
+              50: '#fefdf0',
+              100: '#fef7cd',
+              200: '#feee95',
+              300: '#fde047', // Gold accent
+              400: '#facc15',
+              500: '#eab308',
+              600: '#ca8a04',
+              700: '#a16207',
+              800: '#854d0e',
+              900: '#713f12',
+            },
+          },
+        }
+      }
+    }
+  </script>
+  
+  <style>
+    /* Global styles */
+    * {
+      box-sizing: border-box;
+    }
+    
+    body {
+      font-family: 'Inter', sans-serif;
+      overflow-x: hidden;
+      width: 100%;
+      margin: 0;
+      padding: 0;
+    }
+    
+    html {
+      overflow-x: hidden;
+      width: 100%;
+    }
+    
+    /* Tab styles */
+    .tab-button {
+      transition: all 0.3s ease;
+    }
+    
+    .tab-button.active {
+      background: linear-gradient(135deg, #0059cc, #004099);
+      color: white;
+      box-shadow: 0 4px 12px rgba(0, 89, 204, 0.3);
+    }
+    
+    .tab-content {
+      display: none;
+    }
+    
+    .tab-content.active {
+      display: block;
+      animation: fadeIn 0.5s ease-in-out;
+    }
+    
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    
+    /* AI Insight Box */
+    .ai-insight-box {
+      background: linear-gradient(135deg, #eab308, #f59e0b);
+      border-left: 5px solid #d97706;
+    }
+    
+    /* Performance indicator colors */
+    .excellent { color: #22c55e; }
+    .good { color: #3b82f6; }
+    .needs-improvement { color: #ef4444; }
+    
+    /* Rating badge styles */
+    .rating-outstanding { 
+      background-color: #dcfce7; 
+      color: #166534; 
+      border-color: #bbf7d0; 
+    }
+    .rating-highly-satisfactory { 
+      background-color: #dbeafe; 
+      color: #1e40af; 
+      border-color: #93c5fd; 
+    }
+    .rating-satisfactory { 
+      background-color: #fef3c7; 
+      color: #92400e; 
+      border-color: #fde68a; 
+    }
+    .rating-needs-improvement { 
+      background-color: #fed7d7; 
+      color: #c53030; 
+      border-color: #feb2b2; 
+    }
+    .rating-poor { 
+      background-color: #fee2e2; 
+      color: #dc2626; 
+      border-color: #fca5a5; 
+    }
+    
+    /* Chart container responsive */
+    .chart-container {
+      position: relative;
+      height: 400px;
+      width: 100%;
+      max-width: 100%;
+    }
+    
+    @media (max-width: 1024px) {
+      .chart-container {
+        height: 350px;
+      }
+    }
+    
+    @media (max-width: 768px) {
+      .chart-container {
+        height: 300px;
+      }
+    }
+    
+    @media (max-width: 640px) {
+      .chart-container {
+        height: 280px;
+      }
+    }
+    
+    /* Ensure canvas elements are responsive */
+    canvas {
+      max-width: 100% !important;
+      height: auto !important;
+    }
+    
+    /* Loading animation */
+    .loading-spinner {
+      animation: spin 1s linear infinite;
+    }
+    
+    @keyframes spin {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
+    }
+
+    /* Mobile optimizations */
+    @media (max-width: 640px) {
+      .tab-button {
+        font-size: 0.75rem;
+        padding: 0.5rem 0.75rem;
+      }
+      
+      .chart-container {
+        height: 280px;
+        padding: 0.5rem 0;
+      }
+      
+      /* Stack dropdowns vertically on mobile */
+      .flex.flex-col.sm\:flex-row {
+        gap: 0.5rem;
+      }
+      
+      /* Adjust font sizes for better readability */
+      h3 {
+        font-size: 1rem;
+      }
+      
+      h4 {
+        font-size: 0.875rem;
+      }
+    }
+    
+    /* Tablet optimizations */
+    @media (min-width: 641px) and (max-width: 1024px) {
+      .chart-container {
+        height: 350px;
+      }
+    }
+    
+    /* Prevent horizontal overflow */
+    .overflow-x-auto {
+      -webkit-overflow-scrolling: touch;
+    }
+    
+    /* Ensure all content stays within bounds */
+    * {
+      max-width: 100%;
+    }
+    
+    .bg-white {
+      overflow: hidden;
+    }
+  </style>
+</head>
+
+<body class="bg-gray-50">
+  <!-- Loading overlay -->
+  <div id="loader-overlay" class="fixed inset-0 z-50 flex flex-col items-center justify-center bg-white bg-opacity-90 backdrop-blur-sm transition-opacity duration-300">
+    <img src="{{ url_for('static', filename='images/nclogo.png') }}" alt="Logo" class="w-32 h-auto mb-6 animate-bounce">
+    <div class="flex items-center space-x-2">
+      <div class="w-3 h-3 rounded-full bg-primary-500 animate-pulse"></div>
+      <div class="w-3 h-3 rounded-full bg-primary-500 animate-pulse" style="animation-delay: 0.2s"></div>
+      <div class="w-3 h-3 rounded-full bg-primary-500 animate-pulse" style="animation-delay: 0.4s"></div>
+    </div>
+    <p class="text-sm text-gray-600 mt-4">Loading AI Analytics...</p>
+  </div>
+
+  <div class="flex h-screen bg-gray-50">
+    <!-- Sidebar (will be loaded dynamically) -->
+    <div id="sidebar-container"></div>
+    
+    <!-- Main content -->
+    <div class="w-full lg:ml-64 flex flex-col flex-1 min-h-screen">
+      <!-- Top Navigation (will be loaded dynamically) -->
+      <div id="header-container"></div>
+
+      <!-- Main content area -->
+      <main class="flex-1 overflow-auto p-3 sm:p-4 md:p-6 bg-gray-50 w-full">
+        <!-- Header Banner -->
+        <div class="bg-gradient-to-r from-primary-600 to-primary-800 rounded-lg shadow-md mb-4 md:mb-6 w-full">
+          <div class="p-4 md:p-6">
+            <div class="flex flex-col md:flex-row md:items-center justify-between gap-3 md:gap-4">
+              <div class="flex-1 min-w-0">
+                <h1 class="text-lg sm:text-xl md:text-2xl font-bold text-white leading-tight">
+                  <i class="fas fa-robot mr-2 text-secondary-300"></i>
+                  AI Analytics
+                </h1>
+                <p class="mt-1 sm:mt-2 text-xs sm:text-sm text-primary-100 leading-tight">
+                  <span class="block sm:inline">Powered by Gemini AI</span>
+                  <span class="hidden sm:inline"> | </span>
+                  <span class="block sm:inline mt-0.5 sm:mt-0">Advanced Faculty Performance Analytics</span>
+                </p>
+              </div>
+              <div class="flex flex-col sm:flex-row gap-2 w-full md:w-auto">
+                <!-- Global Period Filter -->
+                <select id="global-period-filter" class="px-3 py-2 text-xs sm:text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 bg-white min-h-[44px]">
+                  <option value="all">All Periods</option>
+                </select>
+                
+                <!-- Advanced Analytics Toggle Button -->
+                <button id="toggle-advanced-analytics" class="flex-1 md:flex-none inline-flex items-center justify-center px-3 md:px-4 py-2 bg-purple-600 text-white text-xs sm:text-sm font-medium rounded-md hover:bg-purple-700 transition-colors duration-200 whitespace-nowrap min-h-[44px]" data-advanced="false">
+                  <i class="fas fa-brain mr-1.5 text-xs"></i>
+                  <span class="text-xs sm:text-sm">Enable Advanced Analytics</span>
+                </button>
+                
+                <button id="refresh-analytics" class="flex-1 md:flex-none inline-flex items-center justify-center px-3 md:px-4 py-2 bg-secondary-400 text-gray-900 text-xs sm:text-sm font-medium rounded-md hover:bg-secondary-300 transition-colors duration-200 whitespace-nowrap min-h-[44px]">
+                  <i class="fas fa-sync-alt mr-1.5 text-xs"></i>
+                  <span class="text-xs sm:text-sm">Refresh</span>
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Tab Navigation -->
+        <div class="bg-white rounded-lg shadow-sm border border-gray-200 mb-4 md:mb-6 p-4">
+          <div class="flex flex-wrap gap-2 sm:gap-3">
+            <button class="tab-button active flex-1 sm:flex-none px-3 sm:px-4 py-2 text-xs sm:text-sm font-medium rounded-lg transition-colors min-h-[44px]" data-tab="performance-trend">
+              <i class="fas fa-chart-line mr-1.5 text-xs"></i>
+              <span class="hidden sm:inline">Performance </span>Trend
+            </button>
+            <button class="tab-button flex-1 sm:flex-none px-3 sm:px-4 py-2 text-xs sm:text-sm font-medium rounded-lg bg-gray-100 text-gray-700 hover:bg-gray-200 transition-colors min-h-[44px]" data-tab="comparison">
+              <i class="fas fa-balance-scale mr-1.5 text-xs"></i>
+              Comparison
+            </button>
+            <button class="tab-button flex-1 sm:flex-none px-3 sm:px-4 py-2 text-xs sm:text-sm font-medium rounded-lg bg-gray-100 text-gray-700 hover:bg-gray-200 transition-colors min-h-[44px]" data-tab="question-analysis">
+              <i class="fas fa-clipboard-list mr-1.5 text-xs"></i>
+              <span class="hidden sm:inline">Question </span>Analysis
+            </button>
+            <button class="tab-button flex-1 sm:flex-none px-3 sm:px-4 py-2 text-xs sm:text-sm font-medium rounded-lg bg-gray-100 text-gray-700 hover:bg-gray-200 transition-colors min-h-[44px]" data-tab="engagement">
+              <i class="fas fa-users mr-1.5 text-xs"></i>
+              Engagement
+            </button>
+            <button class="tab-button flex-1 sm:flex-none px-3 sm:px-4 py-2 text-xs sm:text-sm font-medium rounded-lg bg-gray-100 text-gray-700 hover:bg-gray-200 transition-colors min-h-[44px]" data-tab="improvement">
+              <i class="fas fa-lightbulb mr-1.5 text-xs"></i>
+              <span class="hidden sm:inline">Improvement</span>
+              <span class="sm:hidden">Improve</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Tab Content -->
+        <!-- Performance Trend Tab -->
+        <div id="performance-trend" class="tab-content active">
+          <div class="grid grid-cols-1 lg:grid-cols-3 gap-4 md:gap-6">
+            <!-- Performance Chart -->
+            <div class="lg:col-span-2 bg-white rounded-lg shadow-sm border border-gray-200 p-4 md:p-6">
+              <div class="flex flex-col sm:flex-row sm:items-center justify-between mb-4 gap-3">
+                <div>
+                  <h3 class="text-base md:text-lg font-semibold text-gray-900">Faculty Performance Trends</h3>
+                  <p class="text-xs text-gray-500 mt-1">Select faculty and academic year to view performance trends</p>
+                </div>
+                <div class="flex flex-col sm:flex-row gap-2 sm:gap-3">
+                  <select id="trend-faculty-filter" class="px-3 py-2 text-xs sm:text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 min-h-[44px]" required>
+                    <option value="">-- Select Faculty --</option>
+                  </select>
+                  <select id="trend-year-filter" class="px-3 py-2 text-xs sm:text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 min-h-[44px]" required>
+                    <option value="">-- Select Year --</option>
+                  </select>
+                </div>
+              </div>
+              <div class="chart-container">
+                <canvas id="trendChart"></canvas>
+              </div>
+              <div id="trend-no-selection" class="flex flex-col items-center justify-center h-full py-12 text-center">
+                <i class="fas fa-chart-line text-gray-300 text-5xl mb-4"></i>
+                <p class="text-gray-500 text-sm">Please select a faculty and academic year to view performance trends</p>
+              </div>
+            </div>
+
+            <!-- AI Insights -->
+            <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-4 md:p-6">
+              <h4 class="text-base md:text-lg font-semibold text-gray-900 mb-4 flex items-center">
+                <i class="fas fa-robot text-secondary-500 mr-2"></i>
+                AI Insights
+              </h4>
+              <div id="trend-ai-insight" class="ai-insight-box rounded-lg p-4 text-white">
+                <div class="flex items-center">
+                  <i class="fas fa-spinner loading-spinner text-lg mr-2"></i>
+                  <span class="text-sm">Analyzing performance trends...</span>
+                </div>
+              </div>
+              
+              <!-- Performance Metrics -->
+              <div class="mt-4 space-y-3">
+                <div class="flex justify-between items-center">
+                  <span class="text-sm text-gray-600">Period-over-Period Change</span>
+                  <span id="overall-change" class="text-sm font-semibold">--</span>
+                </div>
+                <div class="flex justify-between items-center">
+                  <span class="text-sm text-gray-600">Best Performance</span>
+                  <span id="best-performer" class="text-sm font-semibold">--</span>
+                </div>
+                <div class="flex justify-between items-center">
+                  <span class="text-sm text-gray-600">Growth Rate</span>
+                  <span id="growth-rate" class="text-sm font-semibold">--</span>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Department Performance Trend Section -->
+          <div class="mt-4 md:mt-6 bg-white rounded-lg shadow-sm border border-gray-200 p-4 md:p-6">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between mb-4 gap-3">
+              <div>
+                <h3 class="text-base md:text-lg font-semibold text-gray-900 flex items-center">
+                  <i class="fas fa-building text-primary-600 mr-2"></i>
+                  Department Performance Trends
+                </h3>
+                <p class="text-xs text-gray-500 mt-1">Select department and academic year to view performance trends</p>
+              </div>
+              <div class="flex flex-col sm:flex-row gap-2 sm:gap-3">
+                <select id="dept-trend-filter" class="px-3 py-2 text-xs sm:text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 min-h-[44px]" required>
+                  <option value="">-- Select Department --</option>
+                </select>
+                <select id="dept-year-filter" class="px-3 py-2 text-xs sm:text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 min-h-[44px]" required>
+                  <option value="">-- Select Year --</option>
+                </select>
+              </div>
+            </div>
+            
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-4 md:gap-6">
+              <!-- Department Trend Chart -->
+              <div class="lg:col-span-2">
+                <div class="chart-container">
+                  <canvas id="departmentTrendChart"></canvas>
+                </div>
+                <div id="dept-trend-no-selection" class="flex flex-col items-center justify-center h-full py-12 text-center">
+                  <i class="fas fa-building text-gray-300 text-5xl mb-4"></i>
+                  <p class="text-gray-500 text-sm">Please select a department and academic year to view performance trends</p>
+                </div>
+              </div>
+              
+              <!-- Department Statistics -->
+              <div class="space-y-4">
+                <h4 class="text-sm font-semibold text-gray-800">Department Statistics</h4>
+                
+                <div class="space-y-3">
+                  <div class="p-3 bg-green-50 rounded-lg border border-green-200">
+                    <div class="flex justify-between items-center mb-1">
+                      <span class="text-xs text-gray-600">Top Department</span>
+                      <i class="fas fa-crown text-yellow-500"></i>
+                    </div>
+                    <div id="top-department-name" class="text-sm font-semibold text-gray-900 mb-1">--</div>
+                    <div id="top-department-rating" class="text-lg font-bold text-green-600">--</div>
+                  </div>
+                  
+                  <div class="p-3 bg-blue-50 rounded-lg border border-blue-200">
+                    <div class="text-xs text-gray-600 mb-1">Average Rating</div>
+                    <div id="dept-average-rating" class="text-lg font-bold text-blue-600">--</div>
+                  </div>
+                  
+                  <div class="p-3 bg-orange-50 rounded-lg border border-orange-200">
+                    <div class="flex justify-between items-center mb-1">
+                      <span class="text-xs text-gray-600">Needs Attention</span>
+                      <i class="fas fa-exclamation-triangle text-orange-500"></i>
+                    </div>
+                    <div id="low-department-name" class="text-sm font-semibold text-gray-900 mb-1">--</div>
+                    <div id="low-department-rating" class="text-lg font-bold text-orange-600">--</div>
+                  </div>
+                  
+                  <div class="p-3 bg-purple-50 rounded-lg border border-purple-200">
+                    <div class="text-xs text-gray-600 mb-1">Most Improved</div>
+                    <div id="improved-department-name" class="text-sm font-semibold text-gray-900 mb-1">--</div>
+                    <div id="improved-department-change" class="text-lg font-bold text-purple-600">--</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Comparison Tab -->
+        <div id="comparison" class="tab-content">
+          <div class="grid grid-cols-1 lg:grid-cols-3 gap-4 md:gap-6">
+            <!-- Comparison Chart -->
+            <div class="lg:col-span-2 bg-white rounded-lg shadow-sm border border-gray-200 p-4 md:p-6">
+              <div class="flex flex-col sm:flex-row sm:items-center justify-between mb-4 gap-3">
+                <h3 class="text-base md:text-lg font-semibold text-gray-900">Faculty Comparison</h3>
+                <div class="flex flex-col sm:flex-row gap-2 sm:gap-3">
+                  <select id="comparison-department-filter" class="px-3 py-2 text-xs sm:text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 min-h-[44px]">
+                    <option value="all">All Departments</option>
+                  </select>
+                </div>
+              </div>
+              <div class="chart-container">
+                <canvas id="comparisonChart"></canvas>
+              </div>
+            </div>
+
+            <!-- Rankings & AI Insights -->
+            <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-4 md:p-6">
+              <h4 class="text-base md:text-lg font-semibold text-gray-900 mb-4">Rankings</h4>
+              
+              <!-- Top 3 Faculty -->
+              <div id="top-faculty" class="space-y-2 mb-4">
+                <!-- Will be populated by JavaScript -->
+              </div>
+              
+              <!-- Bottom 3 Faculty -->
+              <div id="bottom-faculty" class="space-y-2 mb-4">
+                <!-- Will be populated by JavaScript -->
+              </div>
+              
+              <!-- AI Insight -->
+              <h4 class="text-base md:text-lg font-semibold text-gray-900 mb-4 flex items-center">
+                <i class="fas fa-robot text-secondary-500 mr-2"></i>
+                AI Comparison Insights
+              </h4>
+              <div id="comparison-ai-insight" class="ai-insight-box rounded-lg p-4 text-white">
+                <div class="flex items-center">
+                  <i class="fas fa-spinner loading-spinner text-lg mr-2"></i>
+                  <span class="text-sm">Analyzing faculty comparison...</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Question Analysis Tab -->
+        <div id="question-analysis" class="tab-content">
+          <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-6">
+            <!-- Question Performance Chart -->
+            <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-4 md:p-6">
+              <h3 class="text-base md:text-lg font-semibold text-gray-900 mb-4">Question Performance Analysis</h3>
+              <div class="chart-container">
+                <canvas id="questionChart"></canvas>
+              </div>
+            </div>
+
+            <!-- Question Details Table -->
+            <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-4 md:p-6">
+              <h3 class="text-base md:text-lg font-semibold text-gray-900 mb-4">Detailed Analysis</h3>
+              <div class="overflow-x-auto">
+                <table id="question-table" class="w-full text-sm">
+                  <thead class="bg-gray-50">
+                    <tr>
+                      <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">Question</th>
+                      <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">Mean</th>
+                      <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
+                    </tr>
+                  </thead>
+                  <tbody id="question-tbody">
+                    <!-- Will be populated by JavaScript -->
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+          
+          <!-- AI Insights -->
+          <div class="mt-4 md:mt-6 bg-white rounded-lg shadow-sm border border-gray-200 p-4 md:p-6">
+            <h4 class="text-base md:text-lg font-semibold text-gray-900 mb-4 flex items-center">
+              <i class="fas fa-robot text-secondary-500 mr-2"></i>
+              Question Analysis Insights
+            </h4>
+            <div id="question-ai-insight" class="ai-insight-box rounded-lg p-4 text-white">
+              <div class="flex items-center">
+                <i class="fas fa-spinner loading-spinner text-lg mr-2"></i>
+                <span class="text-sm">Analyzing question performance...</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Engagement Tab -->
+        <div id="engagement" class="tab-content">
+          <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-6">
+            <!-- Engagement Chart -->
+            <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-4 md:p-6">
+              <h3 class="text-base md:text-lg font-semibold text-gray-900 mb-4">Student Engagement Rate</h3>
+              <div class="chart-container">
+                <canvas id="engagementChart"></canvas>
+              </div>
+            </div>
+
+            <!-- Engagement Statistics -->
+            <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-4 md:p-6">
+              <h3 class="text-base md:text-lg font-semibold text-gray-900 mb-4">Engagement Statistics</h3>
+              
+              <div class="space-y-4">
+                <div class="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
+                  <span class="text-sm font-medium text-gray-700">Overall Engagement</span>
+                  <div class="text-right">
+                    <div id="overall-engagement" class="text-lg font-bold text-primary-600">--</div>
+                    <div class="text-xs text-gray-500">of students</div>
+                  </div>
+                </div>
+                
+                <div class="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
+                  <span class="text-sm font-medium text-gray-700">High Engagement</span>
+                  <div class="text-right">
+                    <div id="high-engagement" class="text-lg font-bold text-green-600">--</div>
+                    <div class="text-xs text-gray-500">≥85% participation</div>
+                  </div>
+                </div>
+                
+                <div class="flex justify-between items-center p-3 bg-gray-50 rounded-lg">
+                  <span class="text-sm font-medium text-gray-700">Low Engagement</span>
+                  <div class="text-right">
+                    <div id="low-engagement" class="text-lg font-bold text-red-600">--</div>
+                    <div class="text-xs text-gray-500"><70% participation</div>
+                  </div>
+                </div>
+              </div>
+              
+              <!-- AI Insight -->
+              <div class="mt-4">
+                <h4 class="text-base md:text-lg font-semibold text-gray-900 mb-4 flex items-center">
+                  <i class="fas fa-robot text-secondary-500 mr-2"></i>
+                  AI Engagement Insights
+                </h4>
+                <div id="engagement-ai-insight" class="ai-insight-box rounded-lg p-4 text-white">
+                  <div class="flex items-center">
+                    <i class="fas fa-spinner loading-spinner text-lg mr-2"></i>
+                    <span class="text-sm">Analyzing engagement patterns...</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Department Engagement Rate -->
+          <div class="mt-4 md:mt-6 bg-white rounded-lg shadow-sm border border-gray-200 p-4 md:p-6">
+            <h3 class="text-base md:text-lg font-semibold text-gray-900 mb-4">
+              <i class="fas fa-building text-primary-600 mr-2"></i>
+              Department Engagement Rate
+            </h3>
+            
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-6">
+              <!-- Department Chart -->
+              <div class="chart-container">
+                <canvas id="departmentEngagementChart"></canvas>
+              </div>
+              
+              <!-- Department Rankings -->
+              <div class="space-y-3">
+                <h4 class="text-sm font-semibold text-gray-800 mb-3">Department Rankings</h4>
+                <div id="department-rankings" class="space-y-2">
+                  <!-- Will be populated by JavaScript -->
+                  <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                    <span class="text-sm text-gray-500">Loading department data...</span>
+                  </div>
+                </div>
+                
+                <!-- Department Statistics -->
+                <div class="mt-4 pt-4 border-t border-gray-200">
+                  <h5 class="text-sm font-medium text-gray-700 mb-3">Department Statistics</h5>
+                  <div class="grid grid-cols-2 gap-3 text-xs">
+                    <div class="text-center p-2 bg-green-50 rounded-lg">
+                      <div id="highest-dept-engagement" class="text-lg font-bold text-green-600">--</div>
+                      <div class="text-gray-600">Highest Dept</div>
+                    </div>
+                    <div class="text-center p-2 bg-red-50 rounded-lg">
+                      <div id="lowest-dept-engagement" class="text-lg font-bold text-red-600">--</div>
+                      <div class="text-gray-600">Lowest Dept</div>
+                    </div>
+                    <div class="text-center p-2 bg-blue-50 rounded-lg">
+                      <div id="avg-dept-engagement" class="text-lg font-bold text-blue-600">--</div>
+                      <div class="text-gray-600">Average</div>
+                    </div>
+                    <div class="text-center p-2 bg-purple-50 rounded-lg">
+                      <div id="dept-variance" class="text-lg font-bold text-purple-600">--</div>
+                      <div class="text-gray-600">Variance</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Improvement Opportunities Tab -->
+        <div id="improvement" class="tab-content">
+          <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-6">
+            <!-- Improvement Areas -->
+            <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-4 md:p-6">
+              <div class="flex flex-col sm:flex-row sm:items-center justify-between mb-4 gap-3">
+                <div>
+                  <h3 class="text-base md:text-lg font-semibold text-gray-900 flex items-center">
+                    <i class="fas fa-chart-line text-primary-600 mr-2"></i>
+                    Areas for Improvement
+                  </h3>
+                  <p class="text-xs text-gray-500 mt-1">Select faculty to view improvement opportunities</p>
+                </div>
+                <select id="improvement-faculty-filter" class="px-3 py-2 text-xs sm:text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 min-h-[44px]" required>
+                  <option value="">-- Select Faculty --</option>
+                </select>
+              </div>
+              
+              <div id="improvement-table-container" class="overflow-x-auto" style="display: none;">
+                <table class="w-full text-sm">
+                  <thead class="bg-gray-50">
+                    <tr>
+                      <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">Criteria</th>
+                      <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">Score</th>
+                      <th class="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">Action</th>
+                    </tr>
+                  </thead>
+                  <tbody id="improvement-tbody">
+                    <!-- Will be populated by JavaScript -->
+                  </tbody>
+                </table>
+              </div>
+              
+              <div id="improvement-no-selection" class="flex flex-col items-center justify-center py-12 text-center">
+                <i class="fas fa-user-check text-gray-300 text-5xl mb-4"></i>
+                <p class="text-gray-500 text-sm">Please select a faculty member to view improvement opportunities</p>
+              </div>
+            </div>
+
+            <!-- AI Recommendations -->
+            <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-4 md:p-6">
+              <h3 class="text-base md:text-lg font-semibold text-gray-900 mb-4 flex items-center">
+                <i class="fas fa-robot text-secondary-500 mr-2"></i>
+                AI Recommendations
+              </h3>
+              
+              <div id="improvement-ai-insight" class="ai-insight-box rounded-lg p-4 text-white mb-4">
+                <div class="flex items-center">
+                  <i class="fas fa-lightbulb text-lg mr-2"></i>
+                  <span class="text-sm">Select a faculty member to generate personalized recommendations</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </main>
+    </div>
+  </div>
+
+  <!-- Loading Indicator Modal -->
+  <div id="analytics-loading" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+    <div class="bg-white rounded-lg p-6 max-w-sm mx-4">
+      <div class="text-center">
+        <i class="fas fa-robot text-4xl text-primary-600 mb-4"></i>
+        <h3 class="text-lg font-semibold mb-2">AI Processing</h3>
+        <p class="text-gray-600 mb-4">Analyzing data with Gemini AI...</p>
+        <div class="flex justify-center">
+          <i class="fas fa-spinner loading-spinner text-primary-600 text-2xl"></i>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Global variables for charts
+    let trendChart = null;
+    let comparisonChart = null;
+    let questionChart = null;
+    let engagementChart = null;
+    let departmentEngagementChart = null;
+    let departmentTrendChart = null;
+    
+    // Advanced Analytics Mode (uses AI at maximum potential)
+    let advancedAnalyticsEnabled = false;
+    
+    // Data cache for faster loading
+    let dataCache = {
+      trends: null,
+      comparison: null,
+      questions: null,
+      engagement: null,
+      improvement: null,
+      lastUpdated: null
+    };
+    
+    // Cache duration (5 minutes)
+    const CACHE_DURATION = 5 * 60 * 1000;
+    
+    // Check if cache is valid
+    function isCacheValid() {
+      return dataCache.lastUpdated && 
+             (Date.now() - dataCache.lastUpdated) < CACHE_DURATION;
+    }
+    
+    // Clear cache
+    function clearCache() {
+      dataCache = {
+        trends: null,
+        comparison: null,
+        questions: null,
+        engagement: null,
+        improvement: null,
+        lastUpdated: null
+      };
+    }
+    
+    // Load filter options (faculty, departments, periods, academic years)
+    function loadFilterOptions() {
+      // Load faculty list
+      $.ajax({
+        url: '/api/faculty/list',
+        method: 'GET',
+        success: function(response) {
+          if (response.success && response.faculty) {
+            response.faculty.forEach(faculty => {
+              $('#trend-faculty-filter').append(`<option value="${faculty.faculty_id}">${faculty.first_name} ${faculty.last_name}</option>`);
+              $('#improvement-faculty-filter').append(`<option value="${faculty.faculty_id}">${faculty.first_name} ${faculty.last_name}</option>`);
+            });
+          }
+        },
+        error: function(xhr, status, error) {
+          console.error('Error loading faculty list:', error);
+        }
+      });
+      
+      // Load departments/programs list
+      $.ajax({
+        url: '/api/programs/list',
+        method: 'GET',
+        success: function(response) {
+          if (response.success && response.programs) {
+            response.programs.forEach(program => {
+              $('#comparison-department-filter').append(`<option value="${program.program_id}">${program.name}</option>`);
+              $('#dept-trend-filter').append(`<option value="${program.program_id}">${program.name}</option>`);
+            });
+          }
+        },
+        error: function(xhr, status, error) {
+          console.error('Error loading programs list:', error);
+        }
+      });
+      
+      // Load academic years for trend filters
+      $.ajax({
+        url: '/api/academic-years/list',
+        method: 'GET',
+        success: function(response) {
+          if (response.success && response.academic_years) {
+            response.academic_years.forEach(year => {
+              const optionText = `Since ${year.year_name}`;
+              $('#trend-year-filter').append(`<option value="${year.acad_year_id}">${optionText}</option>`);
+              $('#dept-year-filter').append(`<option value="${year.acad_year_id}">${optionText}</option>`);
+            });
+          }
+        },
+        error: function(xhr, status, error) {
+          console.error('Error loading academic years:', error);
+        }
+      });
+      
+      // Load evaluation periods for global filter
+      $.ajax({
+        url: '/api/evaluation-periods/list',
+        method: 'GET',
+        success: function(response) {
+          if (response.success && response.periods) {
+            let currentPeriodId = null;
+            let firstActivePeriodId = null;
+            
+            // Find the current active period
+            response.periods.forEach((period, index) => {
+              const option = $('<option></option>')
+                .attr('value', period.period_id)
+                .text(period.period_name);
+              
+              $('#global-period-filter').append(option);
+              
+              // Check if this is an active period
+              if (period.status && (period.status.toLowerCase() === 'active' || period.status.toLowerCase() === 'ongoing')) {
+                // If this is the first active period we found, save it
+                if (!firstActivePeriodId) {
+                  firstActivePeriodId = period.period_id;
+                }
+                // Prefer the first active period (most recent) as current
+                if (!currentPeriodId && index === 0) {
+                  currentPeriodId = period.period_id;
+                }
+              }
+              
+              // Also check for is_current flag if it exists
+              if (period.is_current || period.is_active) {
+                currentPeriodId = period.period_id;
+              }
+            });
+            
+            // Set the current period as selected
+            // Priority: is_current flag > first active period > first period
+            if (currentPeriodId) {
+              $('#global-period-filter').val(currentPeriodId);
+              console.log('Current period selected (by is_current flag):', currentPeriodId);
+            } else if (firstActivePeriodId) {
+              $('#global-period-filter').val(firstActivePeriodId);
+              console.log('Current period selected (first active):', firstActivePeriodId);
+            } else if (response.periods.length > 0) {
+              // If no active period, select the most recent one (first in list)
+              const firstPeriod = response.periods[0];
+              $('#global-period-filter').val(firstPeriod.period_id);
+              console.log('Current period selected (most recent):', firstPeriod.period_id);
+            }
+            
+            // IMPORTANT: Load data AFTER period is selected
+            loadInitialData();
+          }
+        },
+        error: function(xhr, status, error) {
+          console.error('Error loading periods list:', error);
+          // Load data anyway with default "all" period
+          loadInitialData();
+        }
+      });
+    }
+    
+    // Load initial data for all tabs
+    function loadInitialData() {
+      console.log('Loading initial data with period:', $('#global-period-filter').val());
+      
+      // Show placeholders for trend charts (require faculty/dept and year selection)
+      $('#trendChart').hide();
+      $('#trend-no-selection').show();
+      $('#departmentTrendChart').hide();
+      $('#dept-trend-no-selection').show();
+      
+      // Show placeholder for improvement tab (requires faculty selection)
+      $('#improvement-table-container').hide();
+      $('#improvement-no-selection').show();
+      
+      // Load other tabs with slight delays to prevent server overload
+      setTimeout(() => loadComparisonData(), 500);
+      setTimeout(() => loadQuestionAnalysisData(), 1000);
+      setTimeout(() => loadEngagementData(), 1500);
+    }
+    
+    // Initialize page
+    $(document).ready(function() {
+      loadGuidanceNavigation('ai-analytics');
+      
+      // Initialize tab functionality
+      initializeTabs();
+      
+      // Load filter options (this will trigger data loading after period is selected)
+      loadFilterOptions();
+      
+      // Hide loader after initialization
+      setTimeout(() => {
+        const overlay = document.getElementById('loader-overlay');
+        overlay.style.opacity = '0';
+        setTimeout(() => {
+          overlay.style.display = 'none';
+        }, 300);
+      }, 1500); // Increased timeout to account for period loading
+    });
+
+    // Tab functionality
+    function initializeTabs() {
+      $('.tab-button').on('click', function() {
+        const targetTab = $(this).data('tab');
+        
+        // Update button states
+        $('.tab-button').removeClass('active').addClass('bg-gray-100 text-gray-700 hover:bg-gray-200');
+        $(this).removeClass('bg-gray-100 text-gray-700 hover:bg-gray-200').addClass('active');
+        
+        // Update content visibility
+        $('.tab-content').removeClass('active');
+        $(`#${targetTab}`).addClass('active');
+        
+        // Show mode status when switching tabs
+        const modeIcon = advancedAnalyticsEnabled ? '🧠' : '⚡';
+        const modeName = advancedAnalyticsEnabled ? 'Advanced' : 'Standard';
+        console.log(`${modeIcon} Switched to ${targetTab} tab (${modeName} Mode active)`);
+        
+        // Load data for the active tab
+        switch(targetTab) {
+          case 'performance-trend':
+            if (!trendChart) loadPerformanceTrendData();
+            break;
+          case 'comparison':
+            if (!comparisonChart) loadComparisonData();
+            break;
+          case 'question-analysis':
+            if (!questionChart) loadQuestionAnalysisData();
+            break;
+          case 'engagement':
+            if (!engagementChart || !departmentEngagementChart) loadEngagementData();
+            break;
+          case 'improvement':
+            loadImprovementData();
+            break;
+        }
+      });
+      
+      // Event listeners for buttons
+      $('#refresh-analytics').on('click', refreshAllData);
+      
+      // Event listener for Advanced Analytics toggle
+      $('#toggle-advanced-analytics').on('click', function() {
+        const button = $(this);
+        const isAdvanced = button.attr('data-advanced') === 'true';
+        
+        if (!isAdvanced) {
+          // Enabling advanced mode
+          Swal.fire({
+            title: 'Enable Advanced Analytics?',
+            html: `
+              <div class="text-left space-y-3">
+                <p class="text-sm text-gray-600">
+                  <i class="fas fa-brain text-purple-600 mr-2"></i>
+                  Advanced Analytics uses AI at <strong>maximum potential</strong> for deeper insights.
+                </p>
+                <div class="bg-yellow-50 border-l-4 border-yellow-400 p-3 rounded">
+                  <p class="text-sm text-yellow-800">
+                    <i class="fas fa-exclamation-triangle mr-2"></i>
+                    <strong>Please note:</strong> This mode takes significantly longer to process (30-60 seconds per analysis) as it generates more comprehensive AI insights.
+                  </p>
+                </div>
+                <ul class="text-sm text-gray-700 space-y-2 mt-3">
+                  <li><i class="fas fa-check text-green-600 mr-2"></i>More detailed performance analysis</li>
+                  <li><i class="fas fa-check text-green-600 mr-2"></i>Comprehensive recommendations</li>
+                  <li><i class="fas fa-check text-green-600 mr-2"></i>Predictive insights & trends</li>
+                  <li><i class="fas fa-check text-green-600 mr-2"></i>Strategic improvement plans</li>
+                </ul>
+              </div>
+            `,
+            icon: 'question',
+            showCancelButton: true,
+            confirmButtonColor: '#9333ea',
+            cancelButtonColor: '#6b7280',
+            confirmButtonText: '<i class="fas fa-bolt mr-2"></i>Enable Advanced Mode',
+            cancelButtonText: 'Cancel',
+            width: '550px'
+          }).then((result) => {
+            if (result.isConfirmed) {
+              // Enable advanced mode
+              advancedAnalyticsEnabled = true;
+              button.attr('data-advanced', 'true');
+              button.removeClass('bg-purple-600 hover:bg-purple-700').addClass('bg-green-600 hover:bg-green-700');
+              button.html('<i class="fas fa-check-circle mr-1.5 text-xs"></i><span class="text-xs sm:text-sm">Advanced Mode Active</span>');
+              
+              // Clear cache to force reload with advanced mode
+              clearCache();
+              
+              Swal.fire({
+                icon: 'success',
+                title: 'Advanced Analytics Enabled',
+                html: `
+                  <div class="text-left space-y-2">
+                    <p class="text-sm">✅ <strong>All analytics tabs</strong> now use comprehensive AI analysis</p>
+                    <p class="text-sm">✅ Switch between tabs freely - Advanced Mode stays active</p>
+                    <p class="text-sm">⏱️ Each analysis takes 30-60 seconds for deep insights</p>
+                  </div>
+                `,
+                timer: 3000,
+                timerProgressBar: true,
+                showConfirmButton: false
+              });
+              
+              // Reload ALL analytics tabs with advanced mode (background loading)
+              setTimeout(() => {
+                console.log('🧠 Advanced Mode: Reloading all analytics tabs with comprehensive AI');
+                
+                // Get current active tab
+                const activeTab = $('.tab-button.active').data('tab');
+                
+                // Always reload all tabs in background for instant switching
+                loadPerformanceTrendData();
+                setTimeout(() => loadDepartmentTrendData(), 100);
+                setTimeout(() => loadComparisonData(), 200);
+                setTimeout(() => loadQuestionAnalysisData(), 300);
+                setTimeout(() => loadEngagementData(), 400);
+                setTimeout(() => loadImprovementData(), 500);
+                
+                console.log(`✅ Advanced Mode activated across all tabs. Current tab: ${activeTab}`);
+              }, 3100);
+            }
+          });
+        } else {
+          // Disabling advanced mode
+          advancedAnalyticsEnabled = false;
+          button.attr('data-advanced', 'false');
+          button.removeClass('bg-green-600 hover:bg-green-700').addClass('bg-purple-600 hover:bg-purple-700');
+          button.html('<i class="fas fa-brain mr-1.5 text-xs"></i><span class="text-xs sm:text-sm">Enable Advanced Analytics</span>');
+          
+          // Clear cache to force reload with standard mode
+          clearCache();
+          
+          Swal.fire({
+            icon: 'info',
+            title: 'Standard Mode Active',
+            html: `
+              <div class="text-left space-y-2">
+                <p class="text-sm">✅ Switched to fast AI analytics (3-10 seconds per tab)</p>
+                <p class="text-sm">✅ All tabs now use standard mode</p>
+              </div>
+            `,
+            timer: 2000,
+            timerProgressBar: true,
+            showConfirmButton: false
+          });
+          
+          // Reload ALL analytics tabs with standard mode
+          setTimeout(() => {
+            console.log('⚡ Standard Mode: Reloading all analytics tabs with fast AI');
+            
+            // Reload all tabs in background
+            loadPerformanceTrendData();
+            setTimeout(() => loadDepartmentTrendData(), 100);
+            setTimeout(() => loadComparisonData(), 200);
+            setTimeout(() => loadQuestionAnalysisData(), 300);
+            setTimeout(() => loadEngagementData(), 400);
+            setTimeout(() => loadImprovementData(), 500);
+            
+            console.log('✅ Standard Mode activated across all tabs');
+          }, 2100);
+        }
+      });
+      
+      // Event listener for global period filter
+      $('#global-period-filter').on('change', function() {
+        // Clear cache when period changes to force fresh data
+        clearCache();
+        console.log('Period filter changed to:', $(this).val());
+        
+        // Reload all tabs when global period changes
+        loadPerformanceTrendData();
+        loadComparisonData();
+        loadQuestionAnalysisData();
+        loadEngagementData();
+        loadImprovementData();
+      });
+      
+      // Event listeners for other filter dropdowns
+      $('#trend-faculty-filter, #trend-year-filter').on('change', function() {
+        const facultyId = $('#trend-faculty-filter').val();
+        const yearId = $('#trend-year-filter').val();
+        
+        if (facultyId && yearId) {
+          loadPerformanceTrendData();
+        } else {
+          // Show placeholder if not both selected
+          if (trendChart) {
+            trendChart.destroy();
+            trendChart = null;
+          }
+          $('#trendChart').hide();
+          $('#trend-no-selection').show();
+        }
+      });
+      
+      $('#dept-trend-filter, #dept-year-filter').on('change', function() {
+        const deptId = $('#dept-trend-filter').val();
+        const yearId = $('#dept-year-filter').val();
+        
+        if (deptId && yearId) {
+          loadDepartmentTrendData();
+        } else {
+          // Show placeholder if not both selected
+          if (departmentTrendChart) {
+            departmentTrendChart.destroy();
+            departmentTrendChart = null;
+          }
+          $('#departmentTrendChart').hide();
+          $('#dept-trend-no-selection').show();
+        }
+      });
+      
+      $('#comparison-department-filter').on('change', function() {
+        loadComparisonData();
+      });
+      
+      // Event listener for improvement faculty filter
+      $('#improvement-faculty-filter').on('change', function() {
+        const facultyId = $(this).val();
+        
+        if (facultyId) {
+          loadImprovementData();
+        } else {
+          // Show placeholder if no faculty selected
+          $('#improvement-table-container').hide();
+          $('#improvement-no-selection').show();
+          $('#improvement-ai-insight').html(`
+            <div class="flex items-center">
+              <i class="fas fa-lightbulb text-lg mr-2"></i>
+              <span class="text-sm">Select a faculty member to generate personalized recommendations</span>
+            </div>
+          `);
+        }
+      });
+    }
+
+    // Load Performance Trend Data
+    function loadPerformanceTrendData() {
+      // Get filter values
+      const facultyId = $('#trend-faculty-filter').val();
+      const yearId = $('#trend-year-filter').val();
+      const periodId = $('#global-period-filter').val();
+      
+      // Validate selections
+      if (!facultyId || !yearId) {
+        console.log('Faculty or Year not selected');
+        if (trendChart) {
+          trendChart.destroy();
+          trendChart = null;
+        }
+        $('#trendChart').hide();
+        $('#trend-no-selection').show();
+        return;
+      }
+      
+      console.log('Loading Performance Trend Data with filters:', { facultyId, yearId, periodId });
+      
+      // Hide placeholder and show chart
+      $('#trend-no-selection').hide();
+      $('#trendChart').show();
+      
+      showLoading('trend-ai-insight', 'Analyzing performance trends...');
+      
+      $.ajax({
+        url: '/api/ai-analytics/performance-trends',
+        method: 'GET',
+        data: {
+          faculty_id: facultyId,
+          year_id: yearId,
+          period_id: periodId,
+          advanced_mode: advancedAnalyticsEnabled
+        },
+        success: function(response) {
+          console.log('Performance Trend Response (with AI):', response);
+          if (response.success) {
+            createTrendChart(response.chart_data);
+            displayAIInsight('trend-ai-insight', response.ai_insight);
+            updatePerformanceMetrics(response.metrics);
+          }
+        },
+        error: function(xhr, status, error) {
+          console.error('Error loading performance trends:', error);
+          displayAIInsight('trend-ai-insight', 'Unable to analyze performance trends at this time.');
+        }
+      });
+    }
+
+    // Load Department Performance Trend Data
+    function loadDepartmentTrendData() {
+      const departmentId = $('#dept-trend-filter').val();
+      const yearId = $('#dept-year-filter').val();
+      const periodId = $('#global-period-filter').val();
+      
+      // Validate selections
+      if (!departmentId || !yearId) {
+        console.log('Department or Year not selected');
+        if (departmentTrendChart) {
+          departmentTrendChart.destroy();
+          departmentTrendChart = null;
+        }
+        $('#departmentTrendChart').hide();
+        $('#dept-trend-no-selection').show();
+        return;
+      }
+      
+      console.log('Loading Department Trend Data with filters:', { departmentId, yearId, periodId });
+      
+      // Hide placeholder and show chart
+      $('#dept-trend-no-selection').hide();
+      $('#departmentTrendChart').show();
+      
+      $.ajax({
+        url: '/api/ai-analytics/department-trends',
+        method: 'GET',
+        data: {
+          department_id: departmentId,
+          year_id: yearId,
+          period_id: periodId,
+          advanced_mode: advancedAnalyticsEnabled
+        },
+        success: function(response) {
+          console.log('Department Trend Response:', response);
+          if (response.success) {
+            createDepartmentTrendChart(response.chart_data);
+            updateDepartmentTrendStats(response.stats);
+          }
+        },
+        error: function(xhr, status, error) {
+          console.error('Error loading department trends:', error);
+          // Show empty state
+          updateDepartmentTrendStats({
+            top_department: { name: 'N/A', rating: '--' },
+            average_rating: '--',
+            low_department: { name: 'N/A', rating: '--' },
+            most_improved: { name: 'N/A', change: '--' }
+          });
+        }
+      });
+    }
+
+    // Load Comparison Data
+    function loadComparisonData() {
+      // Get filter values
+      const departmentId = $('#comparison-department-filter').val();
+      const periodId = $('#global-period-filter').val();
+      
+      showLoading('comparison-ai-insight', 'Analyzing faculty comparison...');
+      
+      $.ajax({
+        url: '/api/ai-analytics/comparison',
+        method: 'GET',
+        data: {
+          department_id: departmentId,
+          period_id: periodId,
+          advanced_mode: advancedAnalyticsEnabled
+        },
+        success: function(response) {
+          if (response.success) {
+            createComparisonChart(response.chart_data);
+            displayRankings(response.rankings);
+            displayAIInsight('comparison-ai-insight', response.ai_insight);
+          }
+        },
+        error: function(xhr, status, error) {
+          console.error('Error loading comparison data:', error);
+          displayAIInsight('comparison-ai-insight', 'Unable to analyze faculty comparison at this time.');
+        }
+      });
+    }
+
+    // Load Question Analysis Data
+    function loadQuestionAnalysisData() {
+      // Get global period filter
+      const periodId = $('#global-period-filter').val();
+      
+      showLoading('question-ai-insight', 'Analyzing question performance...');
+      
+      $.ajax({
+        url: '/api/ai-analytics/question-analysis',
+        method: 'GET',
+        data: {
+          period_id: periodId,
+          advanced_mode: advancedAnalyticsEnabled
+        },
+        success: function(response) {
+          if (response.success) {
+            createQuestionChart(response.chart_data);
+            populateQuestionTable(response.question_data);
+            displayAIInsight('question-ai-insight', response.ai_insight);
+          }
+        },
+        error: function(xhr, status, error) {
+          console.error('Error loading question analysis:', error);
+          displayAIInsight('question-ai-insight', 'Unable to analyze questions at this time.');
+        }
+      });
+    }
+
+    // Load Engagement Data
+    function loadEngagementData() {
+      // Get global period filter
+      const periodId = $('#global-period-filter').val();
+      
+      showLoading('engagement-ai-insight', 'Analyzing engagement patterns...');
+      
+      $.ajax({
+        url: '/api/ai-analytics/engagement',
+        method: 'GET',
+        data: {
+          period_id: periodId,
+          advanced_mode: advancedAnalyticsEnabled
+        },
+        success: function(response) {
+          if (response.success) {
+            createEngagementChart(response.chart_data);
+            updateEngagementStats(response.stats);
+            if (response.department_data) {
+              createDepartmentEngagementChart(response.department_data.chart_data);
+              updateDepartmentEngagementStats(response.department_data.stats);
+              populateDepartmentRankings(response.department_data.rankings);
+            }
+            displayAIInsight('engagement-ai-insight', response.ai_insight);
+          }
+        },
+        error: function(xhr, status, error) {
+          console.error('Error loading engagement data:', error);
+          displayAIInsight('engagement-ai-insight', 'Unable to analyze engagement at this time.');
+        }
+      });
+    }
+
+    // Load Improvement Data
+    function loadImprovementData() {
+      // Get filter values
+      const facultyId = $('#improvement-faculty-filter').val();
+      const periodId = $('#global-period-filter').val();
+      
+      // Validate faculty selection
+      if (!facultyId) {
+        console.log('Faculty not selected for improvement data');
+        $('#improvement-table-container').hide();
+        $('#improvement-no-selection').show();
+        $('#improvement-ai-insight').html(`
+          <div class="flex items-center">
+            <i class="fas fa-lightbulb text-lg mr-2"></i>
+            <span class="text-sm">Select a faculty member to generate personalized recommendations</span>
+          </div>
+        `);
+        return;
+      }
+      
+      console.log('Loading Improvement Data with filters:', { facultyId, periodId });
+      
+      // Hide placeholder and show table
+      $('#improvement-no-selection').hide();
+      $('#improvement-table-container').show();
+      
+      showLoading('improvement-ai-insight', 'Generating improvement recommendations...');
+      
+      $.ajax({
+        url: '/api/ai-analytics/improvement-opportunities',
+        method: 'GET',
+        data: {
+          faculty_id: facultyId,
+          period_id: periodId,
+          advanced_mode: advancedAnalyticsEnabled
+        },
+        success: function(response) {
+          if (response.success) {
+            if (response.improvement_data && response.improvement_data.length > 0) {
+              // Has improvement data - populate table
+              populateImprovementTable(response.improvement_data);
+              displayAIInsight('improvement-ai-insight', response.ai_insight);
+            } else {
+              // No improvement data - show message
+              $('#improvement-tbody').html(`
+                <tr>
+                  <td colspan="3" class="px-3 py-8 text-center text-gray-500">
+                    <i class="fas fa-${response.no_data ? 'inbox' : 'star'} text-4xl mb-2 text-gray-300"></i>
+                    <p class="text-sm">${response.no_data ? 'No evaluation data available for this faculty member.' : 'Excellent! All criteria score 4.0 or above.'}</p>
+                  </td>
+                </tr>
+              `);
+              displayAIInsight('improvement-ai-insight', response.ai_insight);
+            }
+          }
+        },
+        error: function(xhr, status, error) {
+          console.error('Error loading improvement data:', error);
+          displayAIInsight('improvement-ai-insight', 'Unable to generate recommendations at this time.');
+          $('#improvement-tbody').html(`
+            <tr>
+              <td colspan="3" class="px-3 py-8 text-center text-red-500">
+                <i class="fas fa-exclamation-triangle text-4xl mb-2"></i>
+                <p class="text-sm">Error loading data. Please try again.</p>
+              </td>
+            </tr>
+          `);
+        }
+      });
+    }
+
+    // Create Performance Trend Chart (Optimized)
+    function createTrendChart(data) {
+      const ctx = document.getElementById('trendChart');
+      if (!ctx) return;
+      
+      if (trendChart) {
+        trendChart.destroy();
+      }
+      
+      trendChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+          labels: data.labels || [],
+          datasets: data.datasets || []
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          animation: {
+            duration: 800 // Faster animation
+          },
+          interaction: {
+            intersect: false,
+            mode: 'index'
+          },
+          plugins: {
+            legend: {
+              position: 'bottom',
+              labels: {
+                padding: window.innerWidth < 640 ? 8 : 10,
+                font: {
+                  size: window.innerWidth < 640 ? 10 : 12
+                },
+                boxWidth: window.innerWidth < 640 ? 30 : 40
+              }
+            },
+            tooltip: {
+              callbacks: {
+                title: function(context) {
+                  return 'Evaluation Period: ' + context[0].label;
+                },
+                label: function(context) {
+                  return 'Average Rating: ' + context.parsed.y.toFixed(2) + ' / 5.00';
+                },
+                afterLabel: function(context) {
+                  const rating = context.parsed.y;
+                  if (rating >= 4.50) return '(Outstanding)';
+                  if (rating >= 3.50) return '(Highly Satisfactory)';
+                  if (rating >= 2.50) return '(Satisfactory)';
+                  if (rating >= 1.50) return '(Needs Improvement)';
+                  return '(Poor)';
+                }
+              }
+            }
+          },
+          scales: {
+            y: {
+              beginAtZero: false,
+              min: 0,
+              max: 5,
+              ticks: {
+                maxTicksLimit: 6, // Reduce ticks for faster rendering
+                font: {
+                  size: window.innerWidth < 640 ? 9 : 11
+                },
+                callback: function(value) {
+                  return value.toFixed(1);
+                }
+              },
+              title: {
+                display: window.innerWidth >= 640,
+                text: 'Average Rating',
+                font: {
+                  size: window.innerWidth < 640 ? 10 : 12
+                }
+              }
+            },
+            x: {
+              ticks: {
+                font: {
+                  size: window.innerWidth < 640 ? 9 : 11
+                },
+                maxRotation: window.innerWidth < 640 ? 45 : 0,
+                minRotation: window.innerWidth < 640 ? 45 : 0
+              },
+              title: {
+                display: window.innerWidth >= 640,
+                text: 'Evaluation Period',
+                font: {
+                  size: window.innerWidth < 640 ? 10 : 12
+                }
+              }
+            }
+          },
+          elements: {
+            point: {
+              radius: window.innerWidth < 640 ? 3 : 4,
+              hoverRadius: window.innerWidth < 640 ? 5 : 6
+            }
+          }
+        }
+      });
+    }
+
+    // Create Comparison Chart (Optimized)
+    function createComparisonChart(data) {
+      const ctx = document.getElementById('comparisonChart');
+      if (!ctx) return;
+      
+      if (comparisonChart) {
+        comparisonChart.destroy();
+      }
+      
+      comparisonChart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+          labels: data.labels || [],
+          datasets: data.datasets || []
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          animation: {
+            duration: 600 // Faster animation
+          },
+          plugins: {
+            legend: {
+              display: false
+            }
+          },
+          scales: {
+            y: {
+              beginAtZero: false,
+              min: 0,
+              max: 5,
+              ticks: {
+                maxTicksLimit: 6,
+                font: {
+                  size: window.innerWidth < 640 ? 9 : 11
+                },
+                callback: function(value) {
+                  return value.toFixed(1);
+                }
+              },
+              title: {
+                display: window.innerWidth >= 640,
+                text: 'Rating',
+                font: {
+                  size: window.innerWidth < 640 ? 10 : 12
+                }
+              }
+            },
+            x: {
+              ticks: {
+                font: {
+                  size: window.innerWidth < 640 ? 9 : 11
+                },
+                maxRotation: window.innerWidth < 640 ? 45 : 0,
+                minRotation: window.innerWidth < 640 ? 45 : 0
+              }
+            }
+          }
+        }
+      });
+    }
+
+    // Create Question Analysis Chart (Optimized)
+    function createQuestionChart(data) {
+      const ctx = document.getElementById('questionChart');
+      if (!ctx) return;
+      
+      if (questionChart) {
+        questionChart.destroy();
+      }
+      
+      questionChart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+          labels: data.labels || [],
+          datasets: data.datasets || []
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          indexAxis: 'y',
+          animation: {
+            duration: 500 // Faster animation
+          },
+          plugins: {
+            legend: {
+              display: false
+            }
+          },
+          scales: {
+            x: {
+              beginAtZero: false,
+              min: 0,
+              max: 5,
+              ticks: {
+                maxTicksLimit: 6,
+                font: {
+                  size: window.innerWidth < 640 ? 9 : 11
+                }
+              },
+              title: {
+                display: window.innerWidth >= 640,
+                text: 'Average Rating',
+                font: {
+                  size: window.innerWidth < 640 ? 10 : 12
+                }
+              }
+            },
+            y: {
+              ticks: {
+                font: {
+                  size: window.innerWidth < 640 ? 9 : 11
+                },
+                callback: function(value, index) {
+                  const label = this.getLabelForValue(value);
+                  // Truncate long labels on mobile
+                  if (window.innerWidth < 640 && label.length > 30) {
+                    return label.substring(0, 27) + '...';
+                  }
+                  return label;
+                }
+              }
+            }
+          }
+        }
+      });
+    }
+
+    // Create Engagement Chart (Optimized)
+    function createEngagementChart(data) {
+      const ctx = document.getElementById('engagementChart');
+      if (!ctx) return;
+      
+      if (engagementChart) {
+        engagementChart.destroy();
+      }
+      
+      engagementChart = new Chart(ctx, {
+        type: 'doughnut',
+        data: {
+          labels: data.labels || [],
+          datasets: data.datasets || []
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          animation: {
+            duration: 700 // Faster animation
+          },
+          plugins: {
+            legend: {
+              position: 'bottom',
+              labels: {
+                boxWidth: window.innerWidth < 640 ? 10 : 12,
+                padding: window.innerWidth < 640 ? 8 : 10,
+                font: {
+                  size: window.innerWidth < 640 ? 10 : 12
+                }
+              }
+            },
+            tooltip: {
+              bodyFont: {
+                size: window.innerWidth < 640 ? 11 : 13
+              },
+              padding: window.innerWidth < 640 ? 8 : 12
+            }
+          }
+        }
+      });
+    }
+
+    // Create Department Engagement Chart
+    function createDepartmentEngagementChart(data) {
+      const ctx = document.getElementById('departmentEngagementChart');
+      if (!ctx) return;
+      
+      if (departmentEngagementChart) {
+        departmentEngagementChart.destroy();
+      }
+      
+      departmentEngagementChart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+          labels: data.labels || [],
+          datasets: data.datasets || []
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          animation: {
+            duration: 600
+          },
+          plugins: {
+            legend: {
+              display: false
+            }
+          },
+          scales: {
+            y: {
+              beginAtZero: true,
+              max: 100,
+              ticks: {
+                maxTicksLimit: 6,
+                font: {
+                  size: window.innerWidth < 640 ? 9 : 11
+                },
+                callback: function(value) {
+                  return value + '%';
+                }
+              },
+              title: {
+                display: window.innerWidth >= 640,
+                text: 'Engagement Rate (%)',
+                font: {
+                  size: window.innerWidth < 640 ? 10 : 12
+                }
+              }
+            },
+            x: {
+              ticks: {
+                font: {
+                  size: window.innerWidth < 640 ? 9 : 11
+                },
+                maxRotation: window.innerWidth < 640 ? 45 : 45,
+                minRotation: window.innerWidth < 640 ? 45 : 0
+              }
+            }
+          }
+        }
+      });
+    }
+
+    // Create Department Performance Trend Chart
+    function createDepartmentTrendChart(data) {
+      const ctx = document.getElementById('departmentTrendChart');
+      if (!ctx) return;
+      
+      if (departmentTrendChart) {
+        departmentTrendChart.destroy();
+      }
+      
+      departmentTrendChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+          labels: data.labels || [],
+          datasets: data.datasets || []
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          animation: {
+            duration: 800
+          },
+          interaction: {
+            intersect: false,
+            mode: 'index'
+          },
+          plugins: {
+            legend: {
+              position: 'bottom',
+              labels: {
+                boxWidth: window.innerWidth < 640 ? 10 : 12,
+                padding: window.innerWidth < 640 ? 8 : 10,
+                font: {
+                  size: window.innerWidth < 640 ? 10 : 11
+                }
+              }
+            },
+            tooltip: {
+              callbacks: {
+                title: function(context) {
+                  return 'Evaluation Period: ' + context[0].label;
+                },
+                label: function(context) {
+                  return context.dataset.label + ': ' + context.parsed.y.toFixed(2) + ' / 5.00';
+                },
+                afterLabel: function(context) {
+                  const rating = context.parsed.y;
+                  if (rating >= 4.50) return '(Outstanding)';
+                  if (rating >= 3.50) return '(Highly Satisfactory)';
+                  if (rating >= 2.50) return '(Satisfactory)';
+                  if (rating >= 1.50) return '(Needs Improvement)';
+                  return '(Poor)';
+                }
+              }
+            }
+          },
+          scales: {
+            y: {
+              beginAtZero: false,
+              min: 0,
+              max: 5,
+              ticks: {
+                maxTicksLimit: 6,
+                font: {
+                  size: window.innerWidth < 640 ? 9 : 11
+                },
+                callback: function(value) {
+                  return value.toFixed(1);
+                }
+              },
+              title: {
+                display: window.innerWidth >= 640,
+                text: 'Average Rating',
+                font: {
+                  size: window.innerWidth < 640 ? 10 : 12
+                }
+              }
+            },
+            x: {
+              ticks: {
+                font: {
+                  size: window.innerWidth < 640 ? 9 : 11
+                },
+                maxRotation: window.innerWidth < 640 ? 45 : 0,
+                minRotation: window.innerWidth < 640 ? 45 : 0
+              },
+              title: {
+                display: window.innerWidth >= 640,
+                text: 'Evaluation Period',
+                font: {
+                  size: window.innerWidth < 640 ? 10 : 12
+                }
+              }
+            }
+          },
+          elements: {
+            point: {
+              radius: window.innerWidth < 640 ? 3 : 4,
+              hoverRadius: window.innerWidth < 640 ? 5 : 6
+            },
+            line: {
+              tension: 0.3
+            }
+          }
+        }
+      });
+    }
+
+    // Utility functions
+    function showLoading(elementId, message) {
+      $(`#${elementId}`).html(`
+        <div class="flex items-center">
+          <i class="fas fa-spinner loading-spinner text-lg mr-2"></i>
+          <span class="text-sm">${message}</span>
+        </div>
+      `);
+    }
+
+    function displayAIInsight(elementId, insight) {
+      $(`#${elementId}`).html(`
+        <div class="flex items-start">
+          <i class="fas fa-robot text-lg mr-2 mt-0.5"></i>
+          <div class="text-sm leading-relaxed">${insight}</div>
+        </div>
+      `);
+    }
+
+    // Additional utility functions for data population
+    function updatePerformanceMetrics(metrics) {
+      if (metrics) {
+        $('#overall-change').text(metrics.overall_change || '--');
+        $('#best-performer').text(metrics.best_performer || '--');
+        $('#growth-rate').text(metrics.growth_rate || '--');
+      }
+    }
+
+    function displayRankings(rankings) {
+      if (rankings) {
+        // Populate top faculty
+        let topHtml = '<h5 class="text-sm font-semibold text-green-600 mb-2">Top Performers</h5>';
+        rankings.top_faculty.forEach((faculty, index) => {
+          topHtml += `
+            <div class="flex items-center justify-between py-2 border-b border-gray-100">
+              <span class="text-sm">${index + 1}. ${faculty.name}</span>
+              <span class="text-sm font-semibold text-green-600">${faculty.rating}</span>
+            </div>
+          `;
+        });
+        $('#top-faculty').html(topHtml);
+
+        // Populate bottom faculty
+        let bottomHtml = '<h5 class="text-sm font-semibold text-red-600 mb-2">Needs Attention</h5>';
+        rankings.bottom_faculty.forEach((faculty, index) => {
+          bottomHtml += `
+            <div class="flex items-center justify-between py-2 border-b border-gray-100">
+              <span class="text-sm">${index + 1}. ${faculty.name}</span>
+              <span class="text-sm font-semibold text-red-600">${faculty.rating}</span>
+            </div>
+          `;
+        });
+        $('#bottom-faculty').html(bottomHtml);
+      }
+    }
+
+    function populateQuestionTable(questionData) {
+      if (questionData) {
+        let html = '';
+        questionData.forEach(question => {
+          // Updated rating scale based on provided image
+          let statusClass, statusText;
+          if (question.mean >= 4.50) {
+            statusClass = 'rating-outstanding';
+            statusText = 'Outstanding';
+          } else if (question.mean >= 3.50) {
+            statusClass = 'rating-highly-satisfactory';
+            statusText = 'Highly Satisfactory';
+          } else if (question.mean >= 2.50) {
+            statusClass = 'rating-satisfactory';
+            statusText = 'Satisfactory';
+          } else if (question.mean >= 1.50) {
+            statusClass = 'rating-needs-improvement';
+            statusText = 'Needs Improvement';
+          } else {
+            statusClass = 'rating-poor';
+            statusText = 'Poor';
+          }
+          
+          html += `
+            <tr>
+              <td class="px-3 py-2">${question.question_text}</td>
+              <td class="px-3 py-2 font-semibold">${question.mean.toFixed(2)}</td>
+              <td class="px-3 py-2">
+                <span class="px-2 py-1 text-xs rounded-full border ${statusClass}">${statusText}</span>
+              </td>
+            </tr>
+          `;
+        });
+        $('#question-tbody').html(html);
+      }
+    }
+
+    function updateEngagementStats(stats) {
+      if (stats) {
+        $('#overall-engagement').text(stats.overall_engagement || '--');
+        $('#high-engagement').text(stats.high_engagement || '--');
+        $('#low-engagement').text(stats.low_engagement || '--');
+      }
+    }
+
+    function updateDepartmentEngagementStats(stats) {
+      if (stats) {
+        $('#highest-dept-engagement').text(stats.highest_department || '--');
+        $('#lowest-dept-engagement').text(stats.lowest_department || '--');
+        $('#avg-dept-engagement').text(stats.average_engagement || '--');
+        $('#dept-variance').text(stats.variance || '--');
+      }
+    }
+
+    function updateDepartmentTrendStats(stats) {
+      if (stats) {
+        // Top Department
+        if (stats.top_department) {
+          $('#top-department-name').text(stats.top_department.name || 'N/A');
+          $('#top-department-rating').text(stats.top_department.rating || '--');
+        }
+        
+        // Average Rating
+        $('#dept-average-rating').text(stats.average_rating || '--');
+        
+        // Low Department
+        if (stats.low_department) {
+          $('#low-department-name').text(stats.low_department.name || 'N/A');
+          $('#low-department-rating').text(stats.low_department.rating || '--');
+        }
+        
+        // Most Improved Department
+        if (stats.most_improved) {
+          $('#improved-department-name').text(stats.most_improved.name || 'N/A');
+          const change = stats.most_improved.change;
+          if (change && change !== '--') {
+            const changeText = change > 0 ? `+${change}` : change;
+            $('#improved-department-change').text(changeText).removeClass('text-red-600').addClass('text-purple-600');
+          } else {
+            $('#improved-department-change').text('--');
+          }
+        }
+      }
+    }
+
+    function populateDepartmentRankings(rankings) {
+      if (rankings && rankings.length > 0) {
+        let html = '';
+        rankings.forEach((dept, index) => {
+          const getRatingColor = (rate) => {
+            if (rate >= 90) return 'text-green-600';
+            if (rate >= 80) return 'text-blue-600';
+            if (rate >= 70) return 'text-yellow-600';
+            if (rate >= 60) return 'text-orange-600';
+            return 'text-red-600';
+          };
+          
+          const getRatingBadge = (rate) => {
+            if (rate >= 90) return 'bg-green-100 text-green-700 border-green-200';
+            if (rate >= 80) return 'bg-blue-100 text-blue-700 border-blue-200';
+            if (rate >= 70) return 'bg-yellow-100 text-yellow-700 border-yellow-200';
+            if (rate >= 60) return 'bg-orange-100 text-orange-700 border-orange-200';
+            return 'bg-red-100 text-red-700 border-red-200';
+          };
+          
+          html += `
+            <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
+              <div class="flex items-center gap-3">
+                <span class="text-sm font-medium text-gray-600">${index + 1}.</span>
+                <span class="text-sm font-medium text-gray-900">${dept.department_name}</span>
+              </div>
+              <div class="flex items-center gap-2">
+                <span class="text-sm font-bold ${getRatingColor(dept.engagement_rate)}">${dept.engagement_rate}%</span>
+                <span class="px-2 py-1 text-xs rounded-full border ${getRatingBadge(dept.engagement_rate)}">
+                  ${dept.engagement_rate >= 90 ? 'Excellent' : 
+                    dept.engagement_rate >= 80 ? 'Good' : 
+                    dept.engagement_rate >= 70 ? 'Average' : 
+                    dept.engagement_rate >= 60 ? 'Below Average' : 'Poor'}
+                </span>
+              </div>
+            </div>
+          `;
+        });
+        $('#department-rankings').html(html);
+      } else {
+        $('#department-rankings').html(`
+          <div class="flex items-center justify-center p-4 bg-gray-50 rounded-lg">
+            <span class="text-sm text-gray-500">No department data available</span>
+          </div>
+        `);
+      }
+    }
+
+    function populateImprovementTable(improvementData) {
+      if (improvementData) {
+        let html = '';
+        improvementData.forEach(item => {
+          // Updated color coding based on new rating scale
+          let scoreColorClass;
+          if (item.score >= 4.50) {
+            scoreColorClass = 'text-green-700'; // Outstanding
+          } else if (item.score >= 3.50) {
+            scoreColorClass = 'text-blue-600'; // Highly Satisfactory
+          } else if (item.score >= 2.50) {
+            scoreColorClass = 'text-yellow-600'; // Satisfactory
+          } else if (item.score >= 1.50) {
+            scoreColorClass = 'text-orange-600'; // Needs Improvement
+          } else {
+            scoreColorClass = 'text-red-600'; // Poor
+          }
+          
+          html += `
+            <tr>
+              <td class="px-3 py-2">${item.criteria}</td>
+              <td class="px-3 py-2 font-semibold ${scoreColorClass}">${item.score.toFixed(2)}</td>
+              <td class="px-3 py-2">
+                <span class="px-2 py-1 text-xs rounded-full ${item.score < 2.50 ? 'bg-red-100 text-red-700' : item.score < 3.50 ? 'bg-yellow-100 text-yellow-700' : 'bg-green-100 text-green-700'}">
+                  ${item.score < 2.50 ? 'High Priority' : item.score < 3.50 ? 'Medium Priority' : 'Low Priority'}
+                </span>
+              </td>
+            </tr>
+          `;
+        });
+        $('#improvement-tbody').html(html);
+      }
+    }
+
+    // Action functions
+    function refreshAllData() {
+      $('#analytics-loading').removeClass('hidden');
+      
+      // Clear cache for fresh data
+      clearCache();
+      
+      // Reload all tab data progressively
+      loadPerformanceTrendData();
+      setTimeout(() => loadComparisonData(), 200);
+      setTimeout(() => loadQuestionAnalysisData(), 400);
+      setTimeout(() => loadEngagementData(), 600);
+      setTimeout(() => loadImprovementData(), 800);
+      
+      // Hide loading after optimized delay
+      setTimeout(() => {
+        $('#analytics-loading').addClass('hidden');
+        Swal.fire({
+          icon: 'success',
+          title: 'Analytics Refreshed',
+          text: 'All analytics data updated with latest information.',
+          timer: 1500,
+          showConfirmButton: false
+        });
+      }, 2000);
+    }
+
+    // Hide loader when page is ready
+    window.addEventListener('load', function() {
+      setTimeout(function() {
+        const overlay = document.getElementById('loader-overlay');
+        overlay.style.opacity = '0';
+        setTimeout(() => {
+          overlay.style.display = 'none';
+        }, 300);
+      }, 500);
+    });
+    
+    // Handle window resize to redraw charts responsively
+    let resizeTimeout;
+    window.addEventListener('resize', function() {
+      clearTimeout(resizeTimeout);
+      resizeTimeout = setTimeout(function() {
+        // Redraw all active charts with new responsive settings
+        if (trendChart && $('#trend-faculty-filter').val() && $('#trend-year-filter').val()) {
+          const currentData = trendChart.data;
+          trendChart.destroy();
+          trendChart = null;
+          createTrendChart(currentData);
+        }
+        
+        if (comparisonChart) {
+          const currentData = comparisonChart.data;
+          comparisonChart.destroy();
+          comparisonChart = null;
+          createComparisonChart(currentData);
+        }
+        
+        if (questionChart) {
+          const currentData = questionChart.data;
+          questionChart.destroy();
+          questionChart = null;
+          createQuestionChart(currentData);
+        }
+        
+        if (engagementChart) {
+          const currentData = engagementChart.data;
+          engagementChart.destroy();
+          engagementChart = null;
+          createEngagementChart(currentData);
+        }
+        
+        if (departmentEngagementChart) {
+          const currentData = departmentEngagementChart.data;
+          departmentEngagementChart.destroy();
+          departmentEngagementChart = null;
+          createDepartmentEngagementChart(currentData);
+        }
+        
+        if (departmentTrendChart && $('#dept-trend-filter').val() && $('#dept-year-filter').val()) {
+          const currentData = departmentTrendChart.data;
+          departmentTrendChart.destroy();
+          departmentTrendChart = null;
+          createDepartmentTrendChart(currentData);
+        }
+      }, 250); // Debounce resize events
+    });
+  </script>
+  
+  <!-- Prevent logout on browser back button -->
+  <script src="{{ url_for('static', filename='js/prevent-back-logout.js') }}"></script>
+
+  <!-- Session Timeout Monitor (Auto-logout after 1 hour) -->
+  <script src="{{ url_for('static', filename='js/session-timeout.js') }}"></script>
+</body>
+</html>

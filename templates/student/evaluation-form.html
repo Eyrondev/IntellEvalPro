@@ -1,0 +1,1994 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+  <title>Faculty Evaluation Form | IntellEvalPro</title>
+  
+  <!-- Favicon -->
+  <link rel="icon" type="image/png" href="{{ url_for('static', filename='images/nclogo.png') }}">
+  <link rel="shortcut icon" type="image/png" href="{{ url_for('static', filename='images/nclogo.png') }}">
+  <link rel="apple-touch-icon" href="{{ url_for('static', filename='images/nclogo.png') }}">
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  
+  <!-- Font Awesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"/>
+  
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  
+  <!-- jQuery -->
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  
+  <!-- SweetAlert2 -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11.7.12/dist/sweetalert2.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.7.12/dist/sweetalert2.all.min.js"></script>
+  
+  <script>
+    tailwind.config = {
+      theme: {
+        fontFamily: {
+          'sans': ['Inter', 'system-ui', 'sans-serif'],
+        },
+        extend: {
+          colors: {
+            primary: {
+              50: '#e6f0ff',
+              100: '#b3d1ff',
+              200: '#80b3ff',
+              300: '#4d94ff', 
+              400: '#1a75ff',
+              500: '#0059cc',
+              600: '#004db3',
+              700: '#004099',
+              800: '#003380',
+              900: '#002766',
+            },
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    /* Standard Academic Evaluation Form Styles */
+    .evaluation-table {
+      width: 100%;
+      border-collapse: collapse;
+      background: white;
+      font-size: 0.875rem;
+      font-family: 'Times New Roman', Times, serif;
+    }
+    
+    .evaluation-table th {
+      background: #f3f4f6;
+      border: 1px solid #000;
+      padding: 0.5rem;
+      font-weight: 700;
+      text-align: center;
+      color: #000;
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    
+    .evaluation-table td {
+      border: 1px solid #000;
+      padding: 0.5rem;
+      vertical-align: middle;
+      color: #000;
+    }
+    
+    .evaluation-table .criteria-number {
+      text-align: center;
+      font-weight: 600;
+      color: #000;
+      width: 40px;
+      font-size: 0.875rem;
+    }
+    
+    .evaluation-table .criteria-text {
+      color: #000;
+      line-height: 1.6;
+      padding-left: 0.75rem;
+      font-size: 0.875rem;
+    }
+    
+    .evaluation-table .rating-cell {
+      text-align: center;
+      width: 70px;
+      padding: 0.5rem;
+      background: #fafafa;
+    }
+    
+    .evaluation-table .rating-label {
+      display: block;
+      font-size: 0.65rem;
+      color: #666;
+      margin-top: 2px;
+      font-style: italic;
+    }
+    
+    /* Radio button styling - Standard circles */
+    .rating-input,
+    .desktop-radio,
+    .mobile-radio {
+      -webkit-appearance: none;
+      -moz-appearance: none;
+      appearance: none;
+      width: 1.25rem;
+      height: 1.25rem;
+      border: 2px solid #000;
+      border-radius: 50%;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      position: relative;
+      background-color: white !important;
+      margin: 0 auto;
+      display: block;
+      flex-shrink: 0;
+    }
+    
+    /* Ensure white background for unchecked state */
+    input[type="radio"].rating-input,
+    input[type="radio"].desktop-radio,
+    input[type="radio"].mobile-radio {
+      background-color: white !important;
+    }
+    
+    @media (max-width: 640px) {
+      .rating-input {
+        width: 1.5rem;
+        height: 1.5rem;
+        touch-action: manipulation;
+      }
+      
+      .evaluation-table {
+        font-size: 0.75rem;
+      }
+      
+      .evaluation-table th,
+      .evaluation-table td {
+        padding: 0.4rem 0.2rem;
+      }
+      
+      .evaluation-table .rating-cell {
+        width: 50px;
+        padding: 0.3rem;
+      }
+      
+      .evaluation-table .criteria-number {
+        width: 30px;
+      }
+      
+      .evaluation-table .criteria-text {
+        font-size: 0.75rem;
+        padding-left: 0.5rem;
+      }
+      
+      /* Enable horizontal scroll for table on smaller tablets */
+      .overflow-x-auto {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+      }
+    }
+    
+    .rating-input:hover,
+    .desktop-radio:hover,
+    .mobile-radio:hover {
+      border-color: #0059cc;
+      transform: scale(1.1);
+      box-shadow: 0 0 0 2px rgba(0, 89, 204, 0.2);
+    }
+    
+    .rating-input:checked,
+    .desktop-radio:checked,
+    .mobile-radio:checked {
+      background-color: #190cd1 !important;
+      border-color: #190cd1 !important;
+    }
+    
+    /* More specific selectors for checked state */
+    input[type="radio"].rating-input:checked,
+    input[type="radio"].desktop-radio:checked,
+    input[type="radio"].mobile-radio:checked {
+      background-color: #190cd1 !important;
+      border-color: #190cd1 !important;
+    }
+    
+    /* Data attribute based styling for extra enforcement */
+    input[type="radio"][data-checked="true"] {
+      background-color: #190cd1 !important;
+      border-color: #190cd1 !important;
+    }
+    
+    input[type="radio"][data-checked="false"] {
+      background-color: white !important;
+      border-color: #000 !important;
+    }
+    
+    /* Desktop radio checkmark - applies to .rating-input AND .desktop-radio */
+    .rating-input:checked::after,
+    .desktop-radio:checked::after {
+      content: '✓' !important;
+      position: absolute !important;
+      top: 50% !important;
+      left: 50% !important;
+      transform: translate(-50%, -50%) !important;
+      color: white !important;
+      font-weight: bold !important;
+      font-size: 0.875rem !important;
+      line-height: 1 !important;
+      display: block !important;
+      pointer-events: none !important;
+      z-index: 10 !important;
+    }
+    
+    /* Checkmark for data-checked attribute */
+    input[type="radio"][data-checked="true"]::after {
+      content: '✓' !important;
+      position: absolute !important;
+      top: 50% !important;
+      left: 50% !important;
+      transform: translate(-50%, -50%) !important;
+      color: white !important;
+      font-weight: bold !important;
+      font-size: 0.875rem !important;
+      line-height: 1 !important;
+      display: block !important;
+      pointer-events: none !important;
+      z-index: 10 !important;
+    }
+    
+    /* Mobile radio checkmark - different size for mobile */
+    .mobile-radio:checked::after {
+      content: '✓' !important;
+      position: absolute !important;
+      top: 50% !important;
+      left: 50% !important;
+      transform: translate(-50%, -50%) !important;
+      color: white !important;
+      font-weight: bold !important;
+      font-size: 0.75rem !important;
+      line-height: 1 !important;
+      display: block !important;
+      pointer-events: none !important;
+      z-index: 10 !important;
+    }
+    
+    /* Fallback checkmark rule - ensures checkmarks show on any radio button */
+    input[type="radio"]:checked::after {
+      content: '✓' !important;
+      position: absolute !important;
+      top: 50% !important;
+      left: 50% !important;
+      transform: translate(-50%, -50%) !important;
+      color: white !important;
+      font-weight: bold !important;
+      font-size: 0.875rem !important;
+      line-height: 1 !important;
+      display: block !important;
+      pointer-events: none !important;
+      z-index: 10 !important;
+    }
+    
+    /* Combined class selector for desktop radio buttons */
+    .rating-input.desktop-radio:checked::after {
+      content: '✓' !important;
+      position: absolute !important;
+      top: 50% !important;
+      left: 50% !important;
+      transform: translate(-50%, -50%) !important;
+      color: white !important;
+      font-weight: bold !important;
+      font-size: 0.875rem !important;
+      line-height: 1 !important;
+      display: block !important;
+      pointer-events: none !important;
+      z-index: 10 !important;
+    }
+    
+    /* Standard document header styling */
+    .form-header {
+      border: 2px solid #000;
+      padding: 1rem;
+      background: white;
+      margin-bottom: 1rem;
+    }
+    
+    .form-title {
+      font-family: 'Times New Roman', Times, serif;
+      font-size: 1.25rem;
+      font-weight: 700;
+      text-align: center;
+      color: #000;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-bottom: 0.5rem;
+    }
+    
+    .form-subtitle {
+      font-family: 'Times New Roman', Times, serif;
+      font-size: 0.875rem;
+      text-align: center;
+      color: #000;
+      margin-bottom: 0.75rem;
+    }
+    
+    .form-info-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.5rem;
+      font-size: 0.75rem;
+      color: #000;
+    }
+    
+    .form-info-item {
+      display: flex;
+      align-items: center;
+    }
+    
+    .form-info-label {
+      font-weight: 600;
+      margin-right: 0.5rem;
+      min-width: 80px;
+    }
+    
+    /* Mobile responsive adjustments for 390px width */
+    @media (max-width: 480px) {
+      .form-title {
+        font-size: 0.75rem;
+        letter-spacing: 0.5px;
+        padding: 0.25rem;
+      }
+      
+      .form-subtitle {
+        font-size: 0.65rem;
+      }
+      
+      .form-info-label {
+        min-width: 60px;
+        font-size: 0.65rem;
+      }
+      
+      .form-info-grid {
+        grid-template-columns: 1fr;
+        gap: 0.4rem;
+      }
+      
+      /* Hide desktop table, show mobile card layout */
+      .evaluation-table {
+        display: none;
+      }
+      
+      .mobile-criteria-card {
+        display: block !important;
+        background: white;
+        border: 1px solid #000;
+        margin-bottom: 0.75rem;
+        padding: 0.6rem;
+        border-radius: 4px;
+        font-family: 'Times New Roman', Times, serif;
+      }
+      
+      .mobile-criteria-number {
+        display: inline-block;
+        font-weight: 700;
+        font-size: 0.7rem;
+        color: #000;
+        margin-right: 0.3rem;
+      }
+      
+      .mobile-criteria-text {
+        font-size: 0.7rem;
+        color: #000;
+        line-height: 1.4;
+        margin-bottom: 0.5rem;
+        display: inline;
+      }
+      
+      .mobile-rating-options {
+        display: flex;
+        justify-content: space-between;
+        gap: 0.3rem;
+        margin-top: 0.5rem;
+        padding-top: 0.5rem;
+        border-top: 1px solid #ddd;
+      }
+      
+      .mobile-rating-option {
+        flex: 1;
+        text-align: center;
+      }
+      
+      .mobile-rating-option label {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        cursor: pointer;
+        padding: 0.3rem 0.2rem;
+        border-radius: 4px;
+        transition: background-color 0.2s;
+      }
+      
+      .mobile-rating-option label:active {
+        background-color: #f0f0f0;
+      }
+      
+      .mobile-rating-option input[type="radio"] {
+        width: 1.1rem;
+        height: 1.1rem;
+        margin: 0 0 0.2rem 0;
+        cursor: pointer;
+        position: relative;
+      }
+      
+      .mobile-rating-option .rating-number {
+        font-size: 0.7rem;
+        font-weight: 700;
+        color: #000;
+        margin-bottom: 0.15rem;
+      }
+      
+      .mobile-rating-option .rating-label {
+        font-size: 0.55rem;
+        color: #555;
+        line-height: 1.1;
+        text-align: center;
+        font-weight: 500;
+      }
+      
+      .category-header-standard {
+        font-size: 0.7rem;
+        padding: 0.5rem 0.5rem;
+        letter-spacing: 0.2px;
+        border: 1.5px solid #000;
+      }
+      
+      /* Hide rating scale legend on mobile, show simplified version */
+      .rating-scale-legend {
+        display: none;
+      }
+      
+      .mobile-rating-guide {
+        display: block !important;
+      }
+      
+      /* Compact header on mobile */
+      .bg-white.border-2 {
+        padding: 0.5rem !important;
+      }
+      
+      .space-y-2 {
+        gap: 0.3rem;
+      }
+      
+      .border-b-2 {
+        padding-bottom: 0.5rem !important;
+        margin-bottom: 0.5rem !important;
+      }
+      
+      /* Direction notice more compact */
+      .mt-3.sm\\:mt-4.p-2 {
+        padding: 0.5rem !important;
+        margin-top: 0.5rem !important;
+      }
+      
+      .mt-3.sm\\:mt-4.p-2 p {
+        font-size: 0.65rem !important;
+        line-height: 1.35;
+      }
+      
+      /* Make mobile rating guide more compact */
+      .mobile-rating-guide {
+        padding: 0.5rem !important;
+        margin-bottom: 0.75rem !important;
+      }
+      
+      .mobile-rating-guide p {
+        font-size: 0.65rem !important;
+        margin-bottom: 0.3rem !important;
+        font-weight: 600;
+      }
+      
+      .mobile-rating-guide .text-xs {
+        font-size: 0.62rem !important;
+      }
+      
+      /* Category sections spacing */
+      .mb-6 {
+        margin-bottom: 1rem !important;
+      }
+      
+      /* Make bottom action buttons smaller on mobile */
+      .bg-white.rounded-lg.shadow-sm.p-3 button {
+        font-size: 0.7rem !important;
+        padding: 0.5rem 0.75rem !important;
+      }
+      
+      .bg-white.rounded-lg.shadow-sm.p-3 button i {
+        font-size: 0.65rem !important;
+      }
+      
+      .bg-white.rounded-lg.shadow-sm.p-3 .text-xs {
+        font-size: 0.65rem !important;
+      }
+    }
+    
+    @media (max-width: 390px) {
+      .form-title {
+        font-size: 0.68rem;
+      }
+      
+      .evaluation-table {
+        font-size: 0.55rem;
+      }
+      
+      .evaluation-table .criteria-text {
+        font-size: 0.55rem;
+        line-height: 1.25;
+      }
+      
+      .evaluation-table .criteria-number {
+        font-size: 0.55rem;
+        width: 18px;
+      }
+      
+      .evaluation-table th {
+        font-size: 0.52rem;
+        padding: 0.15rem 0.05rem;
+      }
+      
+      .rating-input {
+        width: 0.88rem;
+        height: 0.88rem;
+      }
+      
+      .category-header-standard {
+        font-size: 0.6rem;
+        padding: 0.35rem 0.35rem;
+      }
+      
+      .evaluation-table .rating-cell {
+        width: 30px;
+        padding: 0.12rem 0.04rem;
+      }
+    }
+    
+    .category-header-standard {
+      background: #e5e7eb;
+      border: 2px solid #000;
+      padding: 0.75rem 1rem;
+      font-family: 'Times New Roman', Times, serif;
+      font-size: 1rem;
+      font-weight: 700;
+      color: #000;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    
+    /* Mobile card layout - hidden by default, shown on mobile */
+    .mobile-criteria-card {
+      display: none;
+    }
+    
+    /* Print optimization */
+    @media print {
+      .rating-input {
+        border: 2px solid #000 !important;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+      }
+      
+      .rating-input:checked {
+        background: #000 !important;
+      }
+      
+      .evaluation-table th,
+      .evaluation-table td {
+        border: 1px solid #000 !important;
+      }
+    }
+    
+    .category-card {
+      transition: all 0.3s ease;
+      border: 1px solid #e5e7eb;
+    }
+    
+    .category-card:hover {
+      border-color: #0059cc;
+      box-shadow: 0 4px 12px rgba(0, 89, 204, 0.1);
+    }
+    
+    .progress-step {
+      transition: all 0.3s ease;
+    }
+    
+    .progress-step.active .w-8 {
+      background: linear-gradient(135deg, #0059cc 0%, #004db3 100%);
+      box-shadow: 0 4px 15px rgba(0, 89, 204, 0.4);
+      transform: scale(1.1);
+    }
+    
+    .progress-step.completed .w-8 {
+      background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+      box-shadow: 0 4px 15px rgba(16, 185, 129, 0.4);
+      transform: scale(1.05);
+    }
+    
+    /* Modern shimmer animation */
+    @keyframes shimmer {
+      0% { transform: translateX(-100%) skewX(-12deg); }
+      100% { transform: translateX(200%) skewX(-12deg); }
+    }
+    
+    .animate-shimmer {
+      animation: shimmer 2s infinite;
+    }
+    
+    /* Glassmorphism effect */
+    .bg-white\/95 {
+      background: rgba(255, 255, 255, 0.95);
+    }
+    
+    .backdrop-blur-md {
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+    }
+    
+    /* Modern card hover effects */
+    .category-card {
+      transition: all 0.3s ease;
+      border: 1px solid #e5e7eb;
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .category-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
+      transition: left 0.5s;
+    }
+    
+    .category-card:hover::before {
+      left: 100%;
+    }
+    
+    .category-card:hover {
+      border-color: #0059cc;
+      box-shadow: 0 10px 25px rgba(0, 89, 204, 0.15);
+      transform: translateY(-2px);
+    }
+  </style>
+</head>
+
+<body class="bg-gray-50">
+  <!-- Timer Widget - Compact Mobile Design, Normal Desktop -->
+  <div id="timer-widget" class="fixed z-50 bg-white shadow-lg rounded-lg border-2 border-primary-500 
+                                 top-14 left-2 right-2 p-2 sm:top-16 sm:right-4 sm:left-auto sm:w-auto sm:p-4">
+    <div class="flex items-center gap-1.5 sm:gap-3">
+      <i class="fas fa-clock text-primary-600 text-sm sm:text-xl"></i>
+      <div class="flex-1 min-w-0">
+        <div class="text-[0.65rem] sm:text-xs font-medium text-gray-600 uppercase leading-tight">Time Remaining</div>
+        <div id="evaluation-timer" class="text-base sm:text-2xl font-bold text-gray-900 leading-tight">--:--</div>
+      </div>
+    </div>
+    <!-- Progress bar - More compact on mobile -->
+    <div class="mt-1.5 sm:mt-3 h-1.5 sm:h-2 bg-gray-200 rounded-full overflow-hidden">
+      <div id="timer-progress" class="h-full bg-primary-600 transition-all duration-1000" style="width: 100%"></div>
+    </div>
+  </div>
+
+  <!-- Expired Overlay (Hidden by default) -->
+  <div id="expired-overlay" class="hidden fixed inset-0 bg-black bg-opacity-50 z-[60] flex items-center justify-center p-4">
+    <div class="bg-white rounded-lg shadow-2xl p-6 sm:p-8 max-w-md w-full text-center">
+      <div class="mb-4">
+        <i class="fas fa-clock text-red-600 text-5xl sm:text-6xl"></i>
+      </div>
+      <h2 class="text-2xl sm:text-3xl font-bold text-gray-900 mb-3">Time Expired</h2>
+      <p class="text-gray-600 mb-6 text-sm sm:text-base">
+        The evaluation time has ended. Your responses have been automatically submitted.
+      </p>
+      <button type="button" 
+              data-redirect-url="{{ url_for('student.student_dashboard') }}"
+              onclick="window.location.href=this.getAttribute('data-redirect-url');"
+              class="w-full px-6 py-3 bg-primary-600 text-white font-medium rounded-lg hover:bg-primary-700 transition-colors">
+        Return to Dashboard
+      </button>
+    </div>
+  </div>
+
+  <!-- Full Screen Mobile-First Layout -->
+  <div class="min-h-screen bg-gray-50">
+    <!-- Mobile Header with Back Button -->
+    <header class="bg-white shadow-sm border-b border-gray-200 sticky top-0 z-40">
+      <div class="px-4 py-3 flex items-center justify-between">
+        <button id="back-button" onclick="goBackToPendingEvaluations()" 
+                class="flex items-center text-primary-600 hover:text-primary-700 font-medium">
+          <i class="fas fa-arrow-left mr-2"></i>
+          <span class="hidden sm:inline">Back to Evaluations</span>
+          <span class="sm:hidden">Back</span>
+        </button>
+        <h1 class="text-lg font-semibold text-gray-900 truncate ml-4">Faculty Evaluation</h1>
+      </div>
+    </header>
+
+    <!-- Main content area -->
+    <main id="main-content" class="p-3 sm:p-4 md:p-6 bg-gray-50">
+        <!-- Breadcrumb Navigation - Hidden on mobile -->
+        <nav class="mb-4 hidden md:block" aria-label="Breadcrumb">
+          <ol class="flex items-center space-x-2 text-sm text-gray-500">
+            <li>
+              <a href="{{ url_for('student.student_dashboard') }}" class="hover:text-primary-600 transition-colors">
+                <i class="fas fa-home"></i>
+                Dashboard
+              </a>
+            </li>
+            <li class="flex items-center">
+              <i class="fas fa-chevron-right mx-2 text-gray-400"></i>
+              <a href="{{ url_for('student.pending_evaluations') }}" class="hover:text-primary-600 transition-colors">
+                Pending Evaluations
+              </a>
+            </li>
+            <li class="flex items-center">
+              <i class="fas fa-chevron-right mx-2 text-gray-400"></i>
+              <span class="text-gray-900 font-medium">Evaluation Form</span>
+            </li>
+          </ol>
+        </nav>
+
+        <!-- Standard Academic Header -->
+        <div class="bg-white border-2 border-gray-800 shadow-md p-3 sm:p-4 md:p-6 mb-4 md:mb-6">
+          <!-- Document Title -->
+          <div class="text-center mb-3 sm:mb-4 border-b-2 border-gray-300 pb-3">
+            <h1 class="text-base sm:text-lg md:text-xl font-bold text-gray-900 uppercase tracking-wide mb-1" style="font-family: 'Times New Roman', Times, serif;">
+              Faculty Evaluation Form
+            </h1>
+            <p class="text-xs sm:text-sm text-gray-600" style="font-family: 'Times New Roman', Times, serif;">
+              Student Assessment of Faculty Performance
+            </p>
+          </div>
+          
+          <!-- Evaluation Information - Standard Format -->
+          <div class="space-y-2 sm:space-y-2.5" style="font-family: 'Times New Roman', Times, serif;">
+            <!-- Row 1: Name and Date -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-4">
+              <div class="flex items-baseline border-b border-gray-400 pb-1">
+                <span class="font-semibold text-xs sm:text-sm text-gray-900 min-w-[90px] sm:min-w-[100px]">Name of Faculty:</span>
+                <span id="faculty-name" class="text-xs sm:text-sm text-gray-900 ml-2 flex-1">{{ faculty_name if faculty_name else '' }}</span>
+              </div>
+              <div class="flex items-baseline border-b border-gray-400 pb-1">
+                <span class="font-semibold text-xs sm:text-sm text-gray-900 min-w-[50px] sm:min-w-[60px]">Date:</span>
+                <span class="text-xs sm:text-sm text-gray-900 ml-2 flex-1">{{ current_date if current_date else '' }}</span>
+              </div>
+            </div>
+            
+            <!-- Row 2: Subject and Section -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-4">
+              <div class="flex items-baseline border-b border-gray-400 pb-1">
+                <span class="font-semibold text-xs sm:text-sm text-gray-900 min-w-[90px] sm:min-w-[100px]">Subject Code:</span>
+                <span id="course-info" class="text-xs sm:text-sm text-gray-900 ml-2 flex-1">{{ course_code if course_code else '' }}</span>
+              </div>
+              <div class="flex items-baseline border-b border-gray-400 pb-1">
+                <span class="font-semibold text-xs sm:text-sm text-gray-900 min-w-[120px] sm:min-w-[140px]">Course/Year & Section:</span>
+                <span class="text-xs sm:text-sm text-gray-900 ml-2 flex-1">{{ section_name if section_name else '' }}</span>
+              </div>
+            </div>
+            
+            <!-- Row 3: Period -->
+            <div class="flex items-baseline border-b border-gray-400 pb-1">
+              <span class="font-semibold text-xs sm:text-sm text-gray-900 min-w-[120px] sm:min-w-[130px]">Evaluation Period:</span>
+              <span id="period-info" class="text-xs sm:text-sm text-gray-900 ml-2 flex-1">{{ period_title if period_title else '' }}</span>
+            </div>
+          </div>
+          
+          <!-- Direction Notice -->
+          <div class="mt-3 sm:mt-4 p-2 sm:p-3 bg-gray-50 border border-gray-300 rounded" style="font-family: 'Times New Roman', Times, serif;">
+            <p class="text-xs sm:text-sm text-gray-800 italic leading-relaxed">
+              <strong>Direction:</strong> This evaluation form is confidential. Please rate the faculty/subject professor with utmost integrity by placing a check (✓) mark on the number that corresponds to your assessment based on the following evaluation rating.
+            </p>
+          </div>
+        </div>
+
+        <!-- Evaluation Form -->
+        <form id="evaluation-form" action="{{ url_for('student.submit_evaluation') }}" method="POST">
+          <input type="hidden" name="evaluation_id" value="{{ evaluation_id if evaluation_id else '' }}">
+          <input type="hidden" name="section_id" value="{{ section_id if section_id else '' }}">
+          <input type="hidden" name="period_id" value="{{ period_id if period_id else '' }}">
+          
+          <!-- Dynamic Evaluation Questions - Loaded from Database -->
+          <div id="quality-evaluation" class="space-y-4 md:space-y-6">
+            <!-- Loading State -->
+            <div id="questions-loading" class="text-center py-12">
+              <div class="animate-spin rounded-full h-16 w-16 border-b-4 border-primary-600 mx-auto mb-4"></div>
+              <p class="text-gray-600">Loading evaluation questions...</p>
+            </div>
+            
+            <!-- Error State -->
+            <div id="questions-error" class="hidden bg-red-50 border border-red-200 rounded-lg p-6 text-center">
+              <i class="fas fa-exclamation-triangle text-red-500 text-4xl mb-3"></i>
+              <h3 class="text-lg font-semibold text-red-900 mb-2">Error Loading Questions</h3>
+              <p class="text-red-700 mb-4">Unable to load evaluation questions. Please try refreshing the page.</p>
+              <button onclick="location.reload()" class="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700">
+                <i class="fas fa-redo mr-2"></i>Refresh Page
+              </button>
+            </div>
+            
+            <!-- Dynamic Questions Container -->
+            <div id="dynamic-questions-container">
+              <!-- Questions will be loaded here dynamically -->
+            </div>
+          </div>
+ 
+          <!-- Comments Section - Mobile Optimized -->
+          <div id="comments-section" class="bg-white rounded-lg shadow-sm p-3 sm:p-4 md:p-6 mb-4 md:mb-6">
+            <div class="mb-4">
+              <h3 class="text-lg font-medium text-gray-900 mb-2">
+                <i class="fas fa-comments text-primary-600 mr-2"></i>
+                Comments and Suggestions
+              </h3>
+              <p class="text-sm text-gray-600">Your feedback helps improve the teaching quality and learning experience.</p>
+            </div>
+            
+            <div>
+              <label for="comments" class="block text-sm font-medium text-gray-700 mb-2">
+                <i class="fas fa-comment-dots text-blue-500 mr-1"></i>
+                Please share your comments and suggestions (Optional)
+              </label>
+              <textarea name="comments" id="comments" rows="6" 
+                        class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-primary-500 focus:border-primary-500 text-sm" 
+                        placeholder="Share your thoughts, suggestions, or any feedback about the faculty's teaching approach, methods, or interactions..."></textarea>
+            </div>
+          </div>
+
+          <!-- Form Actions - Mobile Optimized (Hidden by default, shown when scrolled to bottom) -->
+          <div id="bottom-action-bar" class="bg-white rounded-lg shadow-sm p-3 sm:p-4 md:p-6 border-t border-gray-200" style="display: none;">
+            <div class="flex flex-col space-y-3 sm:flex-row sm:space-y-0 sm:gap-3 sm:justify-between sm:items-center">
+              <div class="text-xs sm:text-sm text-gray-600 text-center sm:text-left">
+                <i class="fas fa-info-circle mr-1"></i>
+                All evaluations are anonymous and confidential
+              </div>
+              <div class="flex flex-col space-y-2 sm:flex-row sm:space-y-0 sm:gap-3">
+                <button type="button" id="save-draft-btn" 
+                        class="w-full sm:w-auto px-4 py-2.5 border border-gray-300 rounded-lg text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 transition-colors duration-200">
+                  <i class="fas fa-save mr-2"></i>
+                  Save Draft
+                </button>
+                <button type="submit" id="submit-evaluation-btn" 
+                        class="w-full sm:w-auto px-4 py-2.5 bg-gradient-to-r from-primary-500 to-primary-600 text-white rounded-lg text-sm font-medium hover:from-primary-600 hover:to-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 transition-all duration-200 shadow-lg hover:shadow-xl">
+                  <i class="fas fa-paper-plane mr-2"></i>
+                  Submit Evaluation
+                </button>
+              </div>
+            </div>
+          </div>
+        </form>
+      </main>
+    </div>
+  </div>
+
+  <!-- Include loading animation and unified navigation scripts -->
+  <script src="{{ url_for('static', filename='js/loading-animation.js') }}" onerror="console.log('Loading animation JS failed to load');"></script>
+  <script src="{{ url_for('static', filename='js/student-navigation-unified.js') }}" onerror="console.log('Navigation JS failed to load');"></script>
+  
+  <!-- Prevent logout on browser back button -->
+  <script src="{{ url_for('static', filename='js/prevent-back-logout.js') }}"></script>
+
+  <!-- Session Timeout Monitor (Auto-logout after 1 hour) -->
+  <script src="{{ url_for('static', filename='js/session-timeout.js') }}"></script>
+
+  <script>
+    // Fallback navigation loader if external JS fails - Not needed for full screen layout
+    function loadStudentNavigation(currentPage) {
+      console.log('Full screen evaluation mode - navigation not loaded');
+      // No navigation loading needed for full screen evaluation
+    }
+    
+    // Initialize for evaluation form page (full screen mode)
+    console.log('Evaluation form loaded in full screen mode');
+    
+    // Back navigation function with auto-save
+    function goBackToPendingEvaluations() {
+      // Check if form has been started
+      const hasAnswers = $('input[type="radio"]:checked').length > 0;
+      const textInputs = $('textarea').filter(function() {
+        return $(this).val().trim().length > 0;
+      }).length > 0;
+      
+      if (hasAnswers || textInputs) {
+        // Auto-save draft before leaving
+        Swal.fire({
+          title: 'Saving your progress...',
+          text: 'Please wait while we save your work',
+          icon: 'info',
+          allowOutsideClick: false,
+          showConfirmButton: false,
+          didOpen: () => {
+            Swal.showLoading();
+          }
+        });
+        
+        // Get evaluation ID
+        const evaluationId = getEvaluationId();
+        
+        if (!evaluationId) {
+          console.error('No evaluation ID found for auto-save');
+          // Just navigate back if no evaluation ID
+          window.location.href = '{{ url_for("student.pending_evaluations") }}';
+          return;
+        }
+        
+        // Prepare form data
+        const formData = $('#evaluation-form').serializeArray();
+        const dataObject = {};
+        formData.forEach(function(item) {
+          dataObject[item.name] = item.value;
+        });
+        
+        // Save draft via AJAX
+        $.ajax({
+          url: '{{ url_for("student.save_draft") }}',
+          method: 'POST',
+          contentType: 'application/json',
+          data: JSON.stringify({
+            evaluation_id: evaluationId,
+            form_data: dataObject
+          }),
+          success: function(response) {
+            console.log('Auto-save successful:', response);
+            Swal.fire({
+              title: 'Progress Saved!',
+              text: 'Your evaluation has been saved. You can continue later.',
+              icon: 'success',
+              timer: 1500,
+              showConfirmButton: false
+            }).then(() => {
+              window.location.href = '{{ url_for("student.pending_evaluations") }}';
+            });
+          },
+          error: function(xhr, status, error) {
+            console.error('Auto-save failed:', error);
+            // Still navigate back even if save fails
+            Swal.fire({
+              title: 'Could not save',
+              text: 'Your progress could not be saved, but you can come back to this evaluation.',
+              icon: 'warning',
+              timer: 2000,
+              showConfirmButton: false
+            }).then(() => {
+              window.location.href = '{{ url_for("student.pending_evaluations") }}';
+            });
+          }
+        });
+      } else {
+        // No answers yet, just go back
+        window.location.href = '{{ url_for("student.pending_evaluations") }}';
+      }
+    }
+
+    // Add keyboard shortcut for back navigation (Ctrl+B)
+    $(document).keydown(function(e) {
+      if (e.ctrlKey && e.key === 'b') {
+        e.preventDefault();
+        goBackToPendingEvaluations();
+      }
+    });
+
+    // Global function to get URL parameters
+    function getUrlParameter(name) {
+      name = name.replace(/[\[]/, '\\[').replace(/[\]]/, '\\]');
+      var regex = new RegExp('[\\?&]' + name + '=([^&#]*)');
+      var results = regex.exec(location.search);
+      return results === null ? '' : decodeURIComponent(results[1].replace(/\+/g, ' '));
+    }
+
+    // Alternative method to get evaluation ID from URL path
+    function getEvaluationIdFromPath() {
+      const pathParts = window.location.pathname.split('/');
+      const lastPart = pathParts[pathParts.length - 1];
+      if (lastPart && !isNaN(lastPart)) {
+        return lastPart;
+      }
+      return null;
+    }
+
+    // Get evaluation ID from multiple sources
+    function getEvaluationId() {
+      // Try URL parameter first
+      let evalId = getUrlParameter('evaluation_id');
+      if (evalId) {
+        console.log('Found evaluation ID in URL parameter:', evalId);
+        return evalId;
+      }
+      
+      // Try path parameter
+      evalId = getEvaluationIdFromPath();
+      if (evalId) {
+        console.log('Found evaluation ID in URL path:', evalId);
+        return evalId;
+      }
+      
+      // Try hidden form field
+      const hiddenField = $('input[name="evaluation_id"]').val();
+      if (hiddenField) {
+        console.log('Found evaluation ID in hidden field:', hiddenField);
+        return hiddenField;
+      }
+      
+      console.error('No evaluation ID found in URL parameter, path, or hidden field');
+      console.log('Current URL:', window.location.href);
+      console.log('URL search params:', window.location.search);
+      console.log('URL pathname:', window.location.pathname);
+      return null;
+    }
+
+    // Category color schemes for dynamic rendering
+    const categoryColors = [
+      { bg: 'from-blue-500 to-blue-600', border: 'border-blue-500', icon: 'fa-tasks' },
+      { bg: 'from-green-500 to-green-600', border: 'border-green-500', icon: 'fa-tachometer-alt' },
+      { bg: 'from-purple-500 to-purple-600', border: 'border-purple-500', icon: 'fa-puzzle-piece' },
+      { bg: 'from-yellow-500 to-yellow-600', border: 'border-yellow-500', icon: 'fa-user-friends' },
+      { bg: 'from-red-500 to-red-600', border: 'border-red-500', icon: 'fa-shield-alt' },
+      { bg: 'from-indigo-500 to-indigo-600', border: 'border-indigo-500', icon: 'fa-lock' },
+      { bg: 'from-teal-500 to-teal-600', border: 'border-teal-500', icon: 'fa-tools' },
+      { bg: 'from-pink-500 to-pink-600', border: 'border-pink-500', icon: 'fa-exchange-alt' },
+      { bg: 'from-orange-500 to-orange-600', border: 'border-orange-500', icon: 'fa-star' },
+      { bg: 'from-cyan-500 to-cyan-600', border: 'border-cyan-500', icon: 'fa-lightbulb' }
+    ];
+
+    /**
+     * Load evaluation questions from database
+     */
+    function loadEvaluationQuestions() {
+      console.log('Loading evaluation questions from database...');
+      
+      $.ajax({
+        url: '/api/evaluation/questions',
+        method: 'GET',
+        dataType: 'json',
+        headers: {
+          'X-Requested-With': 'XMLHttpRequest'
+        },
+        success: function(response) {
+          console.log('API Response received successfully:', response);
+          console.log('Response type:', typeof response);
+          console.log('Response success:', response.success);
+          console.log('Response categories:', response.categories);
+          
+          if (response.success && response.categories) {
+            console.log('Questions loaded successfully:', response.categories.length, 'categories');
+            console.log('Total questions:', response.total_questions);
+            
+            // Check if categories have criteria
+            let totalCriteria = 0;
+            response.categories.forEach(cat => {
+              if (cat.criteria) {
+                totalCriteria += cat.criteria.length;
+                console.log(`Category "${cat.category_name}": ${cat.criteria.length} criteria`);
+              }
+            });
+            console.log('Total criteria (questions):', totalCriteria);
+            
+            renderDynamicQuestions(response.categories);
+            
+            // Hide loading, show content
+            $('#questions-loading').hide();
+            $('#dynamic-questions-container').show();
+            
+            // Verify rendering worked and update progress
+            setTimeout(() => {
+              const renderedRadios = $('input[type="radio"]').length;
+              const requiredRadios = $('input[type="radio"][required]').length;
+              console.log('Rendered radio buttons after timeout:', renderedRadios);
+              console.log('Required radio buttons after timeout:', requiredRadios);
+              
+              // Enable submit button now that questions are loaded
+              if (renderedRadios > 0) {
+                $('#submit-evaluation-btn').prop('disabled', false).html('<i class="fas fa-paper-plane mr-2"></i>Submit Evaluation');
+                console.log('Submit button enabled - questions loaded successfully');
+              } else {
+                console.error('No radio buttons rendered - keeping submit button disabled');
+              }
+              
+              updateProgress();
+              
+              // Load draft data after questions are rendered - increased delay for desktop
+              if (typeof window.loadDraftData === 'function') {
+                console.log('Scheduling draft data load in 1 second...');
+                setTimeout(() => {
+                  console.log('Now loading draft data after DOM is stable...');
+                  window.loadDraftData();
+                }, 1000); // Additional 1 second delay for DOM stability
+              }
+            }, 100);
+          } else {
+            console.error('API returned no questions:', response);
+            showQuestionsError(response.message || 'No questions available');
+          }
+        },
+        error: function(xhr, status, error) {
+          console.error('AJAX Error:', {
+            status: status,
+            error: error,
+            responseText: xhr.responseText,
+            statusCode: xhr.status
+          });
+          
+          // Try to parse error response
+          let errorMessage = 'Failed to load questions';
+          if (xhr.status === 404) {
+            errorMessage = 'Evaluation questions endpoint not found (404)';
+          } else if (xhr.status === 403) {
+            errorMessage = 'Not authorized to access evaluation questions (403)';
+          } else if (xhr.status === 500) {
+            errorMessage = 'Server error loading evaluation questions (500)';
+          } else {
+            try {
+              const errorResponse = JSON.parse(xhr.responseText);
+              errorMessage = errorResponse.message || errorMessage;
+            } catch (e) {
+              errorMessage += ': ' + error;
+            }
+          }
+          
+          console.log('Falling back to static questions due to API error:', errorMessage);
+          
+          // Hide loading and show error, then static fallback
+          $('#questions-loading').hide();
+          $('#questions-error').removeClass('hidden').show();
+          $('#static-questions-fallback').removeClass('hidden');
+          
+          // Enable submit button since we have fallback questions
+          $('#submit-evaluation-btn').prop('disabled', false).html('<i class="fas fa-paper-plane mr-2"></i>Submit Evaluation');
+          
+          // Update progress with static questions
+          setTimeout(updateProgress, 100);
+        }
+      });
+    }
+
+    /**
+     * Render dynamic questions in standard academic format
+     */
+    function renderDynamicQuestions(categories) {
+      const container = $('#dynamic-questions-container');
+      container.empty();
+      
+      let globalCriteriaNumber = 1; // Continuous numbering across all categories
+      
+      // Add rating scale legend at the top
+      const legendHtml = $(`
+        <div class="rating-scale-legend bg-gray-50 border-2 border-gray-800 rounded-lg p-4 mb-6">
+          <h4 class="text-sm font-bold text-gray-900 mb-3 text-center uppercase" style="font-family: 'Times New Roman', Times, serif; letter-spacing: 1px;">Rating Scale</h4>
+          <div class="grid grid-cols-5 gap-2 text-center text-xs" style="font-family: 'Times New Roman', Times, serif;">
+            <div class="p-2 bg-white border border-gray-400 rounded">
+              <div class="font-bold text-base">5</div>
+              <div class="text-gray-700 mt-1">Outstanding</div>
+              <div class="text-gray-500 text-xs italic">(Napakahusay)</div>
+            </div>
+            <div class="p-2 bg-white border border-gray-400 rounded">
+              <div class="font-bold text-base">4</div>
+              <div class="text-gray-700 mt-1">Very Satisfactory</div>
+              <div class="text-gray-500 text-xs italic">(Mahusay)</div>
+            </div>
+            <div class="p-2 bg-white border border-gray-400 rounded">
+              <div class="font-bold text-base">3</div>
+              <div class="text-gray-700 mt-1">Satisfactory</div>
+              <div class="text-gray-500 text-xs italic">(Katamtaman na husay)</div>
+            </div>
+            <div class="p-2 bg-white border border-gray-400 rounded">
+              <div class="font-bold text-base">2</div>
+              <div class="text-gray-700 mt-1">Needs Improvement</div>
+              <div class="text-gray-500 text-xs italic">(Nangangailangan ng pagpapabuti)</div>
+            </div>
+            <div class="p-2 bg-white border border-gray-400 rounded">
+              <div class="font-bold text-base">1</div>
+              <div class="text-gray-700 mt-1">Poor</div>
+              <div class="text-gray-500 text-xs italic">(Mahina)</div>
+            </div>
+          </div>
+          <p class="text-xs text-gray-600 text-center mt-3 italic">Direction: Please rate the faculty/subject professor with utmost integrity by placing a check (✓) mark on the number that corresponds to your assessment based on the following evaluation rating.</p>
+        </div>
+        
+        <!-- Simplified mobile rating scale -->
+        <div class="mobile-rating-guide bg-gray-100 border border-gray-600 rounded p-2 mb-4" style="display: none; font-family: 'Times New Roman', Times, serif;">
+          <p class="text-xs font-semibold text-center mb-2">Rating Guide:</p>
+          <div class="text-xs text-center space-y-1">
+            <div><strong>5</strong> - Outstanding | <strong>4</strong> - Very Satisfactory | <strong>3</strong> - Satisfactory</div>
+            <div><strong>2</strong> - Needs Improvement | <strong>1</strong> - Poor</div>
+          </div>
+        </div>
+      `);
+      container.append(legendHtml);
+      
+      categories.forEach((category, catIndex) => {
+        if (!category.criteria || category.criteria.length === 0) {
+          return; // Skip empty categories
+        }
+        
+        // Category label (A, B, C, etc.)
+        const categoryLabel = String.fromCharCode(65 + catIndex);
+        
+        // Create category section
+        const categorySection = $('<div>', {
+          class: 'mb-6'
+        });
+        
+        // Category header - Standard format
+        const headerHtml = `
+          <div class="category-header-standard mb-0">
+            <span class="mr-2">${categoryLabel}.</span>${category.category_name}
+          </div>
+        `;
+        categorySection.append(headerHtml);
+        
+        // Create table
+        const tableHtml = $(`
+          <div class="overflow-x-auto">
+            <table class="evaluation-table">
+              <thead>
+                <tr>
+                  <th rowspan="2" class="criteria-number">#</th>
+                  <th rowspan="2" style="text-align: left; min-width: 250px;">Performance Indicators</th>
+                  <th colspan="5" style="padding: 0.25rem;">Rating</th>
+                </tr>
+                <tr>
+                  <th class="rating-cell" style="padding: 0.25rem 0.5rem;">
+                    5<br>
+                    <span class="rating-label">Outstanding</span>
+                  </th>
+                  <th class="rating-cell" style="padding: 0.25rem 0.5rem;">
+                    4<br>
+                    <span class="rating-label">Very Satisfactory</span>
+                  </th>
+                  <th class="rating-cell" style="padding: 0.25rem 0.5rem;">
+                    3<br>
+                    <span class="rating-label">Satisfactory</span>
+                  </th>
+                  <th class="rating-cell" style="padding: 0.25rem 0.5rem;">
+                    2<br>
+                    <span class="rating-label">Needs Improvement</span>
+                  </th>
+                  <th class="rating-cell" style="padding: 0.25rem 0.5rem;">
+                    1<br>
+                    <span class="rating-label">Poor</span>
+                  </th>
+                </tr>
+              </thead>
+              <tbody id="category-${category.category_id}-body">
+              </tbody>
+            </table>
+          </div>
+        `);
+        
+        const tbody = tableHtml.find(`#category-${category.category_id}-body`);
+        
+        // Create mobile card container
+        const mobileCardsHtml = $('<div>', { class: 'mobile-criteria-container' });
+        
+        // Add each criterion as a table row (desktop) AND mobile card
+        category.criteria.forEach((criterion) => {
+          // Desktop table row
+          const criterionRow = $(`
+            <tr>
+              <td class="criteria-number">${globalCriteriaNumber}.</td>
+              <td class="criteria-text">${criterion.description}</td>
+              <td class="rating-cell">
+                <input type="radio" name="criteria_${criterion.criteria_id}" value="5" class="rating-input desktop-radio" data-criteria-id="${criterion.criteria_id}" required aria-label="Rating 5 for ${criterion.description}">
+              </td>
+              <td class="rating-cell">
+                <input type="radio" name="criteria_${criterion.criteria_id}" value="4" class="rating-input desktop-radio" data-criteria-id="${criterion.criteria_id}" required aria-label="Rating 4 for ${criterion.description}">
+              </td>
+              <td class="rating-cell">
+                <input type="radio" name="criteria_${criterion.criteria_id}" value="3" class="rating-input desktop-radio" data-criteria-id="${criterion.criteria_id}" required aria-label="Rating 3 for ${criterion.description}">
+              </td>
+              <td class="rating-cell">
+                <input type="radio" name="criteria_${criterion.criteria_id}" value="2" class="rating-input desktop-radio" data-criteria-id="${criterion.criteria_id}" required aria-label="Rating 2 for ${criterion.description}">
+              </td>
+              <td class="rating-cell">
+                <input type="radio" name="criteria_${criterion.criteria_id}" value="1" class="rating-input desktop-radio" data-criteria-id="${criterion.criteria_id}" required aria-label="Rating 1 for ${criterion.description}">
+              </td>
+            </tr>
+          `);
+          tbody.append(criterionRow);
+          
+          // Mobile card layout
+          const mobileCard = $(`
+            <div class="mobile-criteria-card">
+              <div>
+                <span class="mobile-criteria-number">${globalCriteriaNumber}.</span>
+                <span class="mobile-criteria-text">${criterion.description}</span>
+              </div>
+              <div class="mobile-rating-options">
+                <div class="mobile-rating-option">
+                  <label>
+                    <input type="radio" name="criteria_${criterion.criteria_id}" value="5" class="mobile-radio" data-criteria-id="${criterion.criteria_id}" required aria-label="Rating 5">
+                    <span class="rating-number">5</span>
+                    <span class="rating-label">Outstanding</span>
+                  </label>
+                </div>
+                <div class="mobile-rating-option">
+                  <label>
+                    <input type="radio" name="criteria_${criterion.criteria_id}" value="4" class="mobile-radio" data-criteria-id="${criterion.criteria_id}" required aria-label="Rating 4">
+                    <span class="rating-number">4</span>
+                    <span class="rating-label">Very Satisfactory</span>
+                  </label>
+                </div>
+                <div class="mobile-rating-option">
+                  <label>
+                    <input type="radio" name="criteria_${criterion.criteria_id}" value="3" class="mobile-radio" data-criteria-id="${criterion.criteria_id}" required aria-label="Rating 3">
+                    <span class="rating-number">3</span>
+                    <span class="rating-label">Satisfactory</span>
+                  </label>
+                </div>
+                <div class="mobile-rating-option">
+                  <label>
+                    <input type="radio" name="criteria_${criterion.criteria_id}" value="2" class="mobile-radio" data-criteria-id="${criterion.criteria_id}" required aria-label="Rating 2">
+                    <span class="rating-number">2</span>
+                    <span class="rating-label">Needs Improvement</span>
+                  </label>
+                </div>
+                <div class="mobile-rating-option">
+                  <label>
+                    <input type="radio" name="criteria_${criterion.criteria_id}" value="1" class="mobile-radio" data-criteria-id="${criterion.criteria_id}" required aria-label="Rating 1">
+                    <span class="rating-number">1</span>
+                    <span class="rating-label">Poor</span>
+                  </label>
+                </div>
+              </div>
+            </div>
+          `);
+          mobileCardsHtml.append(mobileCard);
+          
+          globalCriteriaNumber++; // Increment for continuous numbering
+        });
+        
+        categorySection.append(tableHtml);
+        categorySection.append(mobileCardsHtml);
+        container.append(categorySection);
+      });
+      
+      // Sync radio button selections between desktop and mobile
+      $(document).on('change click', 'input[type="radio"]', function() {
+        const name = $(this).attr('name');
+        const value = $(this).val();
+        
+        // Clear all radio buttons with the same name first
+        $(`input[name="${name}"]`).each(function() {
+          $(this).css('background-color', 'white');
+          $(this).css('border-color', '#000');
+          $(this).attr('data-checked', 'false');
+        });
+        
+        // Set the checked radio button to blue with forced styling
+        $(this).attr('style', 'background-color: #190cd1 !important; border-color: #190cd1 !important;');
+        $(this).attr('data-checked', 'true');
+        
+        // Sync the other version (desktop <-> mobile)
+        $(`input[name="${name}"][value="${value}"]`).each(function() {
+          $(this).prop('checked', true);
+          $(this).attr('style', 'background-color: #190cd1 !important; border-color: #190cd1 !important;');
+          $(this).attr('data-checked', 'true');
+        });
+        
+        updateProgress();
+        
+        // Auto-save draft when radio button changes
+        autoSaveDraft();
+      });
+      
+      console.log('Dynamic questions rendered successfully');
+    }
+
+    /**
+     * Show error state for questions loading
+     */
+    function showQuestionsError(message) {
+      $('#questions-loading').hide();
+      $('#questions-error').removeClass('hidden').show();
+      console.error('Questions loading error:', message);
+    }
+
+    /**
+     * Update progress bar and steps (removed, but keeping function for compatibility)
+     */
+    function updateProgress() {
+      // Progress bar removed - function kept for compatibility
+      // No longer updates any UI elements
+      console.log('Progress tracking disabled');
+    }
+
+    /**
+     * Auto-save draft - debounced to prevent excessive server calls
+     */
+    let autoSaveTimeout = null;
+    function autoSaveDraft() {
+      // Clear existing timeout
+      if (autoSaveTimeout) {
+        clearTimeout(autoSaveTimeout);
+      }
+      
+      // Set new timeout - save after 1 second of inactivity
+      autoSaveTimeout = setTimeout(function() {
+        const evaluationId = getEvaluationId();
+        
+        if (!evaluationId) {
+          console.log('No evaluation ID - skipping auto-save');
+          return;
+        }
+        
+        // Collect form data
+        const formData = $('#evaluation-form').serializeArray();
+        const dataObject = {};
+        formData.forEach(function(item) {
+          dataObject[item.name] = item.value;
+        });
+        
+        // Check if there's any data to save
+        const hasData = $('input[type="radio"]:checked').length > 0 || 
+                       $('textarea').filter(function() { return $(this).val().trim().length > 0; }).length > 0;
+        
+        if (!hasData) {
+          console.log('No data to save yet');
+          return;
+        }
+        
+        console.log('Auto-saving draft...');
+        
+        // Save silently in background
+        $.ajax({
+          url: '{{ url_for("student.save_draft") }}',
+          method: 'POST',
+          contentType: 'application/json',
+          data: JSON.stringify({
+            evaluation_id: evaluationId,
+            form_data: dataObject
+          }),
+          success: function(response) {
+            if (response.success) {
+              console.log('✓ Draft auto-saved successfully');
+              // Optional: Show subtle visual feedback
+              showAutoSaveIndicator();
+            }
+          },
+          error: function(xhr, status, error) {
+            console.error('Auto-save failed:', error);
+          }
+        });
+      }, 1000); // 1 second debounce
+    }
+
+    /**
+     * Show subtle auto-save indicator
+     */
+    function showAutoSaveIndicator() {
+      // Create or get indicator
+      let indicator = $('#auto-save-indicator');
+      if (indicator.length === 0) {
+        indicator = $('<div>', {
+          id: 'auto-save-indicator',
+          class: 'fixed top-20 right-4 bg-green-500 text-white px-3 py-1.5 rounded-lg shadow-lg text-xs font-medium flex items-center space-x-2 z-50',
+          html: '<i class="fas fa-check-circle"></i><span>Saved</span>'
+        }).css({
+          opacity: 0,
+          transition: 'opacity 0.3s ease'
+        });
+        $('body').append(indicator);
+      }
+      
+      // Show indicator
+      indicator.css('opacity', 1);
+      
+      // Hide after 2 seconds
+      setTimeout(function() {
+        indicator.css('opacity', 0);
+      }, 2000);
+    }
+    
+    $(document).ready(function() {
+      console.log('Document ready - starting evaluation form initialization');
+      
+      // Show/hide bottom action bar when scrolled to bottom
+      function checkScrollPosition() {
+        const windowHeight = $(window).height();
+        const documentHeight = $(document).height();
+        const scrollTop = $(window).scrollTop();
+        const bottomActionBar = $('#bottom-action-bar');
+        
+        // Show action bar when user scrolls near the bottom (within 200px)
+        if (scrollTop + windowHeight >= documentHeight - 200) {
+          bottomActionBar.fadeIn(300);
+        } else {
+          bottomActionBar.fadeOut(300);
+        }
+      }
+      
+      // Check scroll position on scroll
+      $(window).on('scroll', checkScrollPosition);
+      
+      // Initial check
+      checkScrollPosition();
+      
+      // Disable submit button initially
+      $('#submit-evaluation-btn').prop('disabled', true).html('<i class="fas fa-spinner fa-spin mr-2"></i>Loading Questions...');
+      
+      // Get evaluation ID
+      const evaluationId = getEvaluationId();
+      console.log('Evaluation ID:', evaluationId);
+      
+      // Load evaluation questions first
+      loadEvaluationQuestions();
+      
+      // Load existing draft if available (will be called after questions load)
+      window.loadDraftData = function() {
+        const evaluationId = getEvaluationId();
+        if (!evaluationId) {
+          console.log('No evaluation ID for draft loading');
+          return;
+        }
+        
+        console.log('🔄 Loading draft data for evaluation:', evaluationId);
+        
+        $.ajax({
+          url: '{{ url_for("student.load_draft", evaluation_id=0) }}'.replace('/0', '/' + evaluationId),
+          method: 'GET',
+          success: function(response) {
+            if (response.success && response.draft_data) {
+              console.log('✅ Draft data loaded successfully:', response.draft_data);
+              
+              // Wait for DOM to be fully rendered (desktop needs more time for CSS)
+              setTimeout(function() {
+                let restoredCount = 0;
+                let textareaCount = 0;
+                
+                // Restore radio button selections with FORCED visual styling (desktop & mobile)
+                Object.keys(response.draft_data).forEach(function(fieldName) {
+                  const fieldValue = response.draft_data[fieldName];
+                  
+                  // Handle radio buttons (criteria_X or question_X)
+                  if (fieldName.startsWith('criteria_') || fieldName.startsWith('question_')) {
+                    const radioButtons = $(`input[type="radio"][name="${fieldName}"][value="${fieldValue}"]`);
+                    
+                    if (radioButtons.length > 0) {
+                      console.log(`✅ Restoring radio button: ${fieldName} = ${fieldValue}`);
+                      
+                      // First, uncheck ALL radio buttons with this name and reset styles
+                      $(`input[type="radio"][name="${fieldName}"]`).each(function() {
+                        $(this).prop('checked', false);
+                        $(this).css('background-color', 'white');
+                        $(this).css('border-color', '#000');
+                        $(this).attr('data-checked', 'false');
+                        $(this).removeAttr('style'); // Remove inline styles
+                      });
+                      
+                      // Then check and style the selected radio button(s)
+                      radioButtons.each(function() {
+                        // Set checked state
+                        $(this).prop('checked', true);
+                        
+                        // FORCE visual styling with inline styles using !important
+                        // This ensures the blue background and checkmark appear on desktop
+                        $(this).attr('style', 'background-color: #190cd1 !important; border-color: #190cd1 !important;');
+                        $(this).attr('data-checked', 'true');
+                        
+                        console.log(`  ✓ Styled radio: background=${$(this).css('background-color')}, border=${$(this).css('border-color')}, data-checked=${$(this).attr('data-checked')}`);
+                      });
+                      
+                      restoredCount++;
+                    }
+                  }
+                  // Handle textarea fields
+                  else if (fieldName.includes('comment') || fieldName.includes('strength') || fieldName.includes('improvement')) {
+                    const textarea = $(`textarea[name="${fieldName}"]`);
+                    if (textarea.length > 0) {
+                      console.log(`✅ Restoring textarea: ${fieldName}`);
+                      textarea.val(fieldValue);
+                      textareaCount++;
+                    }
+                  }
+                });
+                
+                // Update progress
+                updateProgress();
+                
+                // Show toast notification with counts
+                if (restoredCount > 0 || textareaCount > 0) {
+                  const Toast = Swal.mixin({
+                    toast: true,
+                    position: 'top-end',
+                    showConfirmButton: false,
+                    timer: 3000,
+                    timerProgressBar: true,
+                    didOpen: (toast) => {
+                      toast.addEventListener('mouseenter', Swal.stopTimer);
+                      toast.addEventListener('mouseleave', Swal.resumeTimer);
+                    }
+                  });
+                  
+                  Toast.fire({
+                    icon: 'success',
+                    title: 'Draft Restored',
+                    text: `Restored ${restoredCount} answer(s) and ${textareaCount} comment(s)`
+                  });
+                  
+                  console.log(`✅ Draft restore complete: ${restoredCount} radio buttons, ${textareaCount} textareas`);
+                }
+              }, 800); // Wait 800ms for questions to render and CSS to apply
+            } else {
+              console.log('No draft data available');
+            }
+          },
+          error: function(xhr, status, error) {
+            // Silently fail - no draft exists
+            console.log('No draft found or error loading draft:', error);
+          }
+        });
+      };
+      
+      // Form validation and progress tracking
+      let totalQuestions = $('input[type="radio"][required]').length / 5; // 5 options per question
+      let answeredQuestions = 0;
+
+      // Update progress when radio buttons are selected
+      $('input[type="radio"]').on('change', function() {
+        updateProgress();
+      });
+      
+      // Auto-save when textarea fields change
+      $('textarea').on('input', function() {
+        console.log('Textarea changed, triggering auto-save');
+        autoSaveDraft();
+      });
+
+      // Save draft functionality
+      $('#save-draft-btn').on('click', function() {
+        console.log('Save draft button clicked');
+        const formData = $('#evaluation-form').serializeArray();
+        const evaluationId = getEvaluationId(); // Use the global function
+        
+        console.log('Evaluation ID:', evaluationId);
+        console.log('Form data:', formData);
+        
+        if (!evaluationId) {
+          console.error('No evaluation ID found');
+          Swal.fire({
+            title: 'Error',
+            text: 'Unable to save draft. Evaluation ID not found. Please try refreshing the page.',
+            icon: 'error',
+            confirmButtonText: 'OK'
+          });
+          return;
+        }
+        
+        // Convert form data to object
+        const dataObject = {};
+        formData.forEach(function(item) {
+          dataObject[item.name] = item.value;
+        });
+        
+        // Show saving indicator
+        const originalText = $(this).html();
+        $(this).prop('disabled', true).html('<i class="fas fa-spinner fa-spin mr-2"></i>Saving...');
+        
+        console.log('Sending draft save request to {{ url_for("student.save_draft") }}');
+        
+        $.ajax({
+          url: '{{ url_for("student.save_draft") }}',
+          method: 'POST',
+          contentType: 'application/json',
+          data: JSON.stringify({
+            evaluation_id: evaluationId,
+            form_data: dataObject
+          }),
+          success: function(response) {
+            console.log('Draft save response:', response);
+            if (response.success) {
+              Swal.fire({
+                title: 'Draft Saved!',
+                text: 'Your evaluation progress has been saved. You can continue later.',
+                icon: 'success',
+                timer: 2000,
+                showConfirmButton: false
+              });
+            } else {
+              throw new Error(response.message || 'Failed to save draft');
+            }
+          },
+          error: function(xhr, status, error) {
+            console.error('Save draft error:', error);
+            Swal.fire({
+              title: 'Save Failed',
+              text: 'Unable to save your draft. Please try again.',
+              icon: 'error'
+            });
+          },
+          complete: function() {
+            // Restore button
+            $('#save-draft-btn').prop('disabled', false).html(originalText);
+          }
+        });
+      });
+
+      // Form submission - handle both submit button click and form submit
+      $('#evaluation-form').on('submit', function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        handleFormSubmission($(this));
+        return false;
+      });
+
+      // Also handle submit button click directly
+      $('#submit-evaluation-btn').on('click', function(e) {
+        e.preventDefault();
+        handleFormSubmission($('#evaluation-form'));
+        return false;
+      });
+
+      function handleFormSubmission(form) {
+        console.log('=== FORM SUBMISSION DEBUG ===');
+        
+        // Check if questions are loaded
+        const questionsContainer = $('#dynamic-questions-container');
+        if (questionsContainer.children().length === 0) {
+          console.error('No questions loaded yet!');
+          Swal.fire({
+            title: 'Questions Not Loaded',
+            text: 'Please wait for the evaluation questions to load completely.',
+            icon: 'warning',
+            confirmButtonText: 'OK',
+            confirmButtonColor: '#0059cc'
+          });
+          return;
+        }
+        
+        // Debug: Check all radio buttons
+        const allRadios = $('input[type="radio"]');
+        const checkedRadios = $('input[type="radio"]:checked');
+        console.log(`Total radio buttons: ${allRadios.length}`);
+        console.log(`Checked radio buttons: ${checkedRadios.length}`);
+        
+        // Debug: Check required radio buttons
+        const requiredRadios = $('input[type="radio"][required]');
+        console.log(`Required radio buttons: ${requiredRadios.length}`);
+        
+        // If no radio buttons exist, questions haven't loaded
+        if (allRadios.length === 0) {
+          console.error('No radio buttons found! Questions may not be loaded.');
+          Swal.fire({
+            title: 'Questions Not Available',
+            text: 'No evaluation questions found. Please refresh the page and try again.',
+            icon: 'error',
+            confirmButtonText: 'Refresh Page',
+            confirmButtonColor: '#0059cc'
+          }).then(() => {
+            location.reload();
+          });
+          return;
+        }
+        
+        // Check if all required fields are filled
+        let allAnswered = true;
+        let missingQuestions = [];
+        
+        // Get unique question names (groups) instead of checking each radio button
+        let uniqueQuestionNames = [...new Set($('input[type="radio"][required]').map(function() {
+          return $(this).attr('name');
+        }).get())];
+        
+        console.log('Total unique questions found:', uniqueQuestionNames.length);
+        console.log('Question names:', uniqueQuestionNames);
+        
+        // Check each question group
+        uniqueQuestionNames.forEach(function(questionName) {
+          const checkedCount = $(`input[name="${questionName}"]:checked`).length;
+          console.log(`Question ${questionName}: ${checkedCount} checked`);
+          
+          if (checkedCount === 0) {
+            allAnswered = false;
+            let questionText = $(`input[name="${questionName}"]`).first().closest('.border-l-4').find('label').text().trim();
+            if (questionText) {
+              missingQuestions.push(questionText);
+              console.log(`Missing question: ${questionText}`);
+            } else {
+              // Fallback: use question name if label not found
+              missingQuestions.push(`Question ${questionName.replace('criteria_', '')}`);
+              console.log(`Missing question (fallback): Question ${questionName.replace('criteria_', '')}`);
+            }
+          }
+        });
+        
+        console.log('All answered:', allAnswered);
+        console.log('Missing questions count:', missingQuestions.length);
+        console.log('Missing questions:', missingQuestions);
+        
+        if (!allAnswered) {
+          Swal.fire({
+            title: 'Incomplete Evaluation',
+            text: `Please answer all required questions before submitting. ${missingQuestions.length} questions remaining.`,
+            icon: 'warning',
+            confirmButtonText: 'OK',
+            confirmButtonColor: '#0059cc'
+          });
+          return;
+        }
+        
+        // Confirm submission
+        Swal.fire({
+          title: 'Submit Evaluation?',
+          text: 'Once submitted, you will not be able to modify your responses. Are you sure you want to continue?',
+          icon: 'question',
+          showCancelButton: true,
+          confirmButtonColor: '#0059cc',
+          cancelButtonColor: '#6b7280',
+          confirmButtonText: 'Yes, Submit',
+          cancelButtonText: 'Review Again'
+        }).then((result) => {
+          if (result.isConfirmed) {
+            console.log('User confirmed submission');
+            
+            // Show loading
+            Swal.fire({
+              title: 'Submitting Evaluation...',
+              allowOutsideClick: false,
+              didOpen: () => {
+                Swal.showLoading();
+              }
+            });
+            
+            // Log form data before sending
+            const formData = form.serialize();
+            console.log('Form data to be sent:', formData);
+            
+            // Set a fallback timeout to redirect even if AJAX fails
+            let redirectTimeout = setTimeout(function() {
+              console.log('Fallback redirect triggered');
+              Swal.close();
+              Swal.fire({
+                title: 'Redirecting...',
+                text: 'Taking you back to pending evaluations.',
+                icon: 'info',
+                timer: 2000,
+                showConfirmButton: false
+              }).then(() => {
+                window.location.href = '{{ url_for("student.pending_evaluations") }}';
+              });
+            }, 10000); // 10 second fallback
+            
+            // Submit the form via AJAX
+            $.ajax({
+              url: form.attr('action') || '{{ url_for("student.submit_evaluation") }}',
+              method: 'POST',
+              data: form.serialize(),
+              success: function(response, textStatus, xhr) {
+                // Clear the fallback timeout since we got a response
+                clearTimeout(redirectTimeout);
+                
+                console.log('Server response:', response);
+                console.log('Response type:', typeof response);
+                console.log('Status:', textStatus);
+                console.log('XHR status:', xhr.status);
+                
+                // Close any existing Swal dialogs first
+                Swal.close();
+                
+                // Check if we have a successful response
+                if (xhr.status === 200) {
+                  let isSuccess = false;
+                  let responseMessage = 'Evaluation submitted successfully!';
+                  
+                  // Handle different response types
+                  if (typeof response === 'object' && response !== null) {
+                    // JSON response
+                    isSuccess = response.success === true;
+                    if (response.message) {
+                      responseMessage = response.message;
+                    }
+                  } else if (typeof response === 'string') {
+                    // String response - try to parse as JSON first
+                    try {
+                      const parsed = JSON.parse(response);
+                      isSuccess = parsed.success === true;
+                      if (parsed.message) {
+                        responseMessage = parsed.message;
+                      }
+                    } catch (e) {
+                      // Plain text response - consider it successful if no error indicators
+                      isSuccess = !response.toLowerCase().includes('error') && !response.toLowerCase().includes('failed');
+                      if (response.trim()) {
+                        responseMessage = response;
+                      }
+                    }
+                  }
+                  
+                  if (isSuccess || xhr.status === 200) {
+                    // Show success message and redirect (draft is already deleted by the server)
+                    Swal.fire({
+                      title: 'Evaluation Complete!',
+                      text: 'Thank you for your feedback. Your evaluation has been submitted successfully.',
+                      icon: 'success',
+                      confirmButtonColor: '#0059cc',
+                      confirmButtonText: 'Continue to Pending Evaluations',
+                      allowOutsideClick: false,
+                      allowEscapeKey: false
+                    }).then((result) => {
+                      // Always redirect, regardless of button click
+                      console.log('Redirecting to pending evaluations...');
+                      window.location.href = '{{ url_for("student.pending_evaluations") }}';
+                    });
+                    
+                    // Also set a backup redirect in case the dialog doesn't work
+                    setTimeout(() => {
+                      window.location.href = '{{ url_for("student.pending_evaluations") }}';
+                    }, 3000);
+                  } else {
+                    throw new Error('Submission failed: ' + responseMessage);
+                  }
+                } else {
+                  throw new Error('Server returned status: ' + xhr.status);
+                }
+              },
+              error: function(xhr, status, error) {
+                // Clear the fallback timeout
+                clearTimeout(redirectTimeout);
+                
+                console.log('AJAX Error:');
+                console.log('- Status:', status);
+                console.log('- Error:', error);
+                console.log('- Response Text:', xhr.responseText);
+                console.log('- Status Code:', xhr.status);
+                
+                Swal.close();
+                
+                let errorMessage = 'There was an error submitting your evaluation.';
+                
+                if (xhr.responseText) {
+                  try {
+                    const errorResponse = JSON.parse(xhr.responseText);
+                    if (errorResponse.error) {
+                      errorMessage = errorResponse.error;
+                    }
+                  } catch (e) {
+                    // Not JSON, use the response text directly
+                    errorMessage = xhr.responseText;
+                  }
+                }
+                
+                Swal.fire({
+                  title: 'Submission Failed',
+                  text: errorMessage + ' Please try again.',
+                  icon: 'error',
+                  confirmButtonColor: '#0059cc',
+                  confirmButtonText: 'Try Again'
+                });
+              }
+            });
+          }
+        });
+      }
+
+      // Add smooth scrolling to category cards
+      $('.category-card').each(function(index) {
+        $(this).css('animation-delay', (index * 0.1) + 's');
+      });
+
+      // Initialize Evaluation Timer
+      // evaluation_id is passed from Flask template
+      const timerEvaluationId = parseInt('{{ evaluation_id }}') || 0;
+      console.log('Starting evaluation timer for evaluation ID:', timerEvaluationId);
+      startEvaluation(timerEvaluationId);
+    });
+  </script>
+
+  <!-- Evaluation Timer Script -->
+  <script src="{{ url_for('static', filename='js/evaluation-timer.js') }}"></script>
+</body>
+</html>

@@ -1,0 +1,1395 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+  <title>Academic Years | IntellEvalPro</title>
+  
+  <!-- Favicon -->
+  <link rel="icon" type="image/png" href="{{ url_for('static', filename='images/nclogo.png') }}">
+  <link rel="shortcut icon" type="image/png" href="{{ url_for('static', filename='images/nclogo.png') }}">
+  <link rel="apple-touch-icon" href="{{ url_for('static', filename='images/nclogo.png') }}">
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  
+  <!-- Font Awesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"/>
+  
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  
+  <!-- jQuery -->
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  
+  <!-- SweetAlert2 -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11.7.12/dist/sweetalert2.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.7.12/dist/sweetalert2.all.min.js"></script>
+  
+  <script>
+    tailwind.config = {
+      theme: {
+        fontFamily: {
+          'sans': ['Inter', 'system-ui', 'sans-serif'],
+        },
+        extend: {
+          colors: {
+            primary: {
+              50: '#e6f0ff',
+              100: '#b3d1ff',
+              200: '#80b3ff',
+              300: '#4d94ff', 
+              400: '#1a75ff',
+              500: '#0059cc',
+              600: '#004db3',
+              700: '#004099',
+              800: '#003380',
+              900: '#002766',
+            },
+            secondary: {
+              50: '#f5f7fa',
+              100: '#e4e7eb',
+              200: '#cbd2d9',
+              300: '#9aa5b1',
+              400: '#7b8794',
+              500: '#616e7c',
+              600: '#52606d',
+              700: '#3e4c59',
+              800: '#323f4b',
+              900: '#1f2933',
+            },
+          },
+        }
+      }
+    }
+  </script>
+  
+  <style>
+    /* Custom scrollbar */
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    
+    ::-webkit-scrollbar-track {
+      background: #f1f1f1;
+      border-radius: 10px;
+    }
+    
+    ::-webkit-scrollbar-thumb {
+      background: #c1c1c1;
+      border-radius: 10px;
+    }
+    
+    ::-webkit-scrollbar-thumb:hover {
+      background: #a8a8a8;
+    }
+        /* Active nav link */
+    .nav-link.active {
+      position: relative;
+    }
+    
+    .nav-link.active::after {
+      content: '';
+      position: absolute;
+      left: 0;
+      width: 4px;
+      height: 100%;
+      background-color: #0059cc;
+      border-radius: 0 2px 2px 0;
+    }
+  </style>
+</head>
+<body class="bg-gray-50 font-sans overflow-x-hidden">
+  
+  <!-- Loading overlay -->
+  <div id="loader-overlay" class="fixed inset-0 z-50 flex flex-col items-center justify-center bg-white bg-opacity-90 backdrop-blur-sm transition-opacity duration-300">
+    <img src="{{ url_for('static', filename='images/nclogo.png') }}" alt="Logo" class="w-32 h-auto mb-6 animate-bounce">
+    <div class="flex items-center space-x-2">
+      <div class="w-3 h-3 rounded-full bg-primary-500 animate-pulse"></div>
+      <div class="w-3 h-3 rounded-full bg-primary-500 animate-pulse" style="animation-delay: 0.2s"></div>
+      <div class="w-3 h-3 rounded-full bg-primary-500 animate-pulse" style="animation-delay: 0.4s"></div>
+    </div>
+  </div>
+
+  <div class="flex h-screen bg-gray-50">
+    <!-- Admin Sidebar -->
+    <div id="admin-sidebar"></div>
+    
+    <!-- Main content -->
+    <div class="lg:ml-64 flex flex-col flex-1 min-h-screen">
+      <!-- Admin Header -->
+      <div id="admin-header"></div>
+
+      <!-- Main content area -->
+      <main id="main-content" class="flex-1 overflow-auto p-3 sm:p-4 lg:p-6 bg-gray-50">
+        <!-- Page header -->
+        <div class="mb-4 sm:mb-6">
+          <div class="flex flex-col space-y-4 lg:flex-row lg:items-center lg:justify-between lg:space-y-0">
+            <div>
+              <h1 class="text-xl sm:text-2xl lg:text-3xl font-bold text-gray-800">Academic Years Management</h1>
+              <p class="text-sm sm:text-base text-gray-500 mt-1">Manage academic years, semesters, and evaluation periods</p>
+            </div>
+            <div class="flex-shrink-0">
+              <button type="button" id="add-academic-year-btn" class="w-full sm:w-auto inline-flex items-center justify-center px-4 py-3 sm:py-2 bg-primary-500 text-white font-medium rounded-lg hover:bg-primary-600 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 transition-colors duration-200 min-h-[44px]">
+                <i class="fas fa-plus mr-2"></i>
+                Add Academic Year
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Statistics Cards -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-3 sm:gap-4 lg:gap-6 mb-4 sm:mb-6">
+          <div class="bg-white rounded-lg shadow-sm p-4 sm:p-6 hover:shadow-md transition-all">
+            <div class="flex items-center">
+              <div class="p-2 sm:p-3 rounded-full bg-blue-100">
+                <i class="fas fa-calendar-alt text-blue-600 text-lg sm:text-xl"></i>
+              </div>
+              <div class="ml-3 sm:ml-4">
+                <h3 class="text-xl sm:text-2xl font-bold text-gray-800" id="total-academic-years">8</h3>
+                <p class="text-gray-600 text-xs sm:text-sm">Academic Years</p>
+              </div>
+            </div>
+          </div>
+          <div class="bg-white rounded-lg shadow-sm p-4 sm:p-6 hover:shadow-md transition-all">
+            <div class="flex items-center">
+              <div class="p-2 sm:p-3 rounded-full bg-green-100">
+                <i class="fas fa-calendar-check text-green-600 text-lg sm:text-xl"></i>
+              </div>
+              <div class="ml-3 sm:ml-4">
+                <h3 class="text-xl sm:text-2xl font-bold text-gray-800" id="active-semesters">3</h3>
+                <p class="text-gray-600 text-xs sm:text-sm">Active Semesters</p>
+              </div>
+            </div>
+          </div>
+          <div class="bg-white rounded-lg shadow-sm p-4 sm:p-6 hover:shadow-md transition-all">
+            <div class="flex items-center">
+              <div class="p-2 sm:p-3 rounded-full bg-purple-100">
+                <i class="fas fa-clock text-purple-600 text-lg sm:text-xl"></i>
+              </div>
+              <div class="ml-3 sm:ml-4">
+                <h3 class="text-xl sm:text-2xl font-bold text-gray-800" id="evaluation-periods">15</h3>
+                <p class="text-gray-600 text-xs sm:text-sm">Evaluation Periods</p>
+              </div>
+            </div>
+          </div>
+          <div class="bg-white rounded-lg shadow-sm p-4 sm:p-6 hover:shadow-md transition-all">
+            <div class="flex items-center">
+              <div class="p-2 sm:p-3 rounded-full bg-orange-100">
+                <i class="fas fa-star text-orange-600 text-lg sm:text-xl"></i>
+              </div>
+              <div class="ml-3 sm:ml-4">
+                <h3 class="text-xl sm:text-2xl font-bold text-gray-800" id="current-year">2024-2025</h3>
+                <p class="text-gray-600 text-xs sm:text-sm">Current Year</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Current Academic Year Overview -->
+        <div class="bg-white rounded-lg shadow-sm p-4 sm:p-6 mb-4 sm:mb-6" id="current-year-overview">
+          <div class="flex flex-col space-y-3 sm:flex-row sm:items-center sm:justify-between sm:space-y-0 mb-4">
+            <h3 class="text-base sm:text-lg font-semibold text-gray-800">Current Academic Year Overview</h3>
+            <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-green-100 text-green-800 self-start" id="overview-status-badge">
+              <div class="w-2 h-2 bg-green-400 rounded-full mr-2"></div>
+              Active
+            </span>
+          </div>
+          
+          <div class="grid grid-cols-1 xl:grid-cols-3 gap-4 sm:gap-6">
+            <div class="xl:col-span-2">
+              <div class="flex flex-col space-y-2 sm:flex-row sm:items-center sm:space-y-0 mb-4">
+                <h4 class="text-lg sm:text-xl font-bold text-gray-800" id="overview-year-title">Academic Year 2024-2025</h4>
+                <button class="ml-0 sm:ml-3 text-primary-600 hover:text-primary-800 self-start sm:self-auto p-2" id="edit-current-year-btn">
+                  <i class="fas fa-edit"></i>
+                </button>
+              </div>
+              
+              <div id="evaluation-periods-container" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
+                <!-- Dynamically loaded evaluation periods -->
+                <div class="text-center text-gray-500 py-8">Loading...</div>
+              </div>
+            </div>
+            
+            <div>
+              <h4 class="font-semibold text-gray-800 mb-3">Year Statistics</h4>
+              <div class="space-y-3" id="year-statistics">
+                <div class="flex justify-between">
+                  <span class="text-sm text-gray-600">Total Students</span>
+                  <span class="font-medium text-gray-800">-</span>
+                </div>
+                <div class="flex justify-between">
+                  <span class="text-sm text-gray-600">Active Faculty</span>
+                  <span class="font-medium text-gray-800">-</span>
+                </div>
+                <div class="flex justify-between">
+                  <span class="text-sm text-gray-600">Total Courses</span>
+                  <span class="font-medium text-gray-800">-</span>
+                </div>
+                <div class="flex justify-between">
+                  <span class="text-sm text-gray-600">Evaluation Rate</span>
+                  <span class="font-medium text-green-600">-</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Academic Years List -->
+        <div class="bg-white rounded-lg shadow-sm overflow-hidden mb-6">
+          <div class="px-3 sm:px-4 lg:px-6 py-4 border-b border-gray-200">
+            <div class="flex flex-col space-y-4 lg:flex-row lg:items-center lg:justify-between lg:space-y-0">
+              <h3 class="text-lg sm:text-xl lg:text-2xl font-semibold text-gray-800">All Academic Years</h3>
+              <div class="flex flex-col space-y-3 sm:flex-row sm:space-y-0 sm:space-x-3">
+                <div class="relative">
+                  <input type="text" id="search-years" placeholder="Search academic years..." class="w-full sm:w-64 lg:w-72 pl-10 pr-4 py-3 sm:py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 text-sm sm:text-base min-h-[44px]">
+                  <i class="fas fa-search absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
+                </div>
+                <select id="status-filter" class="w-full sm:w-auto px-3 py-3 sm:py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 text-sm sm:text-base min-h-[44px]">
+                  <option value="">All Status</option>
+                  <option value="active">Active</option>
+                  <option value="completed">Completed</option>
+                  <option value="upcoming">Upcoming</option>
+                </select>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Mobile Card Layout (visible on small screens) -->
+          <div class="block md:hidden" id="mobile-years-container">
+            <!-- Mobile cards will be populated here -->
+          </div>
+          
+          <!-- Desktop Table Layout (hidden on small screens) -->
+          <div class="hidden md:block overflow-x-auto">
+            <table class="min-w-full divide-y divide-gray-200">
+              <thead class="bg-gray-50">
+                <tr>
+                  <th class="px-3 lg:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Academic Year</th>
+                  <th class="px-3 lg:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider hidden lg:table-cell">Duration</th>
+                  <th class="px-3 lg:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Evaluations</th>
+                  <th class="px-3 lg:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider hidden xl:table-cell">Completion Rate</th>
+                  <th class="px-3 lg:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                  <th class="px-3 lg:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                </tr>
+              </thead>
+              <tbody id="desktop-years-tbody" class="bg-white divide-y divide-gray-200">
+                <!-- Academic years will be dynamically loaded here -->
+                <tr>
+                  <td colspan="6" class="px-6 py-8 text-center text-gray-500">
+                    <i class="fas fa-spinner fa-spin text-2xl mb-2"></i>
+                    <p>Loading academic years...</p>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          
+          <!-- Pagination -->
+          <div class="bg-white px-4 py-3 border-t border-gray-200 sm:px-6">
+            <div class="flex flex-col space-y-3 sm:flex-row sm:items-center sm:justify-between sm:space-y-0">
+              <div class="flex items-center">
+                <p id="pagination-info" class="text-xs sm:text-sm text-gray-700">
+                  Showing <span class="font-medium">0</span> to <span class="font-medium">0</span> of <span class="font-medium">0</span> academic years
+                </p>
+              </div>
+              <div id="pagination-controls" class="flex items-center justify-center space-x-1 sm:space-x-2">
+                <!-- Pagination buttons will be dynamically generated -->
+              </div>
+            </div>
+          </div>
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <!-- Add Academic Year Modal -->
+  <div id="add-academic-year-modal" class="hidden fixed inset-0 z-50 overflow-y-auto" aria-labelledby="modal-title" role="dialog" aria-modal="true">
+    <div class="flex items-center justify-center min-h-screen p-4">
+      <!-- Background overlay -->
+      <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" aria-hidden="true"></div>
+
+      <!-- Modal panel -->
+      <div class="relative bg-white rounded-lg shadow-xl transform transition-all w-full max-w-sm sm:max-w-md lg:max-w-lg xl:max-w-xl">
+        <div class="bg-white px-4 sm:px-6 pt-5 pb-4">
+          <div class="w-full">
+            <h3 class="text-lg sm:text-xl font-semibold text-gray-900 mb-4" id="modal-title">
+              Add New Academic Year
+            </h3>
+            <form id="add-academic-year-form" class="space-y-4">
+              <div>
+                <label for="academic-year-name" class="block text-sm font-medium text-gray-700 mb-1">Academic Year</label>
+                <input type="text" id="academic-year-name" placeholder="e.g., 2025-2026" class="w-full px-3 py-3 sm:py-2 border border-gray-300 rounded-md shadow-sm focus:ring-2 focus:ring-primary-500 focus:border-primary-500 text-sm sm:text-base min-h-[44px]">
+              </div>
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label for="start-date" class="block text-sm font-medium text-gray-700 mb-1">Start Date</label>
+                  <input type="date" id="start-date" class="w-full px-3 py-3 sm:py-2 border border-gray-300 rounded-md shadow-sm focus:ring-2 focus:ring-primary-500 focus:border-primary-500 text-sm sm:text-base min-h-[44px]">
+                </div>
+                <div>
+                  <label for="end-date" class="block text-sm font-medium text-gray-700 mb-1">End Date</label>
+                  <input type="date" id="end-date" class="w-full px-3 py-3 sm:py-2 border border-gray-300 rounded-md shadow-sm focus:ring-2 focus:ring-primary-500 focus:border-primary-500 text-sm sm:text-base min-h-[44px]">
+                </div>
+              </div>
+              <div>
+                <label for="academic-year-description" class="block text-sm font-medium text-gray-700 mb-1">Description</label>
+                <textarea id="academic-year-description" rows="3" placeholder="Optional description for this academic year..." class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-2 focus:ring-primary-500 focus:border-primary-500 text-sm sm:text-base resize-none"></textarea>
+              </div>
+              <div class="flex items-center">
+                <input type="checkbox" id="set-as-active" class="rounded border-gray-300 text-primary-600 focus:ring-primary-500 w-4 h-4">
+                <label for="set-as-active" class="ml-2 block text-sm text-gray-700">Set as active academic year</label>
+              </div>
+            </form>
+          </div>
+        </div>
+        <div class="bg-gray-50 px-4 sm:px-6 py-3 flex flex-col space-y-2 sm:flex-row-reverse sm:space-y-0 sm:space-x-3 sm:space-x-reverse">
+          <button type="button" id="save-academic-year-btn" class="w-full sm:w-auto inline-flex justify-center items-center px-4 py-3 sm:py-2 bg-primary-600 text-base sm:text-sm font-medium text-white rounded-md hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 transition-colors min-h-[44px]">
+            Add Academic Year
+          </button>
+          <button type="button" id="cancel-academic-year-btn" class="w-full sm:w-auto inline-flex justify-center items-center px-4 py-3 sm:py-2 bg-white text-base sm:text-sm font-medium text-gray-700 border border-gray-300 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 transition-colors min-h-[44px]">
+            Cancel
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Add Semester Modal -->
+  <div id="add-semester-modal" class="hidden fixed inset-0 z-50 overflow-y-auto" aria-labelledby="modal-title" role="dialog" aria-modal="true">
+    <div class="flex items-center justify-center min-h-screen p-4">
+      <!-- Background overlay -->
+      <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" aria-hidden="true"></div>
+
+      <!-- Modal panel -->
+      <div class="relative bg-white rounded-lg shadow-xl transform transition-all w-full max-w-sm sm:max-w-md lg:max-w-lg xl:max-w-xl">
+        <div class="bg-white px-4 sm:px-6 pt-5 pb-4">
+          <div class="w-full">
+            <h3 class="text-lg sm:text-xl font-semibold text-gray-900 mb-4">
+              Add New Semester
+            </h3>
+            <form id="add-semester-form" class="space-y-4">
+              <div>
+                <label for="semester-academic-year" class="block text-sm font-medium text-gray-700 mb-1">Academic Year</label>
+                <select id="semester-academic-year" class="w-full px-3 py-3 sm:py-2 border border-gray-300 rounded-md shadow-sm focus:ring-2 focus:ring-primary-500 focus:border-primary-500 text-sm sm:text-base min-h-[44px]">
+                  <option value="">Select Academic Year</option>
+                  <option value="2024-2025" selected>2024-2025 (Current)</option>
+                  <option value="2025-2026">2025-2026 (Upcoming)</option>
+                </select>
+              </div>
+              <div>
+                <label for="semester-type" class="block text-sm font-medium text-gray-700 mb-1">Semester Type</label>
+                <select id="semester-type" class="w-full px-3 py-3 sm:py-2 border border-gray-300 rounded-md shadow-sm focus:ring-2 focus:ring-primary-500 focus:border-primary-500 text-sm sm:text-base min-h-[44px]">
+                  <option value="">Select Semester</option>
+                  <option value="1">1st Semester</option>
+                  <option value="2">2nd Semester</option>
+                  <option value="summer">Summer</option>
+                </select>
+              </div>
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label for="semester-start-date" class="block text-sm font-medium text-gray-700 mb-1">Start Date</label>
+                  <input type="date" id="semester-start-date" class="w-full px-3 py-3 sm:py-2 border border-gray-300 rounded-md shadow-sm focus:ring-2 focus:ring-primary-500 focus:border-primary-500 text-sm sm:text-base min-h-[44px]">
+                </div>
+                <div>
+                  <label for="semester-end-date" class="block text-sm font-medium text-gray-700 mb-1">End Date</label>
+                  <input type="date" id="semester-end-date" class="w-full px-3 py-3 sm:py-2 border border-gray-300 rounded-md shadow-sm focus:ring-2 focus:ring-primary-500 focus:border-primary-500 text-sm sm:text-base min-h-[44px]">
+                </div>
+              </div>
+              <div>
+                <label for="evaluation-period-name" class="block text-sm font-medium text-gray-700 mb-1">Evaluation Period Name</label>
+                <input type="text" id="evaluation-period-name" placeholder="e.g., Mid-term Evaluation 2025" class="w-full px-3 py-3 sm:py-2 border border-gray-300 rounded-md shadow-sm focus:ring-2 focus:ring-primary-500 focus:border-primary-500 text-sm sm:text-base min-h-[44px]">
+              </div>
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label for="evaluation-start-date" class="block text-sm font-medium text-gray-700 mb-1">Evaluation Start</label>
+                  <input type="date" id="evaluation-start-date" class="w-full px-3 py-3 sm:py-2 border border-gray-300 rounded-md shadow-sm focus:ring-2 focus:ring-primary-500 focus:border-primary-500 text-sm sm:text-base min-h-[44px]">
+                </div>
+                <div>
+                  <label for="evaluation-end-date" class="block text-sm font-medium text-gray-700 mb-1">Evaluation End</label>
+                  <input type="date" id="evaluation-end-date" class="w-full px-3 py-3 sm:py-2 border border-gray-300 rounded-md shadow-sm focus:ring-2 focus:ring-primary-500 focus:border-primary-500 text-sm sm:text-base min-h-[44px]">
+                </div>
+              </div>
+            </form>
+          </div>
+        </div>
+        <div class="bg-gray-50 px-4 sm:px-6 py-3 flex flex-col space-y-2 sm:flex-row-reverse sm:space-y-0 sm:space-x-3 sm:space-x-reverse">
+          <button type="button" id="save-semester-btn" class="w-full sm:w-auto inline-flex justify-center items-center px-4 py-3 sm:py-2 bg-secondary-600 text-base sm:text-sm font-medium text-white rounded-md hover:bg-secondary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-secondary-500 transition-colors min-h-[44px]">
+            Add Semester
+          </button>
+          <button type="button" id="cancel-semester-btn" class="w-full sm:w-auto inline-flex justify-center items-center px-4 py-3 sm:py-2 bg-white text-base sm:text-sm font-medium text-gray-700 border border-gray-300 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 transition-colors min-h-[44px]">
+            Cancel
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      // Global variables
+      let academicYearsData = [];
+      let filteredYearsData = [];
+      let editingTermId = null;
+      let currentPage = 1;
+      const itemsPerPage = 10;
+      
+      // Load initial data
+      loadAcademicYears();
+      loadCurrentYearOverview();
+      
+      // Load academic years from database
+      function loadAcademicYears() {
+        fetch('/api/academic-years')
+          .then(response => response.json())
+          .then(data => {
+            if (data.success) {
+              academicYearsData = data.data;
+              filteredYearsData = data.data;
+              currentPage = 1;
+              updateStatistics(data.stats);
+              renderAcademicYearsTable();
+              renderPagination();
+            } else {
+              console.error('Error loading academic years:', data.error);
+            }
+          })
+          .catch(error => {
+            console.error('Error fetching academic years:', error);
+          });
+      }
+      
+      // Update statistics cards
+      function updateStatistics(stats) {
+        document.getElementById('total-academic-years').textContent = stats.total_years || 0;
+        document.getElementById('active-semesters').textContent = stats.active_terms || 0;
+        document.getElementById('evaluation-periods').textContent = stats.total_periods || 0;
+        document.getElementById('current-year').textContent = stats.current_year || 'N/A';
+      }
+      
+      // Render academic years table
+      function renderAcademicYearsTable() {
+        const tbody = document.querySelector('#desktop-years-tbody');
+        const mobileContainer = document.querySelector('#mobile-years-container');
+        
+        if (!filteredYearsData || filteredYearsData.length === 0) {
+          tbody.innerHTML = '<tr><td colspan="6" class="px-6 py-4 text-center text-gray-500">No academic years found</td></tr>';
+          mobileContainer.innerHTML = '<div class="p-6 text-center text-gray-500">No academic years found</div>';
+          return;
+        }
+        
+        // Calculate pagination
+        const startIndex = (currentPage - 1) * itemsPerPage;
+        const endIndex = startIndex + itemsPerPage;
+        const paginatedYears = filteredYearsData.slice(startIndex, endIndex);
+        
+        // Render desktop table
+        renderDesktopTable(tbody, paginatedYears);
+        
+        // Render mobile cards
+        renderMobileCards(mobileContainer, paginatedYears);
+      }
+      
+      // Render desktop table rows
+      function renderDesktopTable(tbody, years) {
+        tbody.innerHTML = years.map(year => {
+          const statusColors = {
+            'Active': 'bg-green-100 text-green-800',
+            'Completed': 'bg-blue-100 text-blue-800',
+            'Upcoming': 'bg-gray-100 text-gray-800'
+          };
+          
+          const iconColors = {
+            'Active': 'bg-green-100 text-green-600',
+            'Completed': 'bg-blue-100 text-blue-600',
+            'Upcoming': 'bg-gray-100 text-gray-600'
+          };
+          
+          const icon = year.status === 'Active' ? 'fa-star' : year.status === 'Completed' ? 'fa-check' : 'fa-clock';
+          
+          return `
+            <tr class="hover:bg-gray-50">
+              <td class="px-3 lg:px-6 py-4 whitespace-nowrap">
+                <div class="flex items-center">
+                  <div class="flex-shrink-0 w-8 h-8 lg:w-10 lg:h-10 ${iconColors[year.status] || 'bg-gray-100'} rounded-full flex items-center justify-center">
+                    <i class="fas ${icon} text-xs lg:text-sm"></i>
+                  </div>
+                  <div class="ml-3 lg:ml-4">
+                    <div class="text-sm font-medium text-gray-900">${year.year_code || year.year_name}</div>
+                    <div class="text-xs text-gray-500">${year.is_current ? 'Current Academic Year' : year.status}</div>
+                  </div>
+                </div>
+              </td>
+              <td class="px-3 lg:px-6 py-4 whitespace-nowrap hidden lg:table-cell">
+                <div class="text-sm text-gray-900">${formatDate(year.start_date)} - ${formatDate(year.end_date)}</div>
+                <div class="text-xs text-gray-500">${calculateDuration(year.start_date, year.end_date)} days</div>
+              </td>
+              <td class="px-3 lg:px-6 py-4 whitespace-nowrap">
+                <div class="text-sm text-gray-900">${year.total_evaluations || 0} Total</div>
+                <div class="text-xs text-gray-500">${(year.total_evaluations - year.completed_evaluations) || 0} Pending</div>
+              </td>
+              <td class="px-3 lg:px-6 py-4 whitespace-nowrap hidden xl:table-cell">
+                <div class="flex items-center">
+                  <div class="flex-1 bg-gray-200 rounded-full h-2 mr-2">
+                    <div class="bg-green-500 h-2 rounded-full" style="width: ${year.completion_rate || 0}%"></div>
+                  </div>
+                  <span class="text-xs text-gray-600">${year.completion_rate || 0}%</span>
+                </div>
+              </td>
+              <td class="px-3 lg:px-6 py-4 whitespace-nowrap">
+                <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${statusColors[year.status] || 'bg-gray-100 text-gray-800'}">
+                  ${year.status}
+                </span>
+              </td>
+              <td class="px-3 lg:px-6 py-4 whitespace-nowrap text-sm font-medium">
+                <div class="flex items-center space-x-2">
+                  <button onclick="viewYear(${year.acad_year_id})" class="text-primary-600 hover:text-primary-900 p-2" title="View Details">
+                    <i class="fas fa-eye text-sm"></i>
+                  </button>
+                  <button onclick="editYear(${year.acad_year_id})" class="text-blue-600 hover:text-blue-900 p-2" title="Edit">
+                    <i class="fas fa-edit text-sm"></i>
+                  </button>
+                  <button onclick="manageSemesters(${year.acad_year_id})" class="text-green-600 hover:text-green-900 p-2" title="Manage Semesters">
+                    <i class="fas fa-calendar-alt text-sm"></i>
+                  </button>
+                  ${year.status === 'Upcoming' ? `
+                  <button onclick="deleteYear(${year.acad_year_id})" class="text-red-600 hover:text-red-900 p-2" title="Delete">
+                    <i class="fas fa-trash text-sm"></i>
+                  </button>
+                  ` : ''}
+                </div>
+              </td>
+            </tr>
+          `;
+        }).join('');
+      }
+      
+      // Render mobile cards
+      function renderMobileCards(container, years) {
+        container.innerHTML = years.map(year => {
+          const statusColors = {
+            'Active': 'bg-green-100 text-green-800 border-green-200',
+            'Completed': 'bg-blue-100 text-blue-800 border-blue-200',
+            'Upcoming': 'bg-gray-100 text-gray-800 border-gray-200'
+          };
+          
+          const iconColors = {
+            'Active': 'bg-green-100 text-green-600',
+            'Completed': 'bg-blue-100 text-blue-600',
+            'Upcoming': 'bg-gray-100 text-gray-600'
+          };
+          
+          const icon = year.status === 'Active' ? 'fa-star' : year.status === 'Completed' ? 'fa-check' : 'fa-clock';
+          
+          return `
+            <div class="bg-white border border-gray-200 rounded-lg p-4 m-3 shadow-sm">
+              <div class="flex items-start justify-between mb-3">
+                <div class="flex items-center">
+                  <div class="flex-shrink-0 w-10 h-10 ${iconColors[year.status] || 'bg-gray-100'} rounded-full flex items-center justify-center mr-3">
+                    <i class="fas ${icon} text-sm"></i>
+                  </div>
+                  <div>
+                    <h4 class="text-base font-semibold text-gray-900">${year.year_code || year.year_name}</h4>
+                    <p class="text-sm text-gray-500">${formatDate(year.start_date)} - ${formatDate(year.end_date)}</p>
+                  </div>
+                </div>
+                <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium ${statusColors[year.status] || 'bg-gray-100 text-gray-800'}">
+                  ${year.status}
+                </span>
+              </div>
+              
+              <div class="grid grid-cols-2 gap-4 mb-4">
+                <div>
+                  <p class="text-xs text-gray-500 uppercase tracking-wide">Evaluations</p>
+                  <p class="text-sm font-medium text-gray-900">${year.total_evaluations || 0} Total</p>
+                  <p class="text-xs text-gray-500">${(year.total_evaluations - year.completed_evaluations) || 0} Pending</p>
+                </div>
+                <div>
+                  <p class="text-xs text-gray-500 uppercase tracking-wide">Completion</p>
+                  <div class="flex items-center mt-1">
+                    <div class="flex-1 bg-gray-200 rounded-full h-2 mr-2">
+                      <div class="bg-green-500 h-2 rounded-full" style="width: ${year.completion_rate || 0}%"></div>
+                    </div>
+                    <span class="text-sm font-medium text-gray-900">${year.completion_rate || 0}%</span>
+                  </div>
+                </div>
+              </div>
+              
+              <div class="flex items-center justify-between pt-3 border-t border-gray-100">
+                <div class="text-xs text-gray-500">
+                  ${calculateDuration(year.start_date, year.end_date)} days duration
+                </div>
+                <div class="flex items-center space-x-3">
+                  <button onclick="viewYear(${year.acad_year_id})" class="text-primary-600 hover:text-primary-900 p-2" title="View Details">
+                    <i class="fas fa-eye text-sm"></i>
+                  </button>
+                  <button onclick="editYear(${year.acad_year_id})" class="text-blue-600 hover:text-blue-900 p-2" title="Edit">
+                    <i class="fas fa-edit text-sm"></i>
+                  </button>
+                  <button onclick="manageSemesters(${year.acad_year_id})" class="text-green-600 hover:text-green-900 p-2" title="Manage Semesters">
+                    <i class="fas fa-calendar-alt text-sm"></i>
+                  </button>
+                  ${year.status === 'Upcoming' ? `
+                  <button onclick="deleteYear(${year.acad_year_id})" class="text-red-600 hover:text-red-900 p-2" title="Delete">
+                    <i class="fas fa-trash text-sm"></i>
+                  </button>
+                  ` : ''}
+                </div>
+              </div>
+            </div>
+          `;
+        }).join('');
+      }
+      
+      // Render pagination controls
+      function renderPagination() {
+        const totalPages = Math.ceil(filteredYearsData.length / itemsPerPage);
+        const paginationControls = document.getElementById('pagination-controls');
+        
+        if (!paginationControls) return;
+        
+        // Update pagination info
+        updatePaginationInfo();
+        
+        if (totalPages <= 1) {
+          paginationControls.innerHTML = '';
+          return;
+        }
+        
+        let html = '';
+        
+        // Previous button
+        html += `
+          <button onclick="goToPage(${currentPage - 1})" 
+                  class="px-3 py-2 text-xs sm:text-sm border border-gray-300 rounded-md hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed min-h-[44px] sm:min-h-[36px]" 
+                  ${currentPage === 1 ? 'disabled' : ''}>
+            Previous
+          </button>
+        `;
+        
+        // Page numbers
+        const maxVisiblePages = 5;
+        let startPage = Math.max(1, currentPage - Math.floor(maxVisiblePages / 2));
+        let endPage = Math.min(totalPages, startPage + maxVisiblePages - 1);
+        
+        if (endPage - startPage < maxVisiblePages - 1) {
+          startPage = Math.max(1, endPage - maxVisiblePages + 1);
+        }
+        
+        // First page if not visible
+        if (startPage > 1) {
+          html += `<button onclick="goToPage(1)" class="px-3 py-2 text-xs sm:text-sm border border-gray-300 rounded-md hover:bg-gray-50 min-h-[44px] sm:min-h-[36px]">1</button>`;
+          if (startPage > 2) {
+            html += `<span class="px-2 text-gray-500">...</span>`;
+          }
+        }
+        
+        // Page numbers
+        for (let i = startPage; i <= endPage; i++) {
+          if (i === currentPage) {
+            html += `<button class="px-3 py-2 text-xs sm:text-sm bg-primary-600 text-white rounded-md min-h-[44px] sm:min-h-[36px]">${i}</button>`;
+          } else {
+            html += `<button onclick="goToPage(${i})" class="px-3 py-2 text-xs sm:text-sm border border-gray-300 rounded-md hover:bg-gray-50 min-h-[44px] sm:min-h-[36px]">${i}</button>`;
+          }
+        }
+        
+        // Last page if not visible
+        if (endPage < totalPages) {
+          if (endPage < totalPages - 1) {
+            html += `<span class="px-2 text-gray-500">...</span>`;
+          }
+          html += `<button onclick="goToPage(${totalPages})" class="px-3 py-2 text-xs sm:text-sm border border-gray-300 rounded-md hover:bg-gray-50 min-h-[44px] sm:min-h-[36px]">${totalPages}</button>`;
+        }
+        
+        // Next button
+        html += `
+          <button onclick="goToPage(${currentPage + 1})" 
+                  class="px-3 py-2 text-xs sm:text-sm border border-gray-300 rounded-md hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed min-h-[44px] sm:min-h-[36px]" 
+                  ${currentPage === totalPages ? 'disabled' : ''}>
+            Next
+          </button>
+        `;
+        
+        paginationControls.innerHTML = html;
+      }
+      
+      // Update pagination info text
+      function updatePaginationInfo() {
+        const totalItems = filteredYearsData.length;
+        const startIndex = totalItems === 0 ? 0 : (currentPage - 1) * itemsPerPage + 1;
+        const endIndex = Math.min(currentPage * itemsPerPage, totalItems);
+        
+        const paginationInfo = document.getElementById('pagination-info');
+        if (paginationInfo) {
+          paginationInfo.innerHTML = `
+            Showing <span class="font-medium">${startIndex}</span> to <span class="font-medium">${endIndex}</span> of <span class="font-medium">${totalItems}</span> academic years
+          `;
+        }
+      }
+      
+      // Go to specific page
+      window.goToPage = function(page) {
+        const totalPages = Math.ceil(filteredYearsData.length / itemsPerPage);
+        if (page < 1 || page > totalPages) return;
+        
+        currentPage = page;
+        renderAcademicYearsTable();
+        renderPagination();
+        
+        // Scroll to table top
+        document.querySelector('.overflow-x-auto').scrollIntoView({ behavior: 'smooth', block: 'start' });
+      };
+      
+      // Helper functions
+      function formatDate(dateString) {
+        const date = new Date(dateString);
+        return date.toLocaleDateString('en-US', { month: 'short', year: 'numeric' });
+      }
+      
+      function calculateDuration(startDate, endDate) {
+        const start = new Date(startDate);
+        const end = new Date(endDate);
+        const diff = Math.abs(end - start);
+        return Math.ceil(diff / (1000 * 60 * 60 * 24));
+      }
+      
+      // Load current year overview
+      function loadCurrentYearOverview() {
+        fetch('/api/academic-years/current-overview')
+          .then(response => response.json())
+          .then(data => {
+            if (data.success) {
+              displayCurrentYearOverview(data);
+            } else {
+              // Hide overview if no current year
+              document.getElementById('current-year-overview').style.display = 'none';
+            }
+          })
+          .catch(error => {
+            console.error('Error loading current year overview:', error);
+            document.getElementById('current-year-overview').style.display = 'none';
+          });
+      }
+      
+      // Display current year overview
+      function displayCurrentYearOverview(data) {
+        const currentYear = data.current_year;
+        const evaluationPeriods = data.evaluation_periods;
+        const stats = data.statistics;
+        
+        // Update title
+        document.getElementById('overview-year-title').textContent = currentYear.year_name || currentYear.year_code;
+        
+        // Update edit button
+        document.getElementById('edit-current-year-btn').onclick = function() {
+          editYear(currentYear.acad_year_id);
+        };
+        
+        // Render evaluation periods
+        const container = document.getElementById('evaluation-periods-container');
+        if (!evaluationPeriods || evaluationPeriods.length === 0) {
+          container.innerHTML = '<div class="col-span-3 text-center text-gray-500 py-4">No evaluation periods found</div>';
+        } else {
+          container.innerHTML = evaluationPeriods.map(period => {
+            const colorClasses = {
+              'green': { bg: 'bg-green-50', text: 'text-green-800', badge: 'bg-green-200 text-green-800', icon: 'fa-clock' },
+              'blue': { bg: 'bg-blue-50', text: 'text-blue-800', badge: 'bg-blue-200 text-blue-800', icon: 'fa-check-circle' },
+              'gray': { bg: 'bg-gray-50', text: 'text-gray-800', badge: 'bg-gray-200 text-gray-800', icon: 'fa-calendar' },
+              'yellow': { bg: 'bg-yellow-50', text: 'text-yellow-800', badge: 'bg-yellow-200 text-yellow-800', icon: 'fa-hourglass-half' }
+            };
+            
+            const colors = colorClasses[period.status_color] || colorClasses['gray'];
+            const startDate = new Date(period.start_date).toLocaleDateString('en-US', { month: 'short', year: 'numeric' });
+            const endDate = new Date(period.end_date).toLocaleDateString('en-US', { month: 'short', year: 'numeric' });
+            
+            return `
+              <div class="${colors.bg} rounded-lg p-3 sm:p-4">
+                <div class="flex items-center justify-between mb-2">
+                  <h5 class="font-medium ${colors.text} text-sm sm:text-base">${period.title}</h5>
+                  <span class="text-xs ${colors.badge} px-2 py-1 rounded">${period.display_status}</span>
+                </div>
+                <p class="text-xs sm:text-sm ${colors.text.replace('800', '600')}">${startDate} - ${endDate}</p>
+                <div class="mt-2 text-xs ${colors.text.replace('800', '600')}">
+                  <i class="fas ${colors.icon} mr-1"></i>
+                  Evaluations: ${period.completed_evaluations || 0}/${period.total_evaluations || 0} completed
+                </div>
+              </div>
+            `;
+          }).join('');
+        }
+        
+        // Update statistics
+        const statsContainer = document.getElementById('year-statistics');
+        statsContainer.innerHTML = `
+          <div class="flex justify-between">
+            <span class="text-sm text-gray-600">Total Students</span>
+            <span class="font-medium text-gray-800">${(stats.total_students || 0).toLocaleString()}</span>
+          </div>
+          <div class="flex justify-between">
+            <span class="text-sm text-gray-600">Active Faculty</span>
+            <span class="font-medium text-gray-800">${stats.active_faculty || 0}</span>
+          </div>
+          <div class="flex justify-between">
+            <span class="text-sm text-gray-600">Total Courses</span>
+            <span class="font-medium text-gray-800">${stats.total_courses || 0}</span>
+          </div>
+          <div class="flex justify-between">
+            <span class="text-sm text-gray-600">Evaluation Rate</span>
+            <span class="font-medium text-green-600">${stats.evaluation_rate || 0}%</span>
+          </div>
+        `;
+      }
+      
+      // View year details
+      window.viewYear = function(acadYearId) {
+        const year = academicYearsData.find(y => y.acad_year_id === acadYearId);
+        if (!year) return;
+        
+        Swal.fire({
+          title: year.year_name || year.year_code,
+          html: `
+            <div class="text-left">
+              <p><strong>Year Code:</strong> ${year.year_code}</p>
+              <p><strong>Duration:</strong> ${formatDate(year.start_date)} - ${formatDate(year.end_date)}</p>
+              <p><strong>Status:</strong> ${year.status}</p>
+              <p><strong>Total Semesters:</strong> ${year.total_terms || 0}</p>
+              <p><strong>Total Sections:</strong> ${year.total_sections || 0}</p>
+              <p><strong>Evaluations:</strong> ${year.total_evaluations || 0} total, ${year.completed_evaluations || 0} completed</p>
+              <p><strong>Completion Rate:</strong> ${year.completion_rate || 0}%</p>
+              <p><strong>Evaluation Periods:</strong> ${year.evaluation_periods || 0}</p>
+            </div>
+          `,
+          confirmButtonColor: '#0059cc'
+        });
+      };
+      
+      // Edit year
+      window.editYear = function(acadYearId) {
+        const year = academicYearsData.find(y => y.acad_year_id === acadYearId);
+        if (!year) return;
+        
+        editingTermId = acadYearId;
+        document.getElementById('academic-year-name').value = year.year_code;
+        document.getElementById('start-date').value = year.start_date;
+        document.getElementById('end-date').value = year.end_date;
+        document.getElementById('set-as-active').checked = year.is_current;
+        
+        document.getElementById('modal-title').textContent = 'Edit Academic Year';
+        document.getElementById('save-academic-year-btn').textContent = 'Update Academic Year';
+        
+        addAcademicYearModal.classList.remove('hidden');
+      };
+      
+      // Manage semesters for a year
+      window.manageSemesters = function(acadYearId) {
+        const year = academicYearsData.find(y => y.acad_year_id === acadYearId);
+        if (!year) return;
+        
+        // Load existing semesters and show add semester modal
+        fetch('/api/academic-terms/' + acadYearId)
+          .then(response => response.json())
+          .then(data => {
+            if (data.success) {
+              const terms = data.data;
+              
+              // Build the terms display HTML
+              let termsListHtml = '';
+              if (terms.length > 0) {
+                termsListHtml = '<div class="mb-4"><h4 class="font-semibold text-gray-700 mb-2">Existing Semesters:</h4><ul class="text-left space-y-2">';
+                terms.forEach(term => {
+                  const statusBadge = term.is_current ? '<span class="ml-2 text-xs bg-green-100 text-green-800 px-2 py-1 rounded">Current</span>' : '';
+                  termsListHtml += `
+                    <li class="py-2 px-3 bg-gray-50 rounded border border-gray-200">
+                      <div class="flex items-center justify-between">
+                        <div>
+                          <strong class="text-gray-900">${term.term_name}</strong> ${statusBadge}
+                          <div class="text-sm text-gray-600">${formatDate(term.start_date)} to ${formatDate(term.end_date)}</div>
+                        </div>
+                      </div>
+                    </li>
+                  `;
+                });
+                termsListHtml += '</ul></div>';
+              } else {
+                termsListHtml = '<p class="text-gray-500 mb-4 text-center py-4 bg-gray-50 rounded">No semesters yet. Add one below.</p>';
+              }
+              
+              // Show modal with existing terms and add new semester option
+              Swal.fire({
+                title: `Manage Semesters - ${year.year_code}`,
+                html: termsListHtml + '<hr class="my-4"><p class="text-center text-gray-600 mb-2">Add a new semester below</p>',
+                showCancelButton: true,
+                confirmButtonText: '<i class="fas fa-plus mr-2"></i>Add New Semester',
+                cancelButtonText: 'Close',
+                confirmButtonColor: '#0059cc',
+                width: '600px',
+                customClass: {
+                  confirmButton: 'inline-flex items-center'
+                }
+              }).then((result) => {
+                if (result.isConfirmed) {
+                  // Pre-select this year in the add semester modal
+                  document.getElementById('semester-academic-year').value = acadYearId;
+                  addSemesterModal.classList.remove('hidden');
+                }
+              });
+            } else {
+              // If error fetching terms, still allow adding a semester
+              Swal.fire({
+                title: `Manage Semesters - ${year.year_code}`,
+                text: 'Unable to load existing semesters. You can still add a new one.',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: '<i class="fas fa-plus mr-2"></i>Add New Semester',
+                cancelButtonText: 'Close',
+                confirmButtonColor: '#0059cc',
+                customClass: {
+                  confirmButton: 'inline-flex items-center'
+                }
+              }).then((result) => {
+                if (result.isConfirmed) {
+                  document.getElementById('semester-academic-year').value = acadYearId;
+                  addSemesterModal.classList.remove('hidden');
+                }
+              });
+            }
+          })
+          .catch(error => {
+            console.error('Error loading semesters:', error);
+            Swal.fire({
+              icon: 'error',
+              title: 'Error',
+              text: 'Failed to load semesters. Please try again.'
+            });
+          });
+      };
+      
+      // Delete year
+      window.deleteYear = function(acadYearId) {
+        Swal.fire({
+          title: 'Are you sure?',
+          text: "This will delete the academic year and all associated semesters and evaluation periods!",
+          icon: 'warning',
+          showCancelButton: true,
+          confirmButtonColor: '#d33',
+          cancelButtonColor: '#3085d6',
+          confirmButtonText: 'Yes, delete it!'
+        }).then((result) => {
+          if (result.isConfirmed) {
+            fetch(`/api/academic-years/${acadYearId}`, {
+              method: 'DELETE'
+            })
+            .then(response => response.json())
+            .then(data => {
+              if (data.success) {
+                Swal.fire({
+                  icon: 'success',
+                  title: 'Deleted!',
+                  text: data.message,
+                  toast: true,
+                  position: 'top-end',
+                  showConfirmButton: false,
+                  timer: 3000,
+                  timerProgressBar: true
+                });
+                loadAcademicYears();
+              } else {
+                Swal.fire({
+                  icon: 'error',
+                  title: 'Error',
+                  text: data.error
+                });
+              }
+            })
+            .catch(error => {
+              console.error('Error:', error);
+              Swal.fire({
+                icon: 'error',
+                title: 'Error',
+                text: 'Failed to delete academic year'
+              });
+            });
+          }
+        });
+      };
+      
+      // Modal functionality for Academic Year
+      const addAcademicYearBtn = document.getElementById('add-academic-year-btn');
+      const addAcademicYearModal = document.getElementById('add-academic-year-modal');
+      const cancelAcademicYearBtn = document.getElementById('cancel-academic-year-btn');
+      const saveAcademicYearBtn = document.getElementById('save-academic-year-btn');
+
+      // Modal functionality for Semester
+      const addSemesterModal = document.getElementById('add-semester-modal');
+      const cancelSemesterBtn = document.getElementById('cancel-semester-btn');
+      const saveSemesterBtn = document.getElementById('save-semester-btn');
+
+      // Academic Year Modal Events
+      addAcademicYearBtn.addEventListener('click', function() {
+        editingTermId = null;
+        document.getElementById('modal-title').textContent = 'Add New Academic Year';
+        saveAcademicYearBtn.textContent = 'Add Academic Year';
+        document.getElementById('add-academic-year-form').reset();
+        addAcademicYearModal.classList.remove('hidden');
+      });
+
+      cancelAcademicYearBtn.addEventListener('click', function() {
+        addAcademicYearModal.classList.add('hidden');
+        editingTermId = null;
+      });
+
+      saveAcademicYearBtn.addEventListener('click', function() {
+        const academicYear = document.getElementById('academic-year-name').value.trim();
+        const startDate = document.getElementById('start-date').value;
+        const endDate = document.getElementById('end-date').value;
+        const setAsActive = document.getElementById('set-as-active').checked;
+
+        if (!academicYear || !startDate || !endDate) {
+          Swal.fire({
+            icon: 'error',
+            title: 'Missing Information',
+            text: 'Please fill in all required fields.',
+          });
+          return;
+        }
+
+        const data = {
+          year_code: academicYear,
+          start_date: startDate,
+          end_date: endDate,
+          is_current: setAsActive ? 1 : 0
+        };
+        
+        const url = editingTermId ? `/api/academic-years/${editingTermId}` : '/api/academic-years';
+        const method = editingTermId ? 'PUT' : 'POST';
+
+        // Show loading
+        Swal.fire({
+          title: editingTermId ? 'Updating Academic Year...' : 'Creating Academic Year...',
+          html: editingTermId ? 'Please wait...' : 'Creating academic year and default semesters...',
+          allowOutsideClick: false,
+          didOpen: () => {
+            Swal.showLoading();
+          }
+        });
+
+        fetch(url, {
+          method: method,
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(data)
+        })
+        .then(response => response.json())
+        .then(data => {
+          if (data.success) {
+            // If this is a new academic year (not editing), create default semesters
+            if (!editingTermId && data.acad_year_id) {
+              const acadYearId = data.acad_year_id;
+              
+              // Calculate semester dates (split year in half)
+              const start = new Date(startDate);
+              const end = new Date(endDate);
+              const midPoint = new Date(start.getTime() + (end.getTime() - start.getTime()) / 2);
+              
+              // Format dates for API
+              const firstSemStart = startDate;
+              const firstSemEnd = midPoint.toISOString().split('T')[0];
+              const secondSemStart = new Date(midPoint.getTime() + 86400000).toISOString().split('T')[0]; // Add 1 day
+              const secondSemEnd = endDate;
+              
+              // Create 1st Semester
+              const firstSemesterData = {
+                acad_year_id: acadYearId,
+                term_name: '1st Semester',
+                term_code: '1ST_SEM',
+                start_date: firstSemStart,
+                end_date: firstSemEnd,
+                is_current: setAsActive ? 1 : 0
+              };
+              
+              // Create 2nd Semester
+              const secondSemesterData = {
+                acad_year_id: acadYearId,
+                term_name: '2nd Semester',
+                term_code: '2ND_SEM',
+                start_date: secondSemStart,
+                end_date: secondSemEnd,
+                is_current: 0 // Second semester is never initially current
+              };
+              
+              // Create both semesters
+              return Promise.all([
+                fetch('/api/academic-terms', {
+                  method: 'POST',
+                  headers: { 'Content-Type': 'application/json' },
+                  body: JSON.stringify(firstSemesterData)
+                }),
+                fetch('/api/academic-terms', {
+                  method: 'POST',
+                  headers: { 'Content-Type': 'application/json' },
+                  body: JSON.stringify(secondSemesterData)
+                })
+              ]).then(responses => {
+                return Promise.all(responses.map(r => r.json()));
+              }).then(results => {
+                const firstSemSuccess = results[0].success;
+                const secondSemSuccess = results[1].success;
+                
+                if (firstSemSuccess && secondSemSuccess) {
+                  return {
+                    success: true,
+                    message: data.message,
+                    semesters_created: true
+                  };
+                } else {
+                  return {
+                    success: true,
+                    message: data.message,
+                    semesters_created: false,
+                    warning: 'Academic year created but some semesters failed to create'
+                  };
+                }
+              });
+            } else {
+              // Just editing, no semesters to create
+              return Promise.resolve({
+                success: true,
+                message: data.message,
+                semesters_created: false
+              });
+            }
+          } else {
+            throw new Error(data.error || 'Failed to save academic year');
+          }
+        })
+        .then(result => {
+          if (result.success) {
+            let successMessage = editingTermId ? 'Academic Year Updated' : 'Academic Year Created';
+            let successText = result.message;
+            
+            if (result.semesters_created) {
+              successMessage = 'Academic Year & Semesters Created';
+              successText = `${result.message}<br><br><i class="fas fa-check-circle text-green-500"></i> 1st Semester created<br><i class="fas fa-check-circle text-green-500"></i> 2nd Semester created`;
+            } else if (result.warning) {
+              successMessage = 'Partial Success';
+              successText = result.warning;
+            }
+            
+            Swal.fire({
+              icon: 'success',
+              title: successMessage,
+              html: successText,
+              confirmButtonColor: '#0059cc',
+              timer: result.semesters_created ? 4000 : 3000,
+              timerProgressBar: true
+            });
+            
+            addAcademicYearModal.classList.add('hidden');
+            document.getElementById('add-academic-year-form').reset();
+            editingTermId = null;
+            loadAcademicYears();
+            loadCurrentYearOverview(); // Reload overview in case current year changed
+          } else {
+            Swal.fire({
+              icon: 'error',
+              title: 'Error',
+              text: result.message || 'Failed to save academic year'
+            });
+          }
+        })
+        .catch(error => {
+          console.error('Error:', error);
+          Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: error.message || 'Failed to save academic year'
+          });
+        });
+      });
+
+      // Semester Modal Events
+      cancelSemesterBtn.addEventListener('click', function() {
+        addSemesterModal.classList.add('hidden');
+      });
+
+      saveSemesterBtn.addEventListener('click', function() {
+        const acadYearId = document.getElementById('semester-academic-year').value;
+        const semesterType = document.getElementById('semester-type').value;
+        const semesterStartDate = document.getElementById('semester-start-date').value;
+        const semesterEndDate = document.getElementById('semester-end-date').value;
+        const evaluationPeriodName = document.getElementById('evaluation-period-name').value.trim();
+        const evaluationStartDate = document.getElementById('evaluation-start-date').value;
+        const evaluationEndDate = document.getElementById('evaluation-end-date').value;
+
+        if (!acadYearId || !semesterType || !semesterStartDate || !semesterEndDate) {
+          Swal.fire({
+            icon: 'error',
+            title: 'Missing Information',
+            text: 'Please fill in all required semester fields.',
+          });
+          return;
+        }
+
+        // First, create or get the semester (academic term)
+        const semesterNames = {
+          '1': '1st Semester',
+          '2': '2nd Semester',
+          'summer': 'Summer Term'
+        };
+        const semesterCodes = {
+          '1': '1ST_SEM',
+          '2': '2ND_SEM',
+          'summer': 'SUMMER'
+        };
+
+        // Create semester first
+        const semesterData = {
+          acad_year_id: acadYearId,
+          term_name: semesterNames[semesterType],
+          term_code: semesterCodes[semesterType],
+          start_date: semesterStartDate,
+          end_date: semesterEndDate
+        };
+
+        fetch('/api/academic-terms', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(semesterData)
+        })
+        .then(response => response.json())
+        .then(data => {
+          if (data.success) {
+            const acadTermId = data.acad_term_id;
+            
+            // Now create evaluation period if name is provided
+            if (evaluationPeriodName) {
+              const periodData = {
+                acad_term_id: acadTermId,
+                title: evaluationPeriodName,
+                start_date: evaluationStartDate || semesterStartDate,
+                end_date: evaluationEndDate || semesterEndDate,
+                status: 'Pending'
+              };
+
+              return fetch('/api/evaluation-periods', {
+                method: 'POST',
+                headers: {
+                  'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(periodData)
+              });
+            } else {
+              return Promise.resolve({
+                ok: true,
+                json: () => Promise.resolve({
+                  success: true,
+                  message: 'Semester created successfully'
+                })
+              });
+            }
+          } else {
+            throw new Error(data.error || 'Failed to create semester');
+          }
+        })
+        .then(response => response.json())
+        .then(data => {
+          if (data.success) {
+            Swal.fire({
+              icon: 'success',
+              title: 'Success!',
+              html: evaluationPeriodName ? 
+                `Semester and evaluation period created successfully.<br><strong>${data.evaluations_created || 0} evaluations</strong> have been automatically created for enrolled students.` :
+                'Semester created successfully.',
+              confirmButtonColor: '#3B82F6'
+            });
+            addSemesterModal.classList.add('hidden');
+            document.getElementById('add-semester-form').reset();
+            loadAcademicYears();
+            loadCurrentYearOverview(); // Reload overview
+          } else {
+            Swal.fire({
+              icon: 'error',
+              title: 'Error',
+              text: data.error
+            });
+          }
+        })
+        .catch(error => {
+          console.error('Error:', error);
+          Swal.fire({
+            icon: 'error',
+            title: 'Error',
+            text: error.message || 'Failed to add semester'
+          });
+        });
+      });
+
+      // Search functionality
+      const searchInput = document.getElementById('search-years');
+      searchInput.addEventListener('input', function() {
+        const searchTerm = this.value.toLowerCase();
+        filteredYearsData = academicYearsData.filter(year => 
+          (year.year_code && year.year_code.toLowerCase().includes(searchTerm)) ||
+          (year.year_name && year.year_name.toLowerCase().includes(searchTerm))
+        );
+        currentPage = 1;
+        renderAcademicYearsTable();
+        renderPagination();
+      });
+
+      // Filter functionality
+      const statusFilter = document.getElementById('status-filter');
+      statusFilter.addEventListener('change', function() {
+        const status = this.value;
+        if (!status) {
+          filteredYearsData = academicYearsData;
+        } else {
+          filteredYearsData = academicYearsData.filter(year => 
+            year.status.toLowerCase() === status.toLowerCase()
+          );
+        }
+        currentPage = 1;
+        renderAcademicYearsTable();
+        renderPagination();
+      });
+
+      // Close modals when clicking outside
+      window.addEventListener('click', function(event) {
+        if (event.target === addAcademicYearModal) {
+          addAcademicYearModal.classList.add('hidden');
+          editingTermId = null;
+        }
+        if (event.target === addSemesterModal) {
+          addSemesterModal.classList.add('hidden');
+        }
+      });
+    });
+  </script>
+
+  <!-- Include admin navigation script -->
+  <script src="{{ url_for('static', filename='js/admin-navigation.js') }}"></script>
+  
+  <!-- Include loading animation script -->
+  <script src="{{ url_for('static', filename='js/loading-animation.js') }}"></script>
+
+  <!-- Prevent logout on browser back button -->
+  <script src="{{ url_for('static', filename='js/prevent-back-logout.js') }}"></script>
+
+  <!-- Session Timeout Monitor (Auto-logout after 1 hour) -->
+  <script src="{{ url_for('static', filename='js/session-timeout.js') }}"></script>
+
+  <!-- Initialize Navigation -->
+  <script>
+    // Initialize admin navigation with current page
+    if (typeof loadAdminNavigation === 'function') {
+      loadAdminNavigation('academic-years');
+    }
+  </script>
+
+</body>
+</html>

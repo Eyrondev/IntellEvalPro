@@ -1,0 +1,1221 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+  <title>Student Management | IntellEvalPro</title>
+  
+  <!-- Favicon -->
+  <link rel="icon" type="image/png" href="{{ url_for('static', filename='images/nclogo.png') }}">
+  <link rel="shortcut icon" type="image/png" href="{{ url_for('static', filename='images/nclogo.png') }}">
+  <link rel="apple-touch-icon" href="{{ url_for('static', filename='images/nclogo.png') }}">
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  
+  <!-- Font Awesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"/>
+  
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  
+  <!-- jQuery -->
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  
+  <!-- SweetAlert2 -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11.7.12/dist/sweetalert2.min.css">
+  <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.7.12/dist/sweetalert2.all.min.js"></script>
+  
+  <script>
+    tailwind.config = {
+      theme: {
+        fontFamily: {
+          'sans': ['Inter', 'system-ui', 'sans-serif'],
+        },
+        extend: {
+          colors: {
+            primary: {
+              50: '#e6f0ff',
+              100: '#b3d1ff',
+              200: '#80b3ff',
+              300: '#4d94ff', 
+              400: '#1a75ff',
+              500: '#0059cc',
+              600: '#004db3',
+              700: '#004099',
+              800: '#003380',
+              900: '#002666'
+            }
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    /* Global styles */
+    * {
+      box-sizing: border-box;
+    }
+    
+    body {
+      font-family: 'Inter', sans-serif;
+      overflow-x: hidden;
+      width: 100%;
+      margin: 0;
+      padding: 0;
+    }
+    
+    html {
+      overflow-x: hidden;
+      width: 100%;
+    }
+    
+    /* Active nav link */
+    .active-nav {
+      background-color: #e6f0ff;
+      color: #0059cc;
+      border-left: 4px solid #0059cc;
+    }
+    
+    .nav-link.active {
+      position: relative;
+    }
+    
+    .nav-link.active::after {
+      content: '';
+      position: absolute;
+      left: 0;
+      width: 4px;
+      height: 100%;
+      background-color: #0059cc;
+    }
+    
+    /* Custom scrollbar */
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    
+    ::-webkit-scrollbar-track {
+      background: #f1f1f1;
+      border-radius: 10px;
+    }
+    
+    ::-webkit-scrollbar-thumb {
+      background: #c1c1c1;
+      border-radius: 10px;
+    }
+    
+    ::-webkit-scrollbar-thumb:hover {
+      background: #a8a8a8;
+    }
+    
+    /* Mobile responsive styles - 390px minimum baseline */
+    @media (max-width: 768px) {
+      body {
+        overflow-x: hidden;
+        width: 100%;
+      }
+      
+      /* Ensure main content doesn't overflow */
+      main {
+        width: 100%;
+        padding-left: 0.75rem !important;
+        padding-right: 0.75rem !important;
+      }
+      
+      /* Reduce heading sizes on mobile */
+      h1 {
+        font-size: 1.5rem !important;
+        line-height: 2rem !important;
+      }
+      
+      h3 {
+        font-size: 1rem !important;
+        line-height: 1.5rem !important;
+      }
+      
+      /* Make tables scrollable on mobile */
+      .overflow-x-auto {
+        -webkit-overflow-scrolling: touch;
+        scrollbar-width: thin;
+        overflow-x: auto;
+        max-width: 100%;
+      }
+      
+      /* Compact table cells on mobile */
+      table td,
+      table th {
+        padding: 0.5rem 0.5rem;
+        font-size: 0.75rem;
+      }
+      
+      /* Hide ID and department columns on mobile */
+      table th:nth-child(2),
+      table td:nth-child(2),
+      table th:nth-child(3),
+      table td:nth-child(3) {
+        display: none;
+      }
+    }
+    
+    /* Extra small mobile - 390px baseline */
+    @media (max-width: 640px) {
+      /* Optimize main padding */
+      main {
+        padding: 0.625rem !important;
+        width: 100% !important;
+        max-width: 100vw !important;
+      }
+      
+      /* Compact headings */
+      h1 {
+        font-size: 1.375rem !important;
+        margin-bottom: 0.5rem !important;
+      }
+      
+      /* Reduce card padding */
+      .bg-white.rounded-lg {
+        padding: 0.75rem !important;
+      }
+      
+      /* Stack filters vertically */
+      .flex-col.lg\\:flex-row {
+        gap: 0.75rem !important;
+      }
+      
+      /* Full width filters */
+      .lg\\:w-48 {
+        width: 100% !important;
+      }
+      
+      /* Compact search input */
+      input[type="text"],
+      select {
+        font-size: 0.875rem;
+        padding: 0.5rem 0.75rem;
+        min-height: 44px;
+      }
+      
+      /* Further reduce table text */
+      table td,
+      table th {
+        padding: 0.375rem 0.5rem;
+        font-size: 0.7rem;
+        white-space: nowrap;
+      }
+      
+      /* Compact action buttons for mobile */
+      table button {
+        min-height: 36px;
+        min-width: 36px;
+        padding: 0.375rem;
+      }
+      
+      table button i {
+        font-size: 0.875rem;
+      }
+    }
+    
+    /* Very small mobile - 390px specific optimizations */
+    @media (max-width: 480px) {
+      /* Further optimize spacing */
+      main {
+        padding: 0.5rem !important;
+      }
+      
+      /* Smaller heading */
+      h1 {
+        font-size: 1.25rem !important;
+      }
+      
+      /* Compact page description */
+      p.text-gray-600 {
+        font-size: 0.8125rem;
+      }
+      
+      /* Smaller modal on mobile */
+      #retake-modal .relative {
+        width: 95% !important;
+        padding: 1rem !important;
+      }
+      
+      /* Compact modal content */
+      #retake-modal h3 {
+        font-size: 1rem !important;
+      }
+      
+      #retake-modal .text-sm {
+        font-size: 0.8125rem !important;
+      }
+      
+      /* Smaller buttons in modal */
+      #retake-modal button {
+        padding: 0.5rem 0.75rem !important;
+        font-size: 0.8125rem !important;
+      }
+      
+      /* Compact action buttons even more */
+      table button {
+        min-height: 32px;
+        min-width: 32px;
+        padding: 0.25rem;
+      }
+    }
+    
+    /* Tablet responsive styles */
+    @media (min-width: 641px) and (max-width: 1023px) {
+      /* Show more columns on tablet */
+      table th:nth-child(3),
+      table td:nth-child(3) {
+        display: table-cell;
+      }
+      
+      /* Adjust table font size for tablet */
+      table td,
+      table th {
+        font-size: 0.8125rem;
+        padding: 0.625rem 0.75rem;
+      }
+    }
+    
+    /* Desktop and large screens - Enhanced readability */
+    @media (min-width: 1024px) {
+      /* Larger table text for better readability */
+      table td,
+      table th {
+        font-size: 0.9375rem;
+        line-height: 1.5;
+      }
+      
+      table thead th {
+        font-size: 0.8125rem;
+        font-weight: 600;
+      }
+    }
+    
+    /* Extra large screens - Even better readability */
+    @media (min-width: 1280px) {
+      table td,
+      table th {
+        font-size: 1rem;
+        line-height: 1.6;
+      }
+      
+      table thead th {
+        font-size: 0.875rem;
+      }
+    }
+    
+    /* Ultra-wide screens - Maximum readability */
+    @media (min-width: 1536px) {
+      table td,
+      table th {
+        font-size: 1.0625rem;
+        padding: 1rem 1.5rem;
+      }
+      
+      table thead th {
+        font-size: 0.9375rem;
+      }
+    }
+    
+    /* Touch-friendly interactions */
+    @media (hover: none) and (pointer: coarse) {
+      /* Ensure 44x44px minimum touch targets */
+      button,
+      a,
+      select,
+      input {
+        min-height: 44px;
+        padding: 0.625rem 0.75rem;
+      }
+      
+      /* Touch-friendly dropdowns */
+      select {
+        font-size: 16px; /* Prevent zoom on iOS */
+      }
+      
+      /* Larger tap targets for links */
+      a {
+        padding: 0.5rem;
+      }
+    }
+  </style>
+</head>
+
+<body class="bg-gray-50">
+  <div class="flex h-screen">
+    <!-- Sidebar (will be loaded dynamically) -->
+    <div id="sidebar-container"></div>
+    
+    <!-- Main content -->
+    <div class="w-full lg:ml-64 flex flex-col flex-1 min-h-screen">
+      <!-- Top Navigation (will be loaded dynamically) -->
+      <div id="header-container"></div>
+      
+      <!-- Main content area -->
+      <main class="flex-1 overflow-x-hidden overflow-y-auto bg-gray-50 p-3 sm:p-4 md:p-6 w-full">
+        <!-- Page Header -->
+        <div class="mb-4 md:mb-6">
+          <h1 class="text-xl sm:text-2xl font-bold text-gray-900 mb-1 sm:mb-2">Student Management</h1>
+          <p class="text-sm sm:text-base text-gray-600">Manage student evaluations, records, and permissions</p>
+        </div>
+
+        <!-- Search and Filters -->
+        <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-3 sm:p-4 mb-4 md:mb-6">
+          <div class="flex flex-col lg:flex-row gap-3 sm:gap-4">
+            <!-- Search Bar -->
+            <div class="flex-1 min-w-0">
+              <div class="relative">
+                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                  <i class="fas fa-search text-gray-400 text-sm"></i>
+                </div>
+                <input type="text" id="student-search" placeholder="Search students..." 
+                       class="w-full pl-9 sm:pl-10 pr-3 sm:pr-4 py-2 text-sm sm:text-base border border-gray-300 rounded-md focus:ring-2 focus:ring-primary-500 focus:border-transparent min-h-[44px]">
+              </div>
+            </div>
+            
+            <!-- Department Filter -->
+            <div class="w-full lg:w-48">
+              <select id="department-filter" class="w-full px-3 py-2 text-sm sm:text-base border border-gray-300 rounded-md focus:ring-2 focus:ring-primary-500 focus:border-transparent min-h-[44px]">
+                <option value="">All Departments</option>
+                <option value="Computer Science">Computer Science</option>
+                <option value="Information Technology">Information Technology</option>
+                <option value="Business Administration">Business Administration</option>
+                <option value="Engineering">Engineering</option>
+              </select>
+            </div>
+            
+            <!-- Status Filter -->
+            <div class="w-full lg:w-48">
+              <select id="status-filter" class="w-full px-3 py-2 text-sm sm:text-base border border-gray-300 rounded-md focus:ring-2 focus:ring-primary-500 focus:border-transparent min-h-[44px]">
+                <option value="">All Status</option>
+                <option value="Completed">Completed</option>
+                <option value="In Progress">In Progress</option>
+                <option value="Pending">Pending</option>
+                <option value="No Evaluations">No Evaluations</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <!-- Students Table -->
+        <div class="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
+          <div class="px-3 sm:px-4 py-3 border-b border-gray-200 bg-gray-50">
+            <h3 class="text-base sm:text-lg font-medium text-gray-900">Students List</h3>
+          </div>
+          
+          <div class="overflow-x-auto">
+            <table class="min-w-full divide-y divide-gray-200">
+              <thead class="bg-gray-50">
+                <tr>
+                  <th class="px-2 sm:px-3 md:px-4 lg:px-6 py-2 sm:py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">Student</th>
+                  <th class="hidden sm:table-cell px-2 sm:px-3 md:px-4 lg:px-6 py-2 sm:py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">ID</th>
+                  <th class="hidden md:table-cell px-2 sm:px-3 md:px-4 lg:px-6 py-2 sm:py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">Department</th>
+                  <th class="px-2 sm:px-3 md:px-4 lg:px-6 py-2 sm:py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">Status</th>
+                  <th class="px-2 sm:px-3 md:px-4 lg:px-6 py-2 sm:py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider whitespace-nowrap">Actions</th>
+                </tr>
+              </thead>
+              <tbody id="students-table-body" class="bg-white divide-y divide-gray-200">
+                <!-- Students will be loaded dynamically -->
+              </tbody>
+            </table>
+          </div>
+          
+          <!-- Loading State -->
+          <div id="loading-state" class="flex items-center justify-center py-8 sm:py-12">
+            <div class="animate-spin rounded-full h-6 w-6 sm:h-8 sm:w-8 border-b-2 border-primary-500"></div>
+            <span class="ml-2 text-sm sm:text-base text-gray-600">Loading students...</span>
+          </div>
+          
+          <!-- Empty State -->
+          <div id="empty-state" class="hidden text-center py-8 sm:py-12 px-4">
+            <i class="fas fa-users text-gray-300 text-4xl sm:text-5xl mb-3 sm:mb-4"></i>
+            <h3 class="text-base sm:text-lg font-medium text-gray-900 mb-2">No Students Found</h3>
+            <p class="text-sm sm:text-base text-gray-500">No students match your current search criteria.</p>
+          </div>
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <!-- Overlay for mobile sidebar -->
+  <div id="sidebar-overlay" class="fixed inset-0 bg-black bg-opacity-50 z-30 lg:hidden hidden"></div>
+
+  <!-- Retake Evaluation Modal -->
+  <div id="retake-modal" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50 hidden">
+    <div class="relative top-10 sm:top-20 mx-auto p-3 sm:p-5 border w-11/12 sm:w-11/12 md:w-3/4 lg:w-1/2 shadow-lg rounded-md bg-white max-w-2xl">
+      <div class="mt-2 sm:mt-3">
+        <!-- Modal Header -->
+        <div class="flex items-center justify-between mb-3 sm:mb-4">
+          <h3 class="text-base sm:text-lg font-medium text-gray-900">Allow Evaluation Retake</h3>
+          <button type="button" id="close-retake-modal" class="text-gray-400 hover:text-gray-600 p-2 min-h-[44px] min-w-[44px]">
+            <i class="fas fa-times text-lg"></i>
+          </button>
+        </div>
+        
+        <!-- Modal Content -->
+        <div class="mb-3 sm:mb-4">
+          <p class="text-xs sm:text-sm text-gray-600 mb-3 sm:mb-4">Allow the selected student to retake their evaluation(s) for the specified subject(s).</p>
+          
+          <div class="space-y-3 sm:space-y-4">
+            <div>
+              <label class="block text-xs sm:text-sm font-medium text-gray-700 mb-2">Student</label>
+              <div id="selected-student-info" class="p-2 sm:p-3 bg-gray-50 rounded-md">
+                <!-- Student info will be populated here -->
+              </div>
+            </div>
+            
+            <div>
+              <label class="flex items-center justify-between text-xs sm:text-sm font-medium text-gray-700 mb-2">
+                <span>Select Subjects to Retake <span class="text-xs font-normal text-gray-500">(Completed & Expired)</span></span>
+                <button type="button" id="select-all-subjects" class="text-xs text-primary-600 hover:text-primary-700 font-medium min-h-[44px] px-2">
+                  <i class="fas fa-check-square mr-1"></i>Select All
+                </button>
+              </label>
+              
+              <!-- Loading state -->
+              <div id="subjects-loading" class="text-center py-4">
+                <div class="animate-spin rounded-full h-6 w-6 border-b-2 border-primary-500 mx-auto"></div>
+                <p class="text-xs sm:text-sm text-gray-500 mt-2">Loading subjects...</p>
+              </div>
+              
+              <!-- Subjects list -->
+              <div id="subjects-list" class="hidden max-h-48 sm:max-h-60 overflow-y-auto border border-gray-300 rounded-md divide-y divide-gray-200">
+                <!-- Checkboxes will be loaded dynamically -->
+              </div>
+              
+              <!-- Empty state -->
+              <div id="subjects-empty" class="hidden text-center py-4 sm:py-6 border border-gray-200 rounded-md">
+                <i class="fas fa-inbox text-gray-300 text-2xl sm:text-3xl mb-2"></i>
+                <p class="text-xs sm:text-sm text-gray-500">No completed or expired evaluations found for this student.</p>
+              </div>
+            </div>
+            
+            <div>
+              <label class="block text-xs sm:text-sm font-medium text-gray-700 mb-2">Reason for Retake</label>
+              <textarea id="retake-reason" rows="3" class="w-full px-3 py-2 text-sm sm:text-base border border-gray-300 rounded-md focus:ring-2 focus:ring-primary-500 focus:border-transparent" placeholder="Enter reason for allowing retake..."></textarea>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Modal Footer -->
+        <div class="flex flex-col sm:flex-row justify-end gap-2 sm:gap-0 sm:space-x-3">
+          <button type="button" id="cancel-retake" class="w-full sm:w-auto px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 min-h-[44px]">
+            Cancel
+          </button>
+          <button type="button" id="confirm-retake" class="w-full sm:w-auto px-4 py-2 text-sm font-medium text-white bg-primary-600 border border-transparent rounded-md hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 min-h-[44px]">
+            Allow Retake
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Include navigation and loading scripts -->
+  <script src="{{ url_for('static', filename='js/loading-animation.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/guidance-navigation.js') }}"></script>
+
+  <script>
+    // Initialize page
+    document.addEventListener('DOMContentLoaded', function() {
+      loadGuidanceNavigation('student-management');
+      loadStudents();
+      setupEventListeners();
+    });
+
+    let studentsData = [];
+    let selectedStudent = null;
+    let searchTimeout = null;
+
+    /**
+     * Get status display text
+     */
+    function getStatusDisplay(status) {
+      switch(status) {
+        case 'Completed': return 'All Done';
+        case 'In Progress': return 'Evaluating';
+        case 'Pending': return 'Not Started';
+        case 'No Evaluations': return 'No Evals';
+        default: return 'Unknown';
+      }
+    }
+
+    /**
+     * Get status styling classes
+     */
+    function getStatusStyle(status) {
+      switch(status) {
+        case 'Completed': 
+          return 'bg-green-100 text-green-800';
+        case 'In Progress': 
+          return 'bg-blue-100 text-blue-800';
+        case 'Pending': 
+          return 'bg-yellow-100 text-yellow-800';
+        case 'No Evaluations': 
+          return 'bg-gray-100 text-gray-800';
+        default: 
+          return 'bg-gray-100 text-gray-800';
+      }
+    }
+
+    /**
+     * Load students from API
+     */
+    function loadStudents() {
+      // Show loading state
+      document.getElementById('loading-state').style.display = 'flex';
+      document.getElementById('empty-state').classList.add('hidden');
+      
+      fetch('/api/guidance/students')
+        .then(response => {
+          if (!response.ok) {
+            if (response.status === 401) {
+              showError('Authentication required. Please log in as guidance counselor.');
+              return;
+            }
+            throw new Error(`HTTP error! status: ${response.status}`);
+          }
+          return response.json();
+        })
+        .then(data => {
+          if (data.success) {
+            studentsData = data.students;
+            displayStudents(studentsData);
+            populateDepartmentFilter();
+            console.log('Students loaded successfully:', studentsData.length + ' students');
+          } else {
+            showError('Failed to load students: ' + (data.message || 'Unknown error'));
+          }
+        })
+        .catch(error => {
+          console.error('Error loading students:', error);
+          showError('Error loading students: ' + error.message);
+        })
+        .finally(() => {
+          document.getElementById('loading-state').style.display = 'none';
+        });
+    }
+
+    /**
+     * Populate department filter with unique departments
+     */
+    function populateDepartmentFilter() {
+      const departmentSelect = document.getElementById('department-filter');
+      const departments = [...new Set(studentsData.map(s => s.department).filter(d => d))];
+      
+      // Clear existing options except "All Departments"
+      departmentSelect.innerHTML = '<option value="">All Departments</option>';
+      
+      departments.sort().forEach(dept => {
+        const option = document.createElement('option');
+        option.value = dept;
+        option.textContent = dept;
+        departmentSelect.appendChild(option);
+      });
+    }
+
+    /**
+     * Display students in table
+     */
+    function displayStudents(students) {
+      const tbody = document.getElementById('students-table-body');
+      const loadingState = document.getElementById('loading-state');
+      const emptyState = document.getElementById('empty-state');
+      
+      loadingState.style.display = 'none';
+      
+      if (students.length === 0) {
+        tbody.innerHTML = '';
+        emptyState.classList.remove('hidden');
+        return;
+      }
+      
+      emptyState.classList.add('hidden');
+      
+      tbody.innerHTML = students.map(student => `
+        <tr class="hover:bg-gray-50">
+          <td class="px-2 sm:px-3 md:px-4 lg:px-6 py-2.5 sm:py-3 md:py-4">
+            <div class="flex items-center gap-2 sm:gap-3 min-w-0">
+              <div class="h-7 w-7 sm:h-8 sm:w-8 md:h-9 md:w-9 lg:h-10 lg:w-10 rounded-full bg-primary-100 flex items-center justify-center flex-shrink-0">
+                <span class="text-xs sm:text-sm font-medium text-primary-600">${student.first_name.charAt(0)}${student.last_name.charAt(0)}</span>
+              </div>
+              <div class="min-w-0 flex-1">
+                <div class="text-xs sm:text-sm font-medium text-gray-900 truncate">${student.first_name} ${student.last_name}</div>
+                <div class="text-xs text-gray-500 truncate md:hidden">${student.student_number}</div>
+                <div class="text-xs text-gray-400 truncate hidden sm:block">${student.email || 'No email'}</div>
+              </div>
+            </div>
+          </td>
+          <td class="hidden sm:table-cell px-2 sm:px-3 md:px-4 lg:px-6 py-2.5 sm:py-3 md:py-4 whitespace-nowrap text-xs sm:text-sm text-gray-900">
+            ${student.student_number}
+          </td>
+          <td class="hidden md:table-cell px-2 sm:px-3 md:px-4 lg:px-6 py-2.5 sm:py-3 md:py-4 whitespace-nowrap text-xs sm:text-sm text-gray-900">
+            <div class="truncate max-w-[200px]" title="${student.department || 'N/A'}">${student.department || 'N/A'}</div>
+          </td>
+          <td class="px-2 sm:px-3 md:px-4 lg:px-6 py-2.5 sm:py-3 md:py-4 whitespace-nowrap">
+            <span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getStatusStyle(student.status)}">
+              ${student.status}
+            </span>
+          </td>
+          <td class="px-2 sm:px-3 md:px-4 lg:px-6 py-2.5 sm:py-3 md:py-4 whitespace-nowrap text-xs sm:text-sm font-medium">
+            <div class="flex flex-row gap-1 items-center justify-start">
+              <button onclick="viewStudentDetails('${student.student_number}')" 
+                      class="text-primary-600 hover:text-primary-900 hover:bg-primary-50 transition-colors p-1.5 sm:p-2 rounded-lg min-h-[36px] min-w-[36px] sm:min-h-[44px] sm:min-w-[44px] flex items-center justify-center touch-manipulation"
+                      title="View Details"
+                      aria-label="View student details">
+                <i class="fas fa-eye text-xs sm:text-sm"></i>
+              </button>
+              <button onclick="openRetakeModal('${student.student_number}')" 
+                      class="text-green-600 hover:text-green-900 hover:bg-green-50 transition-colors p-1.5 sm:p-2 rounded-lg min-h-[36px] min-w-[36px] sm:min-h-[44px] sm:min-w-[44px] flex items-center justify-center touch-manipulation"
+                      title="Allow Retake"
+                      aria-label="Allow evaluation retake">
+                <i class="fas fa-redo text-xs sm:text-sm"></i>
+              </button>
+              <button onclick="viewEvaluationHistory('${student.student_number}')" 
+                      class="text-blue-600 hover:text-blue-900 hover:bg-blue-50 transition-colors p-1.5 sm:p-2 rounded-lg min-h-[36px] min-w-[36px] sm:min-h-[44px] sm:min-w-[44px] flex items-center justify-center touch-manipulation"
+                      title="View History"
+                      aria-label="View evaluation history">
+                <i class="fas fa-history text-xs sm:text-sm"></i>
+              </button>
+            </div>
+          </td>
+        </tr>
+      `).join('');
+    }
+
+    /**
+     * Setup event listeners
+     */
+    function setupEventListeners() {
+      // Search functionality with debouncing
+      document.getElementById('student-search').addEventListener('input', function() {
+        clearTimeout(searchTimeout);
+        searchTimeout = setTimeout(filterStudents, 300);
+      });
+      document.getElementById('department-filter').addEventListener('change', filterStudents);
+      document.getElementById('status-filter').addEventListener('change', filterStudents);
+      
+      // Modal events
+      document.getElementById('close-retake-modal').addEventListener('click', closeRetakeModal);
+      document.getElementById('cancel-retake').addEventListener('click', closeRetakeModal);
+      document.getElementById('confirm-retake').addEventListener('click', confirmRetake);
+      
+      // Keyboard events
+      document.addEventListener('keydown', function(event) {
+        if (event.key === 'Escape') {
+          const modal = document.getElementById('retake-modal');
+          if (!modal.classList.contains('hidden')) {
+            closeRetakeModal();
+          }
+        }
+        if (event.key === 'Enter' && event.ctrlKey) {
+          const modal = document.getElementById('retake-modal');
+          if (!modal.classList.contains('hidden')) {
+            confirmRetake();
+          }
+        }
+      });
+      
+      // Click outside modal to close
+      document.getElementById('retake-modal').addEventListener('click', function(event) {
+        if (event.target === this) {
+          closeRetakeModal();
+        }
+      });
+    }
+
+    /**
+     * Filter students based on search and filters
+     */
+    function filterStudents() {
+      const searchTerm = document.getElementById('student-search').value.toLowerCase();
+      const departmentFilter = document.getElementById('department-filter').value;
+      const statusFilter = document.getElementById('status-filter').value;
+      
+      const filteredStudents = studentsData.filter(student => {
+        const matchesSearch = !searchTerm || 
+          student.first_name.toLowerCase().includes(searchTerm) ||
+          student.last_name.toLowerCase().includes(searchTerm) ||
+          student.student_number.toLowerCase().includes(searchTerm) ||
+          (student.email && student.email.toLowerCase().includes(searchTerm));
+        
+        const matchesDepartment = !departmentFilter || student.department === departmentFilter;
+        const matchesStatus = !statusFilter || student.status === statusFilter;
+        
+        return matchesSearch && matchesDepartment && matchesStatus;
+      });
+      
+      displayStudents(filteredStudents);
+    }
+
+    /**
+     * Open retake modal for student
+     */
+    function openRetakeModal(studentId) {
+      console.log('Opening retake modal for student:', studentId);
+      selectedStudent = studentsData.find(s => s.student_number === studentId);
+      
+      if (!selectedStudent) {
+        console.error('Student not found:', studentId);
+        showError('Student not found');
+        return;
+      }
+      
+      console.log('Selected student:', selectedStudent);
+      
+      // Populate student info
+      document.getElementById('selected-student-info').innerHTML = `
+        <div class="flex items-center">
+          <div class="h-8 w-8 rounded-full bg-primary-100 flex items-center justify-center mr-3">
+            <span class="text-xs font-medium text-primary-600">${selectedStudent.first_name.charAt(0)}${selectedStudent.last_name.charAt(0)}</span>
+          </div>
+          <div>
+            <div class="text-sm font-medium text-gray-900">${selectedStudent.first_name} ${selectedStudent.last_name}</div>
+            <div class="text-xs text-gray-500">${selectedStudent.student_number}</div>
+          </div>
+        </div>
+      `;
+      
+      // Clear and reset form
+      document.getElementById('retake-reason').value = '';
+      
+      // Reset subjects list
+      document.getElementById('subjects-loading').style.display = 'block';
+      document.getElementById('subjects-list').classList.add('hidden');
+      document.getElementById('subjects-empty').classList.add('hidden');
+      
+      // Load completed evaluations for this student
+      loadStudentEvaluations(studentId);
+      
+      document.getElementById('retake-modal').classList.remove('hidden');
+    }
+
+    /**
+     * Load student's completed evaluations
+     */
+    function loadStudentEvaluations(studentId) {
+      console.log('Loading evaluations for student:', studentId);
+      
+      fetch(`/api/guidance/student-evaluations/${studentId}`)
+        .then(response => {
+          if (!response.ok) {
+            throw new Error(`HTTP error! status: ${response.status}`);
+          }
+          return response.json();
+        })
+        .then(data => {
+          console.log('Student evaluations loaded:', data);
+          
+          document.getElementById('subjects-loading').style.display = 'none';
+          
+          if (data.success && data.evaluations && data.evaluations.length > 0) {
+            // Filter completed and expired evaluations (allow retake for both)
+            const retakeableEvals = data.evaluations.filter(e => e.status === 'Completed' || e.status === 'Expired');
+            
+            if (retakeableEvals.length === 0) {
+              document.getElementById('subjects-empty').classList.remove('hidden');
+              return;
+            }
+            
+            displaySubjectCheckboxes(retakeableEvals);
+          } else {
+            document.getElementById('subjects-empty').classList.remove('hidden');
+          }
+        })
+        .catch(error => {
+          console.error('Error loading evaluations:', error);
+          document.getElementById('subjects-loading').style.display = 'none';
+          document.getElementById('subjects-empty').classList.remove('hidden');
+          document.getElementById('subjects-empty').innerHTML = `
+            <i class="fas fa-exclamation-triangle text-red-300 text-3xl mb-2"></i>
+            <p class="text-sm text-red-500">Error loading subjects: ${error.message}</p>
+          `;
+        });
+    }
+
+    /**
+     * Display subject checkboxes
+     */
+    function displaySubjectCheckboxes(evaluations) {
+      const subjectsList = document.getElementById('subjects-list');
+      
+      subjectsList.innerHTML = evaluations.map((eval, index) => {
+        // Determine status badge styling
+        const isExpired = eval.status === 'Expired';
+        const statusBadge = isExpired 
+          ? '<span class="ml-2 inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-red-100 text-red-800"><i class="fas fa-clock mr-1"></i>Expired</span>'
+          : '<span class="ml-2 inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-green-100 text-green-800"><i class="fas fa-check-circle mr-1"></i>Completed</span>';
+        
+        const borderColor = isExpired ? 'border-l-4 border-red-400' : '';
+        
+        return `
+          <label class="flex items-start p-3 hover:bg-gray-50 cursor-pointer ${borderColor}">
+            <input type="checkbox" 
+                   class="subject-checkbox mt-1 h-4 w-4 text-primary-600 border-gray-300 rounded focus:ring-primary-500" 
+                   value="${eval.evaluation_id}"
+                   data-faculty="${eval.faculty_name}"
+                   data-course="${eval.course_code} - ${eval.course_title || 'N/A'}"
+                   data-status="${eval.status}">
+            <div class="ml-3 flex-1">
+              <div class="text-sm font-medium text-gray-900">${eval.course_code || 'N/A'} - ${eval.course_title || 'Unknown Course'}</div>
+              <div class="text-xs text-gray-600 mt-1">
+                <i class="fas fa-user-tie mr-1"></i>${eval.faculty_name || 'Unknown Faculty'}
+              </div>
+              <div class="text-xs text-gray-500 mt-1">
+                <i class="fas fa-calendar mr-1"></i>${eval.period_name || 'N/A'} | ${eval.academic_year || ''} ${eval.semester ? '- ' + eval.semester : ''}
+              </div>
+              ${eval.submitted_at ? `<div class="text-xs text-gray-400 mt-1"><i class="fas fa-check-circle mr-1"></i>Completed: ${new Date(eval.submitted_at).toLocaleDateString()}</div>` : ''}
+              ${isExpired ? '<div class="text-xs text-red-500 mt-1"><i class="fas fa-exclamation-triangle mr-1"></i>Evaluation expired - student did not complete in time</div>' : ''}
+            </div>
+            ${statusBadge}
+          </label>
+        `;
+      }).join('');
+      
+      subjectsList.classList.remove('hidden');
+      
+      // Setup select all functionality
+      setupSelectAllButton();
+    }
+
+    /**
+     * Setup select all button
+     */
+    function setupSelectAllButton() {
+      const selectAllBtn = document.getElementById('select-all-subjects');
+      const checkboxes = document.querySelectorAll('.subject-checkbox');
+      
+      selectAllBtn.onclick = function() {
+        const allChecked = Array.from(checkboxes).every(cb => cb.checked);
+        
+        checkboxes.forEach(checkbox => {
+          checkbox.checked = !allChecked;
+        });
+        
+        // Update button text
+        if (allChecked) {
+          selectAllBtn.innerHTML = '<i class="fas fa-check-square mr-1"></i>Select All';
+        } else {
+          selectAllBtn.innerHTML = '<i class="fas fa-square mr-1"></i>Deselect All';
+        }
+      };
+      
+      // Update button text based on checkbox states
+      checkboxes.forEach(checkbox => {
+        checkbox.addEventListener('change', function() {
+          const allChecked = Array.from(checkboxes).every(cb => cb.checked);
+          if (allChecked) {
+            selectAllBtn.innerHTML = '<i class="fas fa-square mr-1"></i>Deselect All';
+          } else {
+            selectAllBtn.innerHTML = '<i class="fas fa-check-square mr-1"></i>Select All';
+          }
+        });
+      });
+    }
+
+    /**
+     * Close retake modal
+     */
+    function closeRetakeModal() {
+      document.getElementById('retake-modal').classList.add('hidden');
+      document.getElementById('retake-reason').value = '';
+      document.getElementById('subjects-list').classList.add('hidden');
+      document.getElementById('subjects-empty').classList.add('hidden');
+      document.getElementById('subjects-loading').style.display = 'none';
+      selectedStudent = null;
+    }
+
+    /**
+     * Confirm retake
+     */
+    function confirmRetake() {
+      const selectedCheckboxes = document.querySelectorAll('.subject-checkbox:checked');
+      const reason = document.getElementById('retake-reason').value;
+      
+      if (selectedCheckboxes.length === 0) {
+        showError('Please select at least one subject to retake');
+        return;
+      }
+      
+      if (!reason.trim()) {
+        showError('Please provide a reason for the retake');
+        return;
+      }
+      
+      // Get selected evaluation IDs
+      const evaluationIds = Array.from(selectedCheckboxes).map(cb => cb.value);
+      
+      // Show confirmation dialog
+      Swal.fire({
+        title: 'Confirm Retake Permission',
+        html: `
+          <div class="text-left">
+            <p class="mb-3">Are you sure you want to allow <strong>${selectedStudent.first_name} ${selectedStudent.last_name}</strong> to retake the following ${evaluationIds.length} evaluation(s)?</p>
+            <ul class="list-disc list-inside text-sm text-gray-700 space-y-1 mb-3">
+              ${Array.from(selectedCheckboxes).map(cb => {
+                const isExpired = cb.dataset.status === 'Expired';
+                const statusIcon = isExpired ? '<i class="fas fa-clock text-red-500 mr-1"></i>' : '<i class="fas fa-check-circle text-green-500 mr-1"></i>';
+                return `<li>${statusIcon}${cb.dataset.course} - ${cb.dataset.faculty}</li>`;
+              }).join('')}
+            </ul>
+            <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-3 mt-3">
+              <p class="text-xs text-yellow-800">
+                <i class="fas fa-exclamation-triangle mr-1"></i>
+                <strong>Note:</strong> This will reset the status to "Pending" and delete all previous responses for completed evaluations. Expired evaluations will be given a fresh start.
+              </p>
+            </div>
+          </div>
+        `,
+        icon: 'question',
+        showCancelButton: true,
+        confirmButtonColor: '#0059cc',
+        cancelButtonColor: '#6b7280',
+        confirmButtonText: 'Yes, Allow Retake',
+        cancelButtonText: 'Cancel',
+        width: 600
+      }).then((result) => {
+        if (result.isConfirmed) {
+          // Show loading state
+          Swal.fire({
+            title: 'Processing...',
+            text: `Granting retake permission for ${evaluationIds.length} evaluation(s)...`,
+            allowOutsideClick: false,
+            showConfirmButton: false,
+            willOpen: () => {
+              Swal.showLoading();
+            }
+          });
+          
+          // Prepare the request data
+          const requestData = {
+            student_number: selectedStudent.student_number,
+            evaluation_ids: evaluationIds,
+            reason: reason
+          };
+          
+          console.log('Sending retake request:', requestData);
+          
+          // Send retake request
+          fetch('/api/guidance/allow-retake', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(requestData)
+          })
+          .then(response => {
+            console.log('Retake API response status:', response.status);
+            return response.json();
+          })
+          .then(data => {
+            console.log('Retake API response:', data);
+            if (data.success) {
+              Swal.fire({
+                icon: 'success',
+                title: 'Success!',
+                text: `Retake permission granted for ${evaluationIds.length} evaluation(s)`,
+                timer: 2000,
+                showConfirmButton: false
+              });
+              closeRetakeModal();
+              loadStudents(); // Refresh the list
+            } else {
+              Swal.fire({
+                icon: 'error',
+                title: 'Failed',
+                text: data.message || 'Failed to grant retake permission',
+                confirmButtonColor: '#0059cc'
+              });
+            }
+          })
+          .catch(error => {
+            console.error('Error granting retake:', error);
+            Swal.fire({
+              icon: 'error',
+              title: 'Error',
+              text: 'Error granting retake permission: ' + error.message,
+              confirmButtonColor: '#0059cc'
+            });
+          });
+        }
+      });
+    }
+
+    /**
+     * View student details
+     */
+    function viewStudentDetails(studentId) {
+      const student = studentsData.find(s => s.student_number === studentId);
+      if (!student) return;
+      
+      const evaluationProgress = student.total_evaluations ? 
+        `${student.completed_evaluations}/${student.total_evaluations} completed` : 
+        'No evaluations assigned';
+      
+      Swal.fire({
+        title: 'Student Details',
+        html: `
+          <div class="text-left space-y-3">
+            <div class="flex items-center justify-center mb-4">
+              <div class="h-16 w-16 rounded-full bg-primary-100 flex items-center justify-center">
+                <span class="text-lg font-medium text-primary-600">${student.first_name.charAt(0)}${student.last_name.charAt(0)}</span>
+              </div>
+            </div>
+            <div><strong>Name:</strong> ${student.first_name} ${student.last_name}</div>
+            <div><strong>Student ID:</strong> ${student.student_number}</div>
+            <div><strong>Email:</strong> ${student.email || 'Not provided'}</div>
+            <div><strong>Department:</strong> ${student.department || 'N/A'}</div>
+            <div><strong>Evaluation Status:</strong> <span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getStatusStyle(student.status)}">${student.status}</span></div>
+            <div><strong>Evaluation Progress:</strong> ${evaluationProgress}</div>
+            <div><strong>Registered:</strong> ${student.created_at ? new Date(student.created_at).toLocaleDateString() : 'Unknown'}</div>
+          </div>
+        `,
+        width: 500,
+        confirmButtonText: 'Close',
+        confirmButtonColor: '#0059cc'
+      });
+    }
+
+    /**
+     * View evaluation history
+     */
+    function viewEvaluationHistory(studentId) {
+      // Show loading state
+      Swal.fire({
+        title: 'Loading Evaluation History...',
+        text: 'Please wait while we fetch the evaluation data.',
+        allowOutsideClick: false,
+        showConfirmButton: false,
+        willOpen: () => {
+          Swal.showLoading();
+        }
+      });
+      
+      // Fetch evaluation history
+      fetch(`/api/guidance/student-evaluations/${studentId}`)
+        .then(response => response.json())
+        .then(data => {
+          if (data.success) {
+            const evaluations = data.evaluations;
+            const student = studentsData.find(s => s.student_number === studentId);
+            
+            if (evaluations.length === 0) {
+              Swal.fire({
+                icon: 'info',
+                title: 'No Evaluations Found',
+                text: `${student.first_name} ${student.last_name} has not completed any evaluations yet.`,
+                confirmButtonColor: '#0059cc'
+              });
+              return;
+            }
+            
+            const historyHtml = `
+              <div class="text-left">
+                <div class="mb-4 text-center">
+                  <h3 class="text-lg font-medium">${student.first_name} ${student.last_name}</h3>
+                  <p class="text-sm text-gray-600">${student.student_number}</p>
+                </div>
+                <div class="space-y-3 max-h-96 overflow-y-auto">
+                  ${evaluations.map(eval => `
+                    <div class="border rounded-lg p-3 ${eval.status === 'Completed' ? 'bg-green-50 border-green-200' : 'bg-yellow-50 border-yellow-200'}">
+                      <div class="flex justify-between items-start">
+                        <div class="flex-1">
+                          <div class="font-medium">${eval.faculty_name || 'Unknown Faculty'}</div>
+                          <div class="text-sm text-gray-600">${eval.course_code || ''} ${eval.course_title ? '- ' + eval.course_title : ''}</div>
+                          <div class="text-xs text-gray-500 mt-1">
+                            ${eval.period_name || 'N/A'} | ${eval.academic_year || ''} ${eval.semester ? '- ' + eval.semester : ''}
+                          </div>
+                          ${eval.submitted_at ? `<div class="text-xs text-gray-400 mt-1">Submitted: ${new Date(eval.submitted_at).toLocaleString()}</div>` : ''}
+                        </div>
+                        <div class="text-right">
+                          <span class="inline-flex px-2 py-1 text-xs font-semibold rounded-full ${eval.status === 'Completed' ? 'bg-green-100 text-green-800' : eval.status === 'In Progress' ? 'bg-blue-100 text-blue-800' : 'bg-yellow-100 text-yellow-800'}">
+                            ${eval.status || 'Pending'}
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                  `).join('')}
+                </div>
+              </div>
+            `;
+            
+            Swal.fire({
+              title: 'Evaluation History',
+              html: historyHtml,
+              width: 600,
+              confirmButtonText: 'Close',
+              confirmButtonColor: '#0059cc'
+            });
+          } else {
+            showError('Failed to load evaluation history: ' + (data.message || 'Unknown error'));
+          }
+        })
+        .catch(error => {
+          console.error('Error loading evaluation history:', error);
+          showError('Error loading evaluation history: ' + error.message);
+        });
+    }
+
+    /**
+     * Show error message
+     */
+    function showError(message) {
+      Swal.fire({
+        icon: 'error',
+        title: 'Error',
+        text: message
+      });
+    }
+
+    /**
+     * Show success message
+     */
+    function showSuccess(message) {
+      Swal.fire({
+        icon: 'success',
+        title: 'Success',
+        text: message,
+        timer: 3000,
+        showConfirmButton: false
+      });
+    }
+
+    /**
+     * Show spinner on element
+     */
+    function showElementSpinner(elementId) {
+      const element = document.getElementById(elementId);
+      if (element) {
+        element.innerHTML = `
+          <tr>
+            <td colspan="5" class="px-6 py-8 text-center">
+              <div class="flex items-center justify-center">
+                <div class="animate-spin rounded-full h-6 w-6 border-b-2 border-primary-500"></div>
+                <span class="ml-2 text-gray-600">Loading...</span>
+              </div>
+            </td>
+          </tr>
+        `;
+      }
+    }
+
+    /**
+     * Hide spinner from element
+     */
+    function hideElementSpinner(elementId) {
+      // This function is called after data is loaded, so content will be replaced
+      // by displayStudents function
+    }
+  </script>
+  
+  <!-- Prevent logout on browser back button -->
+  <script src="{{ url_for('static', filename='js/prevent-back-logout.js') }}"></script>
+
+  <!-- Session Timeout Monitor (Auto-logout after 1 hour) -->
+  <script src="{{ url_for('static', filename='js/session-timeout.js') }}"></script>
+</body>
+</html>

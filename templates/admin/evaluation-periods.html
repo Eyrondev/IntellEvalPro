@@ -1,0 +1,1701 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+    <title>Evaluation Periods Management - IntellEvalPro</title>
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" href="{{ url_for('static', filename='images/nclogo.png') }}">
+    <link rel="shortcut icon" type="image/png" href="{{ url_for('static', filename='images/nclogo.png') }}">
+    <link rel="apple-touch-icon" href="{{ url_for('static', filename='images/nclogo.png') }}">
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- jQuery -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    
+    <!-- SweetAlert2 -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.7.12/dist/sweetalert2.all.min.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11.7.12/dist/sweetalert2.min.css">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                fontFamily: {
+                    'sans': ['Inter', 'system-ui', 'sans-serif'],
+                },
+                extend: {
+                    colors: {
+                        primary: {
+                            50: '#e6f0ff',
+                            100: '#b3d1ff',
+                            200: '#80b3ff',
+                            300: '#4d94ff', 
+                            400: '#1a75ff',
+                            500: '#0059cc',
+                            600: '#004db3',
+                            700: '#004099',
+                            800: '#003380',
+                            900: '#002766',
+                        },
+                        secondary: {
+                            50: '#f5f7fa',
+                            100: '#e4e7eb',
+                            200: '#cbd2d9',
+                            300: '#9aa5b1',
+                            400: '#7b8794',
+                            500: '#616e7c',
+                            600: '#52606d',
+                            700: '#3e4c59',
+                            800: '#323f4b',
+                            900: '#1f2933',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            overflow-x: hidden;
+        }
+        
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 10px;
+        }
+        
+        ::-webkit-scrollbar-thumb {
+            background: #c1c1c1;
+            border-radius: 10px;
+        }
+        
+        ::-webkit-scrollbar-thumb:hover {
+            background: #a8a8a8;
+        }
+        
+        /* Card hover effect */
+        .dashboard-card {
+            transition: all 0.3s ease;
+        }
+        
+        .dashboard-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+        }
+        
+        /* Active nav link */
+        .nav-link.active {
+            position: relative;
+        }
+        
+        .nav-link.active::after {
+            content: '';
+            position: absolute;
+            left: 0;
+            width: 4px;
+            height: 100%;
+            background-color: #0059cc;
+            border-radius: 0 2px 2px 0;
+        }
+        
+        /* Mobile responsive */
+        @media (max-width: 768px) {
+            .dashboard-card {
+                margin-bottom: 1rem;
+            }
+        }
+    </style>
+</head>
+<body class="bg-gray-50">
+    <!-- Loading overlay -->
+    <div id="loader-overlay" class="fixed inset-0 z-50 flex flex-col items-center justify-center bg-white bg-opacity-90 backdrop-blur-sm transition-opacity duration-300">
+        <img src="{{ url_for('static', filename='images/nclogo.png') }}" alt="Logo" class="w-32 h-auto mb-6 animate-bounce">
+        <div class="flex items-center space-x-2">
+            <div class="w-3 h-3 rounded-full bg-primary-500 animate-pulse"></div>
+            <div class="w-3 h-3 rounded-full bg-primary-500 animate-pulse" style="animation-delay: 0.2s"></div>
+            <div class="w-3 h-3 rounded-full bg-primary-500 animate-pulse" style="animation-delay: 0.4s"></div>
+        </div>
+    </div>
+
+    <div class="flex h-screen bg-gray-50">
+        <!-- Sidebar (will be loaded dynamically) -->
+        <div id="admin-sidebar"></div>
+        
+        <!-- Main content -->
+        <div class="lg:ml-64 flex flex-col flex-1 min-h-screen">
+            <!-- Top Navigation (will be loaded dynamically) -->
+            <div id="admin-header"></div>
+
+            <!-- Main content area -->
+            <main id="main-content" class="flex-1 overflow-auto p-3 sm:p-4 md:p-6 bg-gray-50">
+                <!-- Page title and controls -->
+                <div class="mb-4 sm:mb-6">
+                    <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                        <div class="flex-1 min-w-0">
+                            <h1 class="text-lg sm:text-xl md:text-2xl font-bold leading-7 text-gray-900 flex items-center gap-2">
+                                <i class="fas fa-calendar-alt text-primary-600 text-base sm:text-lg"></i>
+                                <span class="truncate">Evaluation Periods</span>
+                            </h1>
+                            <p class="mt-1 text-xs sm:text-sm text-gray-500">
+                                Manage evaluation periods and control start/end dates
+                            </p>
+                        </div>
+                        <div class="flex gap-2 sm:ml-4">
+                            <button onclick="openTimerManagement()" class="flex-1 sm:flex-none inline-flex items-center justify-center px-3 sm:px-4 py-2 border border-blue-300 rounded-md shadow-sm text-sm font-medium text-blue-700 bg-blue-50 hover:bg-blue-100 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 min-h-[44px]">
+                                <i class="fas fa-clock mr-2 -ml-0.5"></i>
+                                <span class="hidden sm:inline">Timer</span><span class="sm:hidden">Timer</span>
+                            </button>
+                            <button onclick="syncAllEvaluations()" class="flex-1 sm:flex-none inline-flex items-center justify-center px-3 sm:px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 min-h-[44px]">
+                                <i class="fas fa-sync mr-2 -ml-0.5"></i>
+                                <span class="hidden sm:inline">Sync</span><span class="sm:hidden">Sync</span>
+                            </button>
+                            <button onclick="showAddModal()" class="flex-1 sm:flex-none inline-flex items-center justify-center px-3 sm:px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-primary-600 hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 min-h-[44px]">
+                                <i class="fas fa-plus mr-2 -ml-0.5"></i>
+                                <span class="hidden sm:inline">Add Period</span><span class="sm:hidden">Add</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Statistics Cards -->
+                <div class="grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-4 mb-4 sm:mb-6">
+                    <!-- Total Periods -->
+                    <div class="bg-white overflow-hidden shadow rounded-lg dashboard-card">
+                        <div class="p-3 sm:p-4 md:p-5">
+                            <div class="flex items-center">
+                                <div class="flex-shrink-0 bg-blue-100 rounded-md p-2 sm:p-3">
+                                    <i class="fas fa-calendar-check text-blue-600 text-base sm:text-lg md:text-xl"></i>
+                                </div>
+                                <div class="ml-3 sm:ml-4 md:ml-5 w-0 flex-1">
+                                    <dl>
+                                        <dt class="text-xs sm:text-sm font-medium text-gray-500 truncate">Total</dt>
+                                        <dd class="flex items-baseline">
+                                            <div class="text-lg sm:text-xl md:text-2xl font-semibold text-gray-900" id="stat-total">0</div>
+                                        </dd>
+                                    </dl>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Active Periods -->
+                    <div class="bg-white overflow-hidden shadow rounded-lg dashboard-card">
+                        <div class="p-3 sm:p-4 md:p-5">
+                            <div class="flex items-center">
+                                <div class="flex-shrink-0 bg-green-100 rounded-md p-2 sm:p-3">
+                                    <i class="fas fa-play-circle text-green-600 text-base sm:text-lg md:text-xl"></i>
+                                </div>
+                                <div class="ml-3 sm:ml-4 md:ml-5 w-0 flex-1">
+                                    <dl>
+                                        <dt class="text-xs sm:text-sm font-medium text-gray-500 truncate">Active</dt>
+                                        <dd class="flex items-baseline">
+                                            <div class="text-lg sm:text-xl md:text-2xl font-semibold text-gray-900" id="stat-active">0</div>
+                                        </dd>
+                                    </dl>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Upcoming -->
+                    <div class="bg-white overflow-hidden shadow rounded-lg dashboard-card">
+                        <div class="p-3 sm:p-4 md:p-5">
+                            <div class="flex items-center">
+                                <div class="flex-shrink-0 bg-purple-100 rounded-md p-2 sm:p-3">
+                                    <i class="fas fa-clock text-purple-600 text-base sm:text-lg md:text-xl"></i>
+                                </div>
+                                <div class="ml-3 sm:ml-4 md:ml-5 w-0 flex-1">
+                                    <dl>
+                                        <dt class="text-xs sm:text-sm font-medium text-gray-500 truncate">Upcoming</dt>
+                                        <dd class="flex items-baseline">
+                                            <div class="text-lg sm:text-xl md:text-2xl font-semibold text-gray-900" id="stat-upcoming">0</div>
+                                        </dd>
+                                    </dl>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Completed -->
+                    <div class="bg-white overflow-hidden shadow rounded-lg dashboard-card">
+                        <div class="p-3 sm:p-4 md:p-5">
+                            <div class="flex items-center">
+                                <div class="flex-shrink-0 bg-gray-100 rounded-md p-2 sm:p-3">
+                                    <i class="fas fa-check-circle text-gray-600 text-base sm:text-lg md:text-xl"></i>
+                                </div>
+                                <div class="ml-3 sm:ml-4 md:ml-5 w-0 flex-1">
+                                    <dl>
+                                        <dt class="text-xs sm:text-sm font-medium text-gray-500 truncate">Done</dt>
+                                        <dd class="flex items-baseline">
+                                            <div class="text-lg sm:text-xl md:text-2xl font-semibold text-gray-900" id="stat-completed">0</div>
+                                        </dd>
+                                    </dl>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Filters -->
+                <div class="bg-white shadow rounded-lg p-4 sm:p-6 mb-4 sm:mb-6">
+                    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                        <div class="sm:col-span-2 lg:col-span-2">
+                            <label class="block text-sm font-medium text-gray-700 mb-2">
+                                <i class="fas fa-search mr-1"></i> Search
+                            </label>
+                            <input type="text" id="searchInput" placeholder="Search by title..." 
+                                   class="w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-primary-500 focus:border-primary-500 text-sm"
+                                   oninput="filterPeriods()">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">
+                                <i class="fas fa-calendar-alt mr-1"></i> Academic Year
+                            </label>
+                            <select id="academicYearFilter" onchange="filterByAcademicYear()" 
+                                    class="w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-primary-500 focus:border-primary-500 text-sm">
+                                <!-- Options will be populated by JavaScript -->
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">
+                                <i class="fas fa-filter mr-1"></i> Status
+                            </label>
+                            <select id="statusFilter" onchange="filterPeriods()" 
+                                    class="w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-primary-500 focus:border-primary-500 text-sm">
+                                <option value="">All Status</option>
+                                <option value="Active">Active</option>
+                                <option value="Upcoming">Upcoming</option>
+                                <option value="Completed">Completed</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Periods Table - Desktop View -->
+                <div class="bg-white shadow rounded-lg overflow-hidden hidden md:block">
+                    <div class="overflow-x-auto">
+                        <table class="min-w-full divide-y divide-gray-200">
+                            <thead class="bg-gray-50">
+                                <tr>
+                                    <th scope="col" class="px-4 lg:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Title</th>
+                                    <th scope="col" class="px-4 lg:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider hidden lg:table-cell">Academic Term</th>
+                                    <th scope="col" class="px-4 lg:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Dates</th>
+                                    <th scope="col" class="px-4 lg:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+                                    <th scope="col" class="px-4 lg:px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider hidden xl:table-cell">Evaluations</th>
+                                    <th scope="col" class="px-4 lg:px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody id="periodsTableBody" class="bg-white divide-y divide-gray-200">
+                                <!-- Table rows will be inserted here by JavaScript -->
+                            </tbody>
+                        </table>
+                    </div>
+                    <div id="emptyState" class="hidden p-8 md:p-12 text-center">
+                        <i class="fas fa-calendar-times text-gray-300 text-4xl md:text-6xl mb-4"></i>
+                        <p class="text-gray-500 text-base md:text-lg">No evaluation periods found</p>
+                        <p class="text-gray-400 text-sm mt-2">Create your first evaluation period to get started</p>
+                    </div>
+                </div>
+
+                <!-- Periods Cards - Mobile View -->
+                <div class="md:hidden">
+                    <div id="periodsCardsContainer" class="space-y-4">
+                        <!-- Cards will be inserted here by JavaScript -->
+                    </div>
+                    <div id="emptyStateMobile" class="hidden bg-white shadow rounded-lg p-8 text-center">
+                        <i class="fas fa-calendar-times text-gray-300 text-4xl mb-3"></i>
+                        <p class="text-gray-500 text-base">No periods found</p>
+                        <p class="text-gray-400 text-sm mt-2">Create your first period</p>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <!-- Add/Edit Modal -->
+    <div id="periodModal" class="hidden fixed inset-0 z-50 overflow-y-auto" aria-labelledby="modal-title" role="dialog" aria-modal="true">
+        <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+            <!-- Background overlay -->
+            <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" aria-hidden="true"></div>
+
+            <!-- Modal panel -->
+            <div class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
+                <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
+                    <div class="sm:flex sm:items-start">
+                        <div class="mt-3 text-center sm:mt-0 sm:text-left w-full">
+                            <h3 class="text-base md:text-lg leading-6 font-medium text-gray-900" id="modalTitle">
+                                Add Evaluation Period
+                            </h3>
+                            <div class="mt-4">
+                                <form id="periodForm" class="space-y-4">
+                                    <input type="hidden" id="period_id">
+
+                                    <!-- Academic Term -->
+                                    <div>
+                                        <label for="acad_term_id" class="block text-sm font-medium text-gray-700">Academic Term <span class="text-red-500">*</span></label>
+                                        <select id="acad_term_id" required onchange="checkTermAvailability()"
+                                                class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-primary-500 focus:border-primary-500 text-sm">
+                                            <option value="">Select Academic Term</option>
+                                        </select>
+                                        <div id="termWarning" class="hidden mt-2 p-3 bg-red-50 border border-red-200 rounded-md">
+                                            <div class="flex items-start gap-2">
+                                                <i class="fas fa-exclamation-triangle text-red-600 mt-0.5"></i>
+                                                <div class="text-sm text-red-700">
+                                                    <p class="font-medium">Period Already Exists</p>
+                                                    <p class="mt-1">This academic term already has an evaluation period. Only one period is allowed per term.</p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Title -->
+                                    <div>
+                                        <label for="title" class="block text-sm font-medium text-gray-700">Period Title <span class="text-red-500">*</span></label>
+                                        <input type="text" id="title" required 
+                                               placeholder="e.g., Midterm Faculty Evaluation"
+                                               class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-primary-500 focus:border-primary-500 text-sm">
+                                    </div>
+
+                                    <!-- Date Range -->
+                                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                                        <div>
+                                            <label for="start_date" class="block text-sm font-medium text-gray-700">Start Date <span class="text-red-500">*</span></label>
+                                            <input type="date" id="start_date" required 
+                                                   class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-primary-500 focus:border-primary-500 text-sm">
+                                        </div>
+                                        <div>
+                                            <label for="num_days" class="block text-sm font-medium text-gray-700">Number of Days <span class="text-red-500">*</span></label>
+                                            <input type="number" id="num_days" min="1" max="365" required 
+                                                   placeholder="e.g., 14"
+                                                   class="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-primary-500 focus:border-primary-500 text-sm">
+                                            <p class="text-xs text-gray-500 mt-1">Duration in days</p>
+                                        </div>
+                                        <div>
+                                            <label for="end_date" class="block text-sm font-medium text-gray-700">End Date <span class="text-red-500">*</span></label>
+                                            <input type="date" id="end_date" required readonly
+                                                   class="mt-1 block w-full border-gray-300 rounded-md shadow-sm bg-gray-50 text-sm cursor-not-allowed">
+                                            <p class="text-xs text-gray-500 mt-1">Auto-calculated</p>
+                                        </div>
+                                    </div>
+
+                                    <!-- Duration Info -->
+                                    <div id="durationInfo" class="hidden bg-blue-50 border border-blue-200 rounded-md p-3">
+                                        <div class="flex items-center gap-2 text-blue-800 text-sm">
+                                            <i class="fas fa-info-circle"></i>
+                                            <span class="font-medium">Duration: <span id="durationText"></span></span>
+                                        </div>
+                                        <div class="text-sm text-blue-600 mt-1" id="statusPreview"></div>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse gap-2">
+                    <button type="submit" form="periodForm" id="submitButton"
+                            class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-primary-600 text-base font-medium text-white hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 sm:w-auto text-sm min-h-[44px]">
+                        <span id="submitButtonText">Add Evaluation Period</span>
+                    </button>
+                    <button type="button" onclick="closeModal()" id="cancelButton"
+                            class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 sm:mt-0 sm:w-auto text-sm min-h-[44px]">
+                        Cancel
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Timer Management Modal -->
+    <div id="timerModal" class="hidden fixed inset-0 z-50 overflow-y-auto" aria-labelledby="timer-modal-title" role="dialog" aria-modal="true">
+        <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+            <!-- Background overlay -->
+            <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity" aria-hidden="true"></div>
+
+            <!-- Modal panel -->
+            <div class="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-2xl sm:w-full">
+                <div class="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
+                    <div class="sm:flex sm:items-start">
+                        <div class="mx-auto flex-shrink-0 flex items-center justify-center h-12 w-12 rounded-full bg-blue-100 sm:mx-0 sm:h-10 sm:w-10">
+                            <i class="fas fa-clock text-blue-600"></i>
+                        </div>
+                        <div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left w-full">
+                            <h3 class="text-lg leading-6 font-medium text-gray-900" id="timer-modal-title">
+                                Evaluation Timer Management
+                            </h3>
+                            <div class="mt-4">
+                                <form id="timerForm">
+                                    <!-- Timer Enabled Toggle -->
+                                    <div class="mb-4 p-4 bg-blue-50 rounded-lg border border-blue-200">
+                                        <label class="flex items-center justify-between cursor-pointer">
+                                            <div>
+                                                <span class="text-sm font-semibold text-gray-900">Enable Timer</span>
+                                                <p class="text-xs text-gray-600 mt-1">Limit time for students to complete evaluations</p>
+                                            </div>
+                                            <div class="relative">
+                                                <input type="checkbox" id="timerEnabled" class="sr-only" onchange="toggleTimerFields()">
+                                                <div class="block bg-gray-200 w-14 h-8 rounded-full"></div>
+                                                <div class="dot absolute left-1 top-1 bg-white w-6 h-6 rounded-full transition"></div>
+                                            </div>
+                                        </label>
+                                    </div>
+
+                                    <!-- Timer Settings -->
+                                    <div id="timerSettings" class="space-y-4">
+                                        <!-- Time Limit -->
+                                        <div>
+                                            <label for="timeLimit" class="block text-sm font-medium text-gray-700 mb-1">
+                                                Time Limit (minutes) <span class="text-red-500">*</span>
+                                            </label>
+                                            <input type="number" id="timeLimit" name="timeLimit" min="5" max="180" 
+                                                   class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                                   placeholder="e.g., 30">
+                                            <p class="text-xs text-gray-500 mt-1">How long students have to complete each evaluation</p>
+                                        </div>
+
+                                        <!-- Warning Times -->
+                                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                            <div>
+                                                <label for="warning1" class="block text-sm font-medium text-gray-700 mb-1">
+                                                    First Warning (minutes)
+                                                </label>
+                                                <input type="number" id="warning1" name="warning1" min="1" 
+                                                       class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                                       placeholder="e.g., 5">
+                                                <p class="text-xs text-gray-500 mt-1">Show warning when X minutes remain</p>
+                                            </div>
+                                            <div>
+                                                <label for="warning2" class="block text-sm font-medium text-gray-700 mb-1">
+                                                    Second Warning (minutes)
+                                                </label>
+                                                <input type="number" id="warning2" name="warning2" min="1" 
+                                                       class="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                                                       placeholder="e.g., 2">
+                                                <p class="text-xs text-gray-500 mt-1">Show final warning when X minutes remain</p>
+                                            </div>
+                                        </div>
+
+                                        <!-- Preview -->
+                                        <div class="bg-gray-50 rounded-lg p-4 border border-gray-200">
+                                            <h4 class="text-sm font-semibold text-gray-700 mb-2">Preview:</h4>
+                                            <p class="text-xs text-gray-600" id="timerPreview">Configure timer settings to see preview</p>
+                                        </div>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse gap-2">
+                    <button type="button" onclick="saveTimerSettings()" id="saveTimerButton"
+                            class="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-blue-600 text-base font-medium text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:w-auto text-sm min-h-[44px]">
+                        <i class="fas fa-save mr-2"></i>
+                        Save Settings
+                    </button>
+                    <button type="button" onclick="closeTimerModal()" id="cancelTimerButton"
+                            class="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:mt-0 sm:w-auto text-sm min-h-[44px]">
+                        Cancel
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="/static/js/admin-navigation.js"></script>
+    <script>
+        let allPeriods = [];
+        let allTerms = [];
+        let allAcademicYears = [];
+
+        // Load data on page load
+        $(document).ready(function() {
+            loadTerms();
+            // Don't load periods here - wait for academic year to be selected
+            
+            // Auto-refresh every 60 seconds to update statuses
+            setInterval(function() {
+                const currentYearId = $('#academicYearFilter').val();
+                if (currentYearId) {
+                    loadPeriods(parseInt(currentYearId));
+                }
+            }, 60000);
+            
+            // Date and duration change listeners
+            $('#start_date, #num_days').on('change input', calculateEndDate);
+            $('#start_date, #end_date').on('change', calculateDuration);
+        });
+
+        // Load academic terms
+        function loadTerms() {
+            $.ajax({
+                url: '/api/academic-years',
+                method: 'GET',
+                success: function(response) {
+                    console.log('Academic Years Response:', response);
+                    if (response.success && response.data) {
+                        // Store academic years for filtering
+                        allAcademicYears = response.data;
+                        
+                        // Extract all terms from all academic years
+                        allTerms = [];
+                        response.data.forEach(year => {
+                            if (year.terms && year.terms.length > 0) {
+                                year.terms.forEach(term => {
+                                    allTerms.push({
+                                        acad_term_id: term.acad_term_id,
+                                        term_name: term.term_name,
+                                        term_code: term.term_code,
+                                        year_code: year.year_code,
+                                        acad_year_id: year.acad_year_id,
+                                        is_current: term.is_current
+                                    });
+                                });
+                            }
+                        });
+                        console.log('Loaded terms:', allTerms);
+                        populateTermDropdown();
+                        populateAcademicYearFilter();
+                    } else {
+                        console.error('API returned success=false or no data:', response);
+                    }
+                },
+                error: function(xhr, status, error) {
+                    console.error('Terms AJAX Error:', {xhr, status, error});
+                    console.error('Terms Response:', xhr.responseText);
+                }
+            });
+        }
+
+        // Populate term dropdown
+        function populateTermDropdown() {
+            const select = $('#acad_term_id');
+            select.find('option:not(:first)').remove();
+            
+            if (allTerms.length === 0) {
+                console.warn('No academic terms available');
+                select.append('<option value="" disabled>No terms available - Create academic years first</option>');
+                return;
+            }
+            
+            allTerms.forEach(term => {
+                const current = term.is_current ? ' (Current)' : '';
+                const yearInfo = term.year_code ? `${term.year_code} - ` : '';
+                select.append(`<option value="${term.acad_term_id}">${yearInfo}${term.term_name}${current}</option>`);
+            });
+        }
+
+        // Populate academic year filter dropdown
+        function populateAcademicYearFilter() {
+            const select = $('#academicYearFilter');
+            select.find('option').remove(); // Remove all options
+            
+            if (allAcademicYears.length === 0) {
+                return;
+            }
+            
+            // Sort by year_code descending (most recent first)
+            const sortedYears = [...allAcademicYears].sort((a, b) => {
+                return b.year_code.localeCompare(a.year_code);
+            });
+            
+            // Find the current academic year
+            let currentYearId = null;
+            sortedYears.forEach(year => {
+                const current = year.is_current ? ' (Current)' : '';
+                select.append(`<option value="${year.acad_year_id}">${year.year_code}${current}</option>`);
+                
+                if (year.is_current) {
+                    currentYearId = year.acad_year_id;
+                }
+            });
+            
+            // Auto-select the current academic year (or first year if no current year)
+            if (currentYearId) {
+                select.val(currentYearId);
+                loadPeriods(currentYearId);
+            } else if (sortedYears.length > 0) {
+                // Fallback to most recent year
+                select.val(sortedYears[0].acad_year_id);
+                loadPeriods(sortedYears[0].acad_year_id);
+            }
+        }
+
+        // Load evaluation periods
+        function loadPeriods(academicYearId = null) {
+            const url = academicYearId 
+                ? `/api/evaluation-periods-admin?academic_year_id=${academicYearId}`
+                : '/api/evaluation-periods-admin';
+            
+            $.ajax({
+                url: url,
+                method: 'GET',
+                success: function(response) {
+                    console.log('API Response:', response);
+                    if (response.success) {
+                        allPeriods = response.data;
+                        updateStatistics(response.stats);
+                        displayPeriods(allPeriods);
+                    } else {
+                        console.error('API returned success=false:', response);
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error',
+                            text: response.error || response.message || 'Failed to load evaluation periods'
+                        });
+                    }
+                },
+                error: function(xhr, status, error) {
+                    console.error('AJAX Error:', {xhr, status, error});
+                    console.error('Response Text:', xhr.responseText);
+                    console.error('Status Code:', xhr.status);
+                    
+                    let errorMessage = 'Failed to load evaluation periods';
+                    if (xhr.status === 403) {
+                        errorMessage = 'Access denied. Please log in as admin.';
+                    } else if (xhr.status === 401) {
+                        errorMessage = 'Session expired. Please log in again.';
+                        setTimeout(() => window.location.href = '/login', 2000);
+                    } else if (xhr.responseJSON && xhr.responseJSON.error) {
+                        errorMessage = xhr.responseJSON.error;
+                    }
+                    
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: errorMessage
+                    });
+                }
+            });
+        }
+
+        // Update statistics
+        function updateStatistics(stats) {
+            $('#stat-total').text(stats.total_periods);
+            $('#stat-active').text(stats.active_periods);
+            $('#stat-upcoming').text(stats.upcoming_periods);
+            $('#stat-completed').text(stats.completed_periods);
+        }
+
+        // Filter by academic year
+        function filterByAcademicYear() {
+            const academicYearId = $('#academicYearFilter').val();
+            
+            // Reset other filters when changing academic year
+            $('#searchInput').val('');
+            $('#statusFilter').val('');
+            
+            // Reload periods with academic year filter (always required)
+            if (academicYearId) {
+                loadPeriods(parseInt(academicYearId));
+            }
+        }
+
+        // Display periods in table and cards
+        function displayPeriods(periods) {
+            const tbody = $('#periodsTableBody');
+            const cardsContainer = $('#periodsCardsContainer');
+            tbody.empty();
+            cardsContainer.empty();
+
+            if (periods.length === 0) {
+                $('#emptyState').removeClass('hidden');
+                $('#emptyStateMobile').removeClass('hidden');
+                tbody.closest('table').addClass('hidden');
+                return;
+            }
+
+            $('#emptyState').addClass('hidden');
+            $('#emptyStateMobile').addClass('hidden');
+            tbody.closest('table').removeClass('hidden');
+
+            periods.forEach(period => {
+                const statusBadge = getStatusBadge(period.computed_status);
+                const daysRemaining = period.days_remaining !== null ? period.days_remaining : 'N/A';
+                const durationText = getDurationText(period.start_date, period.end_date);
+                
+                const completionRate = period.total_evaluations > 0 
+                    ? Math.round((period.completed_evaluations / period.total_evaluations) * 100)
+                    : 0;
+
+                // Desktop table row
+                const row = `
+                    <tr class="hover:bg-gray-50 transition-colors duration-150">
+                        <td class="px-4 lg:px-6 py-4">
+                            <div class="font-semibold text-gray-900 text-sm">${period.title}</div>
+                            <div class="text-xs text-gray-500 lg:hidden mt-1">${period.term_title || 'N/A'}</div>
+                        </td>
+                        <td class="px-4 lg:px-6 py-4 hidden lg:table-cell">
+                            <span class="text-sm text-gray-700">${period.term_title || 'N/A'}</span>
+                        </td>
+                        <td class="px-4 lg:px-6 py-4">
+                            <div class="text-xs md:text-sm text-gray-900">${formatDate(period.start_date)}</div>
+                            <div class="text-xs text-gray-500">${formatDate(period.end_date)}</div>
+                            <div class="text-xs text-gray-500 mt-1">${durationText}</div>
+                        </td>
+                        <td class="px-4 lg:px-6 py-4">
+                            ${statusBadge}
+                            ${period.computed_status === 'Active' && daysRemaining !== 'N/A' ? 
+                                `<div class="text-xs text-gray-500 mt-1">${daysRemaining}d left</div>` : ''}
+                        </td>
+                        <td class="px-4 lg:px-6 py-4 hidden xl:table-cell">
+                            <div class="text-sm text-gray-900">${period.total_evaluations || 0} total</div>
+                            <div class="w-full bg-gray-200 rounded-full h-2 mt-1">
+                                <div class="bg-green-500 h-2 rounded-full" style="width: ${completionRate}%"></div>
+                            </div>
+                            <div class="text-xs text-gray-500 mt-1">${completionRate}% done</div>
+                        </td>
+                        <td class="px-4 lg:px-6 py-4 text-center">
+                            <div class="flex items-center justify-center gap-2">
+                                <button onclick="editPeriod(${period.period_id})" 
+                                        class="text-blue-600 hover:text-blue-800 transition-colors p-2 hover:bg-blue-50 rounded min-w-[44px] min-h-[44px] md:min-w-0 md:min-h-0"
+                                        title="Edit">
+                                    <i class="fas fa-edit"></i>
+                                </button>
+                                <button onclick="archivePeriod(${period.period_id}, '${period.title}')" 
+                                        class="text-amber-600 hover:text-amber-800 transition-colors p-2 hover:bg-amber-50 rounded min-w-[44px] min-h-[44px] md:min-w-0 md:min-h-0"
+                                        title="Archive">
+                                    <i class="fas fa-archive"></i>
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+                tbody.append(row);
+
+                // Mobile card
+                const card = `
+                    <div class="bg-white shadow rounded-lg p-4">
+                        <div class="flex items-start justify-between mb-3">
+                            <div class="flex-1">
+                                <h3 class="font-semibold text-gray-900 text-base">${period.title}</h3>
+                                <p class="text-sm text-gray-500 mt-1">${period.term_title || 'N/A'}</p>
+                            </div>
+                            ${statusBadge}
+                        </div>
+                        
+                        <div class="space-y-2 mb-3">
+                            <div class="flex items-center text-sm">
+                                <i class="fas fa-calendar-alt text-gray-400 w-5"></i>
+                                <span class="text-gray-700 ml-2">${formatDate(period.start_date)} - ${formatDate(period.end_date)}</span>
+                            </div>
+                            <div class="flex items-center text-sm">
+                                <i class="fas fa-clock text-gray-400 w-5"></i>
+                                <span class="text-gray-700 ml-2">${durationText}</span>
+                                ${period.computed_status === 'Active' && daysRemaining !== 'N/A' ? 
+                                    `<span class="text-gray-500 ml-2">(${daysRemaining} days left)</span>` : ''}
+                            </div>
+                            <div class="flex items-center text-sm">
+                                <i class="fas fa-clipboard-check text-gray-400 w-5"></i>
+                                <span class="text-gray-700 ml-2">${period.total_evaluations || 0} evaluations</span>
+                            </div>
+                        </div>
+                        
+                        ${period.total_evaluations > 0 ? `
+                            <div class="mb-3">
+                                <div class="flex justify-between text-xs text-gray-600 mb-1">
+                                    <span>Completion</span>
+                                    <span>${completionRate}%</span>
+                                </div>
+                                <div class="w-full bg-gray-200 rounded-full h-2">
+                                    <div class="bg-green-500 h-2 rounded-full" style="width: ${completionRate}%"></div>
+                                </div>
+                            </div>
+                        ` : ''}
+                        
+                        <div class="flex gap-2 pt-3 border-t border-gray-200">
+                            <button onclick="editPeriod(${period.period_id})" 
+                                    class="flex-1 inline-flex items-center justify-center px-4 py-2 border border-blue-300 rounded-md text-sm font-medium text-blue-700 bg-blue-50 hover:bg-blue-100 min-h-[44px]">
+                                <i class="fas fa-edit mr-2"></i>Edit
+                            </button>
+                            <button onclick="archivePeriod(${period.period_id}, '${period.title}')" 
+                                    class="flex-1 inline-flex items-center justify-center px-4 py-2 border border-amber-300 rounded-md text-sm font-medium text-amber-700 bg-amber-50 hover:bg-amber-100 min-h-[44px]">
+                                <i class="fas fa-archive mr-2"></i>Archive
+                            </button>
+                        </div>
+                    </div>
+                `;
+                cardsContainer.append(card);
+            });
+        }
+
+        // Get status badge HTML
+        function getStatusBadge(status) {
+            const badges = {
+                'Active': '<span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800"><i class="fas fa-play-circle mr-1"></i> Active</span>',
+                'Pending': '<span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-purple-100 text-purple-800"><i class="fas fa-clock mr-1"></i> Upcoming</span>',
+                'Closed': '<span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-800"><i class="fas fa-check-circle mr-1"></i> Completed</span>',
+                'Canceled': '<span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-red-100 text-red-800"><i class="fas fa-times-circle mr-1"></i> Cancelled</span>',
+                // Legacy/computed status fallbacks
+                'Upcoming': '<span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-purple-100 text-purple-800"><i class="fas fa-clock mr-1"></i> Upcoming</span>',
+                'Completed': '<span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-gray-100 text-gray-800"><i class="fas fa-check-circle mr-1"></i> Completed</span>',
+                'Cancelled': '<span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-medium bg-red-100 text-red-800"><i class="fas fa-times-circle mr-1"></i> Cancelled</span>'
+            };
+            return badges[status] || badges['Pending'];
+        }
+
+        // Format date
+        function formatDate(dateString) {
+            if (!dateString) return 'N/A';
+            const date = new Date(dateString);
+            return date.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
+        }
+
+        // Get duration text
+        function getDurationText(startDate, endDate) {
+            if (!startDate || !endDate) return 'N/A';
+            const start = new Date(startDate);
+            const end = new Date(endDate);
+            const days = Math.ceil((end - start) / (1000 * 60 * 60 * 24));
+            return `${days} days`;
+        }
+
+        // Calculate end date based on start date and number of days
+        function calculateEndDate() {
+            const startDate = $('#start_date').val();
+            const numDays = parseInt($('#num_days').val());
+            
+            if (startDate && numDays > 0) {
+                const start = new Date(startDate);
+                const end = new Date(start);
+                end.setDate(start.getDate() + numDays);
+                
+                // Format date to YYYY-MM-DD for HTML5 date input
+                const formattedEndDate = end.toISOString().split('T')[0];
+                $('#end_date').val(formattedEndDate);
+                
+                // Update duration info
+                calculateDuration();
+            }
+        }
+
+        // Calculate duration when dates change (for edit mode or manual changes)
+        function calculateDuration() {
+            const startDate = $('#start_date').val();
+            const endDate = $('#end_date').val();
+            
+            if (startDate && endDate) {
+                const start = new Date(startDate);
+                const end = new Date(endDate);
+                const today = new Date();
+                today.setHours(0, 0, 0, 0);
+                
+                if (end <= start) {
+                    $('#durationInfo').addClass('hidden');
+                    return;
+                }
+                
+                const days = Math.ceil((end - start) / (1000 * 60 * 60 * 24));
+                
+                // Update num_days field if not manually set
+                if (!$('#num_days').is(':focus')) {
+                    $('#num_days').val(days);
+                }
+                
+                $('#durationText').text(`${days} days`);
+                
+                // Determine status
+                let statusText = '';
+                if (start > today) {
+                    statusText = 'Status will be: <span class="font-semibold text-purple-700">Pending (Upcoming)</span>';
+                } else if (start <= today && end >= today) {
+                    statusText = 'Status will be: <span class="font-semibold text-green-700">Active</span>';
+                } else {
+                    statusText = 'Status will be: <span class="font-semibold text-gray-700">Closed (Completed)</span>';
+                }
+                
+                $('#statusPreview').html(statusText);
+                $('#durationInfo').removeClass('hidden');
+            } else {
+                $('#durationInfo').addClass('hidden');
+            }
+        }
+
+        // Show add modal
+        function showAddModal() {
+            $('#modalTitle').text('Add Evaluation Period');
+            $('#submitButtonText').text('Add Evaluation Period');
+            $('#periodForm')[0].reset();
+            $('#period_id').val('');
+            $('#durationInfo').addClass('hidden');
+            $('#termWarning').addClass('hidden');
+            $('#end_date').prop('readonly', true).addClass('bg-gray-50 cursor-not-allowed');
+            $('#submitButton').prop('disabled', false);
+            $('#periodModal').removeClass('hidden');
+        }
+
+        // Check if term already has a period
+        function checkTermAvailability() {
+            const termId = $('#acad_term_id').val();
+            const periodId = $('#period_id').val(); // For edit mode
+            
+            if (!termId) {
+                $('#termWarning').addClass('hidden');
+                $('#submitButton').prop('disabled', false);
+                return;
+            }
+            
+            // Check if this term already has a period (excluding current period in edit mode)
+            const existingPeriod = allPeriods.find(p => 
+                p.acad_term_id == termId && 
+                (!periodId || p.period_id != periodId)
+            );
+            
+            if (existingPeriod) {
+                $('#termWarning').removeClass('hidden');
+                $('#submitButton').prop('disabled', true);
+                
+                // Show info about existing period
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Period Already Exists',
+                    html: `<div class="text-left">
+                        <p class="mb-2">This academic term already has an evaluation period:</p>
+                        <div class="bg-gray-50 p-3 rounded-md">
+                            <p class="font-semibold text-primary-600">${existingPeriod.title}</p>
+                            <p class="text-sm text-gray-600 mt-1">
+                                <i class="fas fa-calendar-alt"></i> 
+                                ${formatDate(existingPeriod.start_date)} - ${formatDate(existingPeriod.end_date)}
+                            </p>
+                            <p class="text-sm text-gray-600 mt-1">
+                                <i class="fas fa-info-circle"></i> Status: ${existingPeriod.computed_status}
+                            </p>
+                        </div>
+                        <p class="mt-3 text-sm text-gray-700">Only one evaluation period is allowed per academic term. Please select a different term or edit the existing period.</p>
+                    </div>`,
+                    confirmButtonColor: '#0059cc',
+                    confirmButtonText: 'OK'
+                });
+            } else {
+                $('#termWarning').addClass('hidden');
+                $('#submitButton').prop('disabled', false);
+            }
+        }
+
+        // Edit period
+        function editPeriod(periodId) {
+            const period = allPeriods.find(p => p.period_id === periodId);
+            if (!period) return;
+
+            $('#modalTitle').text('Edit Evaluation Period');
+            $('#submitButtonText').text('Update Evaluation Period');
+            $('#period_id').val(period.period_id);
+            $('#acad_term_id').val(period.acad_term_id);
+            $('#title').val(period.title);
+            
+            // Format dates to YYYY-MM-DD for HTML5 date inputs
+            const startDate = period.start_date ? period.start_date.split('T')[0] : '';
+            const endDate = period.end_date ? period.end_date.split('T')[0] : '';
+            
+            $('#start_date').val(startDate);
+            $('#end_date').val(endDate);
+            
+            // Calculate and set number of days
+            if (startDate && endDate) {
+                const start = new Date(startDate);
+                const end = new Date(endDate);
+                const days = Math.ceil((end - start) / (1000 * 60 * 60 * 24));
+                $('#num_days').val(days);
+            }
+            
+            calculateDuration();
+            $('#end_date').prop('readonly', true).addClass('bg-gray-50 cursor-not-allowed');
+            $('#periodModal').removeClass('hidden');
+        }
+
+        // Close modal
+        function closeModal() {
+            $('#periodModal').addClass('hidden');
+            $('#periodForm')[0].reset();
+            $('#termWarning').addClass('hidden');
+            $('#submitButton').prop('disabled', false);
+        }
+
+        // Submit form
+        $('#periodForm').on('submit', function(e) {
+            e.preventDefault();
+
+            const periodId = $('#period_id').val();
+            const termId = parseInt($('#acad_term_id').val());
+            
+            // Final validation: Check if term already has a period (for new periods only)
+            if (!periodId) {
+                const existingPeriod = allPeriods.find(p => p.acad_term_id == termId);
+                if (existingPeriod) {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Cannot Create Period',
+                        text: 'This academic term already has an evaluation period. Only one period is allowed per term.',
+                        confirmButtonColor: '#0059cc'
+                    });
+                    return;
+                }
+            }
+            
+            const data = {
+                acad_term_id: termId,
+                title: $('#title').val(),
+                start_date: $('#start_date').val(),
+                end_date: $('#end_date').val()
+            };
+
+            const url = periodId 
+                ? `/api/evaluation-periods-admin/${periodId}`
+                : '/api/evaluation-periods-admin';
+            
+            const method = periodId ? 'PUT' : 'POST';
+
+            $.ajax({
+                url: url,
+                method: method,
+                contentType: 'application/json',
+                data: JSON.stringify(data),
+                beforeSend: function() {
+                    // Show loading state
+                    $('#submitButton').prop('disabled', true);
+                    $('#submitButtonText').html('<i class="fas fa-spinner fa-spin mr-2"></i>Saving...');
+                },
+                success: function(response) {
+                    if (response.success) {
+                        closeModal();
+                        
+                        // Show success message
+                        const statusInfo = response.status === 'Active' 
+                            ? '<br><small class="text-gray-600">Email notifications are being sent in the background.</small>' 
+                            : '';
+                        
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Success!',
+                            html: response.message + statusInfo,
+                            timer: 3000,
+                            showConfirmButton: false
+                        }).then(() => {
+                            // Reload with current academic year filter
+                            const currentYearId = $('#academicYearFilter').val();
+                            if (currentYearId) {
+                                loadPeriods(parseInt(currentYearId));
+                            }
+                        });
+                    } else {
+                        $('#submitButton').prop('disabled', false);
+                        $('#submitButtonText').text(periodId ? 'Update Evaluation Period' : 'Add Evaluation Period');
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error',
+                            text: response.error || 'Failed to save evaluation period'
+                        });
+                    }
+                },
+                error: function(xhr) {
+                    $('#submitButton').prop('disabled', false);
+                    $('#submitButtonText').text(periodId ? 'Update Evaluation Period' : 'Add Evaluation Period');
+                    const error = xhr.responseJSON?.error || 'An error occurred';
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: error
+                    });
+                }
+            });
+        });
+        
+        // Check email job status with polling
+        function checkEmailJobStatus(jobId) {
+            $.ajax({
+                url: `/api/email-job-status/${jobId}`,
+                method: 'GET',
+                success: function(response) {
+                    if (response.success) {
+                        const progress = response.progress_percentage;
+                        const sent = response.sent;
+                        const failed = response.failed;
+                        const total = response.total;
+                        
+                        // Update progress bar
+                        $('#email-progress-bar').css('width', progress + '%');
+                        $('#email-progress-text').text(`Sent: ${sent}/${total} | Failed: ${failed}`);
+                        
+                        // Check if completed
+                        if (response.status === 'completed') {
+                            setTimeout(() => {
+                                Swal.fire({
+                                    icon: sent === total ? 'success' : 'warning',
+                                    title: 'Email Notifications Sent!',
+                                    html: `
+                                        <p class="mb-2"><strong>${sent}</strong> emails sent successfully</p>
+                                        ${failed > 0 ? `<p class="text-amber-600"><strong>${failed}</strong> emails failed</p>` : ''}
+                                    `,
+                                    timer: 3000,
+                                    showConfirmButton: true
+                                });
+                                // Reload with current academic year filter
+                                const currentYearId = $('#academicYearFilter').val();
+                                if (currentYearId) {
+                                    loadPeriods(parseInt(currentYearId));
+                                }
+                            }, 500);
+                        } else {
+                            // Continue polling every 1 second
+                            setTimeout(() => checkEmailJobStatus(jobId), 1000);
+                        }
+                    }
+                },
+                error: function() {
+                    // On error, just reload the page
+                    Swal.fire({
+                        icon: 'warning',
+                        title: 'Email Status Unknown',
+                        text: 'Emails are being sent in the background.',
+                        timer: 2000
+                    });
+                    // Reload with current academic year filter
+                    const currentYearId = $('#academicYearFilter').val();
+                    if (currentYearId) {
+                        loadPeriods(parseInt(currentYearId));
+                    }
+                }
+            });
+        }
+
+        // Archive period
+        function archivePeriod(periodId, title) {
+            Swal.fire({
+                title: 'Archive Evaluation Period?',
+                html: `Are you sure you want to archive "<strong>${title}</strong>"?<br><br>
+                       <span class="text-amber-600">This will hide the period from the active list but preserve all evaluation data.</span>`,
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#f59e0b',
+                cancelButtonColor: '#6b7280',
+                confirmButtonText: 'Yes, archive it',
+                cancelButtonText: 'Cancel'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    $.ajax({
+                        url: `/api/evaluation-periods-admin/${periodId}/archive`,
+                        method: 'PUT',
+                        success: function(response) {
+                            if (response.success) {
+                                Swal.fire({
+                                    icon: 'success',
+                                    title: 'Archived!',
+                                    text: response.message,
+                                    timer: 2000,
+                                    showConfirmButton: false
+                                });
+                                // Reload with current academic year filter
+                                const currentYearId = $('#academicYearFilter').val();
+                                if (currentYearId) {
+                                    loadPeriods(parseInt(currentYearId));
+                                }
+                            } else {
+                                Swal.fire({
+                                    icon: 'error',
+                                    title: 'Error',
+                                    text: response.error
+                                });
+                            }
+                        },
+                        error: function(xhr) {
+                            const error = xhr.responseJSON?.error || 'Failed to archive period';
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Cannot Archive',
+                                text: error
+                            });
+                        }
+                    });
+                }
+            });
+        }
+
+        // Filter periods
+        function filterPeriods() {
+            const searchTerm = $('#searchInput').val().toLowerCase();
+            const statusFilter = $('#statusFilter').val();
+
+            const filtered = allPeriods.filter(period => {
+                const matchesSearch = !searchTerm || 
+                    period.title.toLowerCase().includes(searchTerm) ||
+                    (period.term_title && period.term_title.toLowerCase().includes(searchTerm));
+                
+                const matchesStatus = !statusFilter || period.computed_status === statusFilter;
+
+                return matchesSearch && matchesStatus;
+            });
+
+            displayPeriods(filtered);
+        }
+
+        // Reset filters
+        function resetFilters() {
+            $('#searchInput').val('');
+            $('#statusFilter').val('');
+            // Keep the current academic year selected, just reload it
+            const currentYearId = $('#academicYearFilter').val();
+            if (currentYearId) {
+                loadPeriods(parseInt(currentYearId));
+            }
+        }
+        
+        // View archived periods
+        function viewArchivedPeriods() {
+            Swal.fire({
+                title: 'Archived Evaluation Periods',
+                html: '<div id="archivedPeriodsContent">Loading archived periods...</div>',
+                width: '80%',
+                showCloseButton: true,
+                showConfirmButton: false,
+                allowOutsideClick: true,
+                customClass: {
+                    container: 'archived-periods-modal'
+                },
+                didOpen: () => {
+                    loadArchivedPeriods();
+                }
+            });
+        }
+
+        // Load archived periods
+        function loadArchivedPeriods() {
+            $.ajax({
+                url: '/api/evaluation-periods-archived',
+                method: 'GET',
+                success: function(response) {
+                    if (response.success && response.data.length > 0) {
+                        displayArchivedPeriods(response.data);
+                    } else {
+                        $('#archivedPeriodsContent').html(`
+                            <div class="text-center py-8">
+                                <i class="fas fa-archive text-gray-300 text-6xl mb-4"></i>
+                                <p class="text-gray-500 text-lg">No archived evaluation periods found</p>
+                                <p class="text-gray-400 text-sm mt-2">Archived periods will appear here</p>
+                            </div>
+                        `);
+                    }
+                },
+                error: function(xhr) {
+                    $('#archivedPeriodsContent').html(`
+                        <div class="text-center py-8">
+                            <i class="fas fa-exclamation-triangle text-red-300 text-6xl mb-4"></i>
+                            <p class="text-red-500 text-lg">Error loading archived periods</p>
+                            <p class="text-red-400 text-sm mt-2">Please try again later</p>
+                        </div>
+                    `);
+                }
+            });
+        }
+
+        // Display archived periods in modal
+        function displayArchivedPeriods(periods) {
+            let html = `
+                <div class="overflow-x-auto">
+                    <table class="min-w-full divide-y divide-gray-200">
+                        <thead class="bg-gray-50">
+                            <tr>
+                                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Title</th>
+                                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Academic Term</th>
+                                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Duration</th>
+                                <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Evaluations</th>
+                                <th class="px-4 py-3 text-center text-xs font-medium text-gray-500 uppercase">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody class="bg-white divide-y divide-gray-200">
+            `;
+
+            periods.forEach(period => {
+                const completionRate = period.total_evaluations > 0 
+                    ? Math.round((period.completed_evaluations / period.total_evaluations) * 100)
+                    : 0;
+
+                html += `
+                    <tr class="hover:bg-gray-50">
+                        <td class="px-4 py-3">
+                            <div class="font-medium text-gray-900">${period.title}</div>
+                            <div class="text-xs text-amber-600">
+                                <i class="fas fa-archive mr-1"></i>Archived
+                            </div>
+                        </td>
+                        <td class="px-4 py-3">
+                            <span class="text-sm text-gray-700">${period.term_title || 'N/A'}</span>
+                        </td>
+                        <td class="px-4 py-3">
+                            <div class="text-sm text-gray-700">${formatDate(period.start_date)} - ${formatDate(period.end_date)}</div>
+                            <div class="text-xs text-gray-500">${getDurationText(period.start_date, period.end_date)}</div>
+                        </td>
+                        <td class="px-4 py-3">
+                            <div class="text-sm text-gray-900">${period.total_evaluations || 0} total</div>
+                            <div class="w-full bg-gray-200 rounded-full h-1.5 mt-1">
+                                <div class="bg-green-500 h-1.5 rounded-full" style="width: ${completionRate}%"></div>
+                            </div>
+                            <div class="text-xs text-gray-500 mt-1">${completionRate}% completed</div>
+                        </td>
+                        <td class="px-4 py-3 text-center">
+                            <button onclick="unarchivePeriod(${period.period_id}, '${period.title}')" 
+                                    class="text-blue-600 hover:text-blue-800 text-sm font-medium"
+                                    title="Restore">
+                                <i class="fas fa-undo mr-1"></i>Restore
+                            </button>
+                        </td>
+                    </tr>
+                `;
+            });
+
+            html += `
+                        </tbody>
+                    </table>
+                </div>
+            `;
+
+            $('#archivedPeriodsContent').html(html);
+        }
+
+        // Unarchive (restore) a period
+        function unarchivePeriod(periodId, title) {
+            Swal.fire({
+                title: 'Restore Evaluation Period?',
+                html: `Are you sure you want to restore "<strong>${title}</strong>"?<br><br>
+                       <span class="text-blue-600">This will make the period visible in the main list again.</span>`,
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonColor: '#3b82f6',
+                cancelButtonColor: '#6b7280',
+                confirmButtonText: 'Yes, restore it',
+                cancelButtonText: 'Cancel'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    $.ajax({
+                        url: `/api/evaluation-periods-admin/${periodId}/unarchive`,
+                        method: 'PUT',
+                        success: function(response) {
+                            if (response.success) {
+                                Swal.fire({
+                                    icon: 'success',
+                                    title: 'Restored!',
+                                    text: response.message,
+                                    timer: 2000,
+                                    showConfirmButton: false
+                                });
+                                // Reload with current academic year filter
+                                const currentYearId = $('#academicYearFilter').val();
+                                if (currentYearId) {
+                                    loadPeriods(parseInt(currentYearId));
+                                }
+                                loadArchivedPeriods(); // Refresh archived modal
+                            } else {
+                                Swal.fire({
+                                    icon: 'error',
+                                    title: 'Error',
+                                    text: response.error
+                                });
+                            }
+                        },
+                        error: function(xhr) {
+                            const error = xhr.responseJSON?.error || 'Failed to restore period';
+                            Swal.fire({
+                                icon: 'error',
+                                title: 'Cannot Restore',
+                                text: error
+                            });
+                        }
+                    });
+                }
+            });
+        }
+        
+        // Sync all evaluations
+        function syncAllEvaluations() {
+            Swal.fire({
+                title: 'Sync Evaluations',
+                html: 'This will create evaluation records for all enrolled students in active/upcoming periods. Continue?',
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonColor: '#3B82F6',
+                cancelButtonColor: '#6B7280',
+                confirmButtonText: '<i class="fas fa-sync mr-2"></i>Sync Now',
+                cancelButtonText: 'Cancel',
+                showLoaderOnConfirm: true,
+                preConfirm: () => {
+                    return fetch('/api/sync-all-evaluations', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        }
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (!data.success) {
+                            throw new Error(data.error || 'Sync failed');
+                        }
+                        return data;
+                    })
+                    .catch(error => {
+                        Swal.showValidationMessage(`Request failed: ${error}`);
+                    });
+                },
+                allowOutsideClick: () => !Swal.isLoading()
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    Swal.fire({
+                        icon: 'success',
+                        title: 'Sync Complete!',
+                        html: `${result.value.message}<br><br>
+                               <strong>${result.value.evaluations_created}</strong> new evaluation(s) created<br>
+                               <strong>${result.value.periods_synced}</strong> period(s) processed`,
+                        confirmButtonColor: '#3B82F6'
+                    });
+                    // Reload with current academic year filter
+                    const currentYearId = $('#academicYearFilter').val();
+                    if (currentYearId) {
+                        loadPeriods(parseInt(currentYearId));
+                    }
+                }
+            });
+        }
+
+        // ============================================
+        // TIMER MANAGEMENT FUNCTIONS
+        // ============================================
+        
+        // Open timer management modal
+        function openTimerManagement() {
+            $('#timerModal').removeClass('hidden');
+            loadTimerSettings();
+        }
+
+        // Close timer modal
+        function closeTimerModal() {
+            $('#timerModal').addClass('hidden');
+            $('#timerForm')[0].reset();
+        }
+
+        // Toggle timer fields
+        function toggleTimerFields() {
+            const enabled = $('#timerEnabled').is(':checked');
+            const settings = $('#timerSettings');
+            const toggleBg = $('#timerEnabled').siblings('.block');
+            const toggleDot = $('#timerEnabled').siblings('.dot');
+            
+            if (enabled) {
+                // Enable settings
+                settings.removeClass('opacity-50 pointer-events-none');
+                // Update toggle appearance to "ON" state
+                toggleBg.removeClass('bg-gray-200').addClass('bg-blue-600');
+                toggleDot.addClass('translate-x-6');
+            } else {
+                // Disable settings
+                settings.addClass('opacity-50 pointer-events-none');
+                // Update toggle appearance to "OFF" state
+                toggleBg.removeClass('bg-blue-600').addClass('bg-gray-200');
+                toggleDot.removeClass('translate-x-6');
+            }
+            updateTimerPreview();
+        }
+
+        // Load timer settings
+        function loadTimerSettings() {
+            $.ajax({
+                url: '/admin/api/timer-settings',
+                method: 'GET',
+                success: function(response) {
+                    console.log('Timer Settings Response:', response);
+                    if (response.success && response.data) {
+                        const settings = response.data;
+                        console.log('Timer Enabled Value:', settings.enabled, 'Type:', typeof settings.enabled);
+                        
+                        // Convert enabled to boolean - handle various formats from database
+                        // Handles: 0/1, "0"/"1", true/false, "true"/"false"
+                        const isEnabled = settings.enabled === 1 || 
+                                         settings.enabled === '1' || 
+                                         settings.enabled === true || 
+                                         settings.enabled === 'true';
+                        
+                        console.log('Converted to boolean:', isEnabled);
+                        
+                        $('#timerEnabled').prop('checked', isEnabled);
+                        $('#timeLimit').val(settings.time_limit);
+                        $('#warning1').val(settings.warning_1);
+                        $('#warning2').val(settings.warning_2);
+                        
+                        // Call toggle after setting values
+                        toggleTimerFields();
+                        updateTimerPreview();
+                    } else {
+                        console.log('No timer settings found, using defaults');
+                        // Set defaults
+                        $('#timerEnabled').prop('checked', false);
+                        $('#timeLimit').val(30);
+                        $('#warning1').val(5);
+                        $('#warning2').val(2);
+                        toggleTimerFields();
+                    }
+                },
+                error: function(xhr) {
+                    console.error('Failed to load timer settings:', xhr);
+                    Swal.fire({
+                        icon: 'warning',
+                        title: 'Could Not Load Settings',
+                        text: 'Using default timer settings. You can still save new settings.',
+                        timer: 2000
+                    });
+                    // Set defaults
+                    $('#timerEnabled').prop('checked', false);
+                    $('#timeLimit').val(30);
+                    $('#warning1').val(5);
+                    $('#warning2').val(2);
+                    toggleTimerFields();
+                }
+            });
+        }
+
+        // Update timer preview
+        function updateTimerPreview() {
+            const enabled = $('#timerEnabled').is(':checked');
+            const timeLimit = parseInt($('#timeLimit').val()) || 0;
+            const warning1 = parseInt($('#warning1').val()) || 0;
+            const warning2 = parseInt($('#warning2').val()) || 0;
+
+            if (!enabled) {
+                $('#timerPreview').html('<span class="text-gray-500">⏱️ Timer is disabled - Students have unlimited time</span>');
+                return;
+            }
+
+            if (timeLimit === 0) {
+                $('#timerPreview').html('<span class="text-red-600">⚠️ Please set a time limit</span>');
+                return;
+            }
+
+            let preview = `<div class="space-y-1">
+                <p class="text-sm"><i class="fas fa-clock text-blue-600"></i> <strong>Time Limit:</strong> ${timeLimit} minutes</p>`;
+            
+            if (warning1 > 0) {
+                preview += `<p class="text-sm"><i class="fas fa-exclamation-triangle text-yellow-600"></i> <strong>First Warning:</strong> ${warning1} min before timeout</p>`;
+            }
+            
+            if (warning2 > 0) {
+                preview += `<p class="text-sm"><i class="fas fa-exclamation-circle text-red-600"></i> <strong>Final Warning:</strong> ${warning2} min before timeout</p>`;
+            }
+            
+            preview += `</div>`;
+            $('#timerPreview').html(preview);
+        }
+
+        // Listen to input changes for preview
+        $('#timeLimit, #warning1, #warning2').on('input', updateTimerPreview);
+
+        // Save timer settings
+        function saveTimerSettings() {
+            const enabled = $('#timerEnabled').is(':checked');
+            const timeLimit = parseInt($('#timeLimit').val());
+            const warning1 = parseInt($('#warning1').val()) || 0;
+            const warning2 = parseInt($('#warning2').val()) || 0;
+
+            // Validation
+            if (enabled && (!timeLimit || timeLimit < 5)) {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Invalid Time Limit',
+                    text: 'Please set a time limit of at least 5 minutes',
+                    confirmButtonColor: '#3b82f6'
+                });
+                return;
+            }
+
+            if (enabled && warning1 >= timeLimit) {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Invalid Warning Time',
+                    text: 'First warning must be less than the time limit',
+                    confirmButtonColor: '#3b82f6'
+                });
+                return;
+            }
+
+            if (enabled && warning2 >= warning1 && warning1 > 0) {
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Invalid Warning Time',
+                    text: 'Second warning must be less than first warning',
+                    confirmButtonColor: '#3b82f6'
+                });
+                return;
+            }
+
+            const data = {
+                enabled: enabled,
+                time_limit: timeLimit || 30,
+                warning_1: warning1,
+                warning_2: warning2
+            };
+
+            $('#saveTimerButton').prop('disabled', true).html('<i class="fas fa-spinner fa-spin mr-2"></i>Saving...');
+
+            $.ajax({
+                url: '/admin/api/timer-settings',
+                method: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify(data),
+                success: function(response) {
+                    if (response.success) {
+                        Swal.fire({
+                            icon: 'success',
+                            title: 'Settings Saved!',
+                            text: response.message,
+                            timer: 2000,
+                            showConfirmButton: false
+                        }).then(() => {
+                            closeTimerModal();
+                        });
+                    } else {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Save Failed',
+                            text: response.error || 'Failed to save timer settings',
+                            confirmButtonColor: '#3b82f6'
+                        });
+                    }
+                },
+                error: function(xhr) {
+                    const error = xhr.responseJSON?.error || 'An error occurred while saving';
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: error,
+                        confirmButtonColor: '#3b82f6'
+                    });
+                },
+                complete: function() {
+                    $('#saveTimerButton').prop('disabled', false).html('<i class="fas fa-save mr-2"></i>Save Settings');
+                }
+            });
+        }
+    </script>
+    
+    <!-- Include loading animation script -->
+    <script src="{{ url_for('static', filename='js/loading-animation.js') }}"></script>
+    
+    <!-- Prevent logout on browser back button -->
+  <script src="{{ url_for('static', filename='js/prevent-back-logout.js') }}"></script>
+
+  <!-- Session Timeout Monitor (Auto-logout after 1 hour) -->
+    <script src="{{ url_for('static', filename='js/session-timeout.js') }}"></script>
+</body>
+</html>
