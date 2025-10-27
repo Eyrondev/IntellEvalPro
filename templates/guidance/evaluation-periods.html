@@ -901,8 +901,8 @@
             const endDate = $('#end_date').val();
             
             if (startDate && endDate) {
-                const start = new Date(startDate);
-                const end = new Date(endDate);
+                const start = new Date(startDate + 'T00:00:00');
+                const end = new Date(endDate + 'T00:00:00');
                 const today = new Date();
                 today.setHours(0, 0, 0, 0);
                 
@@ -983,6 +983,9 @@
         function closeModal() {
             $('#periodModal').addClass('hidden');
             $('#periodForm')[0].reset();
+            // Reset button state
+            $('#submitButton').prop('disabled', false);
+            $('#submitButtonText').text('Add Evaluation Period');
         }
 
         // Submit form
