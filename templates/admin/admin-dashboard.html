@@ -132,7 +132,6 @@
       background-color: #0059cc;
       border-radius: 0 2px 2px 0;
     }
-    
     /* Mobile responsive styles */
     @media (max-width: 768px) {
       .dashboard-card {
@@ -180,15 +179,6 @@
 </head>
 
 <body class="bg-gray-50">
-  <!-- Loading overlay -->
-  <div id="loader-overlay" class="fixed inset-0 z-50 flex flex-col items-center justify-center bg-white bg-opacity-90 backdrop-blur-sm transition-opacity duration-300">
-    <img src="{{ url_for('static', filename='images/nclogo.png') }}" alt="Logo" class="w-32 h-auto mb-6 animate-bounce">
-    <div class="flex items-center space-x-2">
-      <div class="w-3 h-3 rounded-full bg-primary-500 animate-pulse"></div>
-      <div class="w-3 h-3 rounded-full bg-primary-500 animate-pulse" style="animation-delay: 0.2s"></div>
-      <div class="w-3 h-3 rounded-full bg-primary-500 animate-pulse" style="animation-delay: 0.4s"></div>
-    </div>
-  </div>
 
   <div class="flex h-screen bg-gray-50">
         <!-- Sidebar (will be loaded dynamically) -->
@@ -428,6 +418,8 @@
       
     </div>
   </div>
+  <script src="{{ url_for('static', filename='js/loading-animation.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/admin-navigation.js') }}"></script>
 
   <script>
     const loginUrl = "{{ url_for('auth.login') }}";
@@ -1061,10 +1053,10 @@
   </script>
   
   <!-- Include admin navigation script -->
-  <script src="{{ url_for('static', filename='js/admin-navigation.js') }}"></script>
+ 
   
   <!-- Include loading animation script -->
-  <script src="{{ url_for('static', filename='js/loading-animation.js') }}"></script>
+
   
   <!-- Prevent logout on browser back button -->
   <script src="{{ url_for('static', filename='js/prevent-back-logout.js') }}"></script>
