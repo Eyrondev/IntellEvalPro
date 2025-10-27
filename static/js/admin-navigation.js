@@ -253,9 +253,9 @@ function setActivePage() {
       currentPageElement.textContent = pageTitle;
       console.log('📝 Updated breadcrumb to:', pageTitle);
       
-      // Apply active styling to breadcrumb
-      currentPageElement.classList.remove('text-gray-500');
-      currentPageElement.classList.add('text-primary-600', 'font-semibold');
+      // Keep original styling (no blue color)
+      currentPageElement.classList.remove('text-primary-600');
+      currentPageElement.classList.add('text-gray-500', 'font-medium');
       return true;
     } else {
       attempts++;
