@@ -184,52 +184,67 @@ function initializeAdminMobileMenu() {
 function setActivePage() {
   // Get current page path
   const currentPath = window.location.pathname;
+  console.log('Current path:', currentPath);
   
   // Page mapping for breadcrumb updates
   const pageMap = {
-    'admin-dashboard': 'Dashboard',
-    'user-management': 'User Management',
-    'faculty-list': 'Faculty Management', 
-    'student-list': 'Student Management',
-    'subjects': 'Subjects Management',
-    'sections': 'Section Management',
-    'classes': 'Classes Management',
-    'academic-years': 'Academic Years',
-    'evaluation-periods': 'Evaluation Periods',
-    'activity-logs': 'Activity Logs',
-    'archives': 'Archives'
+    '/admin/admin-dashboard': 'Dashboard',
+    '/admin/user-management': 'User Management',
+    '/admin/faculty-list': 'Faculty Management', 
+    '/admin/student-list': 'Student Management',
+    '/admin/subjects': 'Subjects Management',
+    '/admin/sections': 'Section Management',
+    '/admin/classes': 'Classes Management',
+    '/admin/academic-years': 'Academic Years',
+    '/admin/evaluation-periods': 'Evaluation Periods',
+    '/admin/activity-logs': 'Activity Logs',
+    '/admin/archives': 'Archives'
   };
   
   // Find and update breadcrumb
   const currentPageElement = document.getElementById('current-page');
   if (currentPageElement) {
-    // Check for specific page patterns
-    for (const [key, title] of Object.entries(pageMap)) {
-      if (currentPath.includes(key)) {
-        currentPageElement.textContent = title;
-        break;
+    // Check for exact path match first
+    if (pageMap[currentPath]) {
+      currentPageElement.textContent = pageMap[currentPath];
+      console.log('Updated breadcrumb to:', pageMap[currentPath]);
+    } else {
+      // Fallback: Check for partial path matches
+      for (const [path, title] of Object.entries(pageMap)) {
+        if (currentPath.includes(path.split('/').pop())) {
+          currentPageElement.textContent = title;
+          console.log('Updated breadcrumb (partial match) to:', title);
+          break;
+        }
       }
     }
     
-    // Legacy support for older patterns
-    if (currentPath.includes('faculty-management')) {
-      currentPageElement.textContent = 'Faculty Management';
-    } else if (currentPath.includes('user-management')) {
-      currentPageElement.textContent = 'User Management';
-    }
+    // Apply active styling to breadcrumb
+    currentPageElement.classList.remove('text-gray-500');
+    currentPageElement.classList.add('text-primary-600', 'font-semibold');
   }
   
-  // Set active class in navigation
+  // Set active class in navigation links
+  let activeSet = false;
   document.querySelectorAll('.nav-link').forEach(link => {
     const href = link.getAttribute('href');
-    if (href && currentPath.includes(href.replace('/', ''))) {
-      // Remove active class from all links
-      document.querySelectorAll('.nav-link').forEach(el => {
-        el.classList.remove('active', 'bg-gray-100');
-      });
-      
-      // Add active class to current link
-      link.classList.add('active', 'bg-gray-100');
+    
+    // Remove active classes first
+    link.classList.remove('active', 'bg-gray-100', 'text-primary-700');
+    
+    if (href) {
+      // Check for exact match first
+      if (href === currentPath) {
+        link.classList.add('active', 'bg-gray-100', 'text-primary-700');
+        activeSet = true;
+        console.log('Set active link (exact):', href);
+      }
+      // Then check for partial match (for nested routes)
+      else if (!activeSet && currentPath.startsWith(href) && href.length > 1) {
+        link.classList.add('active', 'bg-gray-100', 'text-primary-700');
+        activeSet = true;
+        console.log('Set active link (partial):', href);
+      }
     }
   });
 }

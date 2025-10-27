@@ -26,7 +26,7 @@
     <ul class="space-y-1">
       <!-- Dashboard Link -->
       <li>
-        <a href="{{ url_for('admin.admin_dashboard') }}" class="nav-link flex items-center px-4 py-2.5 text-sm font-medium text-gray-900 rounded-lg hover:bg-gray-100 group transition-all duration-200">
+        <a href="{{ url_for('admin.admin_dashboard') }}" class="nav-link relative flex items-center px-4 py-2.5 text-sm font-medium text-gray-900 rounded-lg hover:bg-gray-100 group transition-all duration-200">
           <i class="fas fa-gauge-high w-5 h-5 text-primary-500 mr-2.5"></i>
           <span>Dashboard</span>
         </a>
@@ -37,7 +37,7 @@
       
       <!-- Faculty List -->
       <li>
-        <a href="{{ url_for('admin.faculty_list') }}" class="nav-link flex items-center px-4 py-2.5 text-sm font-medium text-gray-900 rounded-lg hover:bg-gray-100 group transition-all duration-200">
+        <a href="{{ url_for('admin.faculty_list') }}" class="nav-link relative flex items-center px-4 py-2.5 text-sm font-medium text-gray-900 rounded-lg hover:bg-gray-100 group transition-all duration-200">
           <i class="fas fa-chalkboard-user w-5 h-5 text-primary-500 mr-2.5"></i>
           <span>Faculty</span>
         </a>
@@ -45,7 +45,7 @@
       
       <!-- Student List -->
       <li>
-        <a href="{{ url_for('admin.student_list') }}" class="nav-link flex items-center px-4 py-2.5 text-sm font-medium text-gray-900 rounded-lg hover:bg-gray-100 group transition-all duration-200">
+        <a href="{{ url_for('admin.student_list') }}" class="nav-link relative flex items-center px-4 py-2.5 text-sm font-medium text-gray-900 rounded-lg hover:bg-gray-100 group transition-all duration-200">
           <i class="fas fa-user-graduate w-5 h-5 text-primary-500 mr-2.5"></i>
           <span>Students</span>
         </a>
@@ -53,7 +53,7 @@
       
       <!-- Subjects -->
       <li>
-        <a href="{{ url_for('admin.subjects') }}" class="nav-link flex items-center px-4 py-2.5 text-sm font-medium text-gray-900 rounded-lg hover:bg-gray-100 group transition-all duration-200">
+        <a href="{{ url_for('admin.subjects') }}" class="nav-link relative flex items-center px-4 py-2.5 text-sm font-medium text-gray-900 rounded-lg hover:bg-gray-100 group transition-all duration-200">
           <i class="fas fa-book w-5 h-5 text-primary-500 mr-2.5"></i>
           <span>Subjects</span>
         </a>
@@ -61,7 +61,7 @@
       
       <!-- Sections -->
       <li>
-        <a href="{{ url_for('admin.sections') }}" class="nav-link flex items-center px-4 py-2.5 text-sm font-medium text-gray-900 rounded-lg hover:bg-gray-100 group transition-all duration-200">
+        <a href="{{ url_for('admin.sections') }}" class="nav-link relative flex items-center px-4 py-2.5 text-sm font-medium text-gray-900 rounded-lg hover:bg-gray-100 group transition-all duration-200">
           <i class="fas fa-chalkboard-teacher w-5 h-5 text-primary-500 mr-2.5"></i>
           <span>Sections</span>
         </a>
@@ -69,7 +69,7 @@
       
       <!-- Academic Years -->
       <li>
-        <a href="{{ url_for('admin.academic_years') }}" class="nav-link flex items-center px-4 py-2.5 text-sm font-medium text-gray-900 rounded-lg hover:bg-gray-100 group transition-all duration-200">
+        <a href="{{ url_for('admin.academic_years') }}" class="nav-link relative flex items-center px-4 py-2.5 text-sm font-medium text-gray-900 rounded-lg hover:bg-gray-100 group transition-all duration-200">
           <i class="fas fa-calendar-days w-5 h-5 text-primary-500 mr-2.5"></i>
           <span>Academic Year</span>
         </a>
@@ -77,7 +77,7 @@
       
       <!-- Evaluation Periods -->
       <li>
-        <a href="{{ url_for('admin.evaluation_periods') }}" class="nav-link flex items-center px-4 py-2.5 text-sm font-medium text-gray-900 rounded-lg hover:bg-gray-100 group transition-all duration-200">
+        <a href="{{ url_for('admin.evaluation_periods') }}" class="nav-link relative flex items-center px-4 py-2.5 text-sm font-medium text-gray-900 rounded-lg hover:bg-gray-100 group transition-all duration-200">
           <i class="fas fa-calendar-alt w-5 h-5 text-primary-500 mr-2.5"></i>
           <span>Evaluation Period</span>
         </a>
@@ -85,7 +85,7 @@
       
       <!-- Activity Logs -->
       <li>
-        <a href="{{ url_for('admin.activity_logs') }}" class="nav-link flex items-center px-4 py-2.5 text-sm font-medium text-gray-900 rounded-lg hover:bg-gray-100 group transition-all duration-200">
+        <a href="{{ url_for('admin.activity_logs') }}" class="nav-link relative flex items-center px-4 py-2.5 text-sm font-medium text-gray-900 rounded-lg hover:bg-gray-100 group transition-all duration-200">
           <i class="fas fa-clipboard-list w-5 h-5 text-primary-500 mr-2.5"></i>
           <span>Activity Logs</span>
         </a>
@@ -93,7 +93,7 @@
       
       <!-- Archives -->
       <li>
-        <a href="{{ url_for('admin.archives') }}" class="nav-link flex items-center px-4 py-2.5 text-sm font-medium text-gray-900 rounded-lg hover:bg-gray-100 group transition-all duration-200">
+        <a href="{{ url_for('admin.archives') }}" class="nav-link relative flex items-center px-4 py-2.5 text-sm font-medium text-gray-900 rounded-lg hover:bg-gray-100 group transition-all duration-200">
           <i class="fas fa-archive w-5 h-5 text-primary-500 mr-2.5"></i>
           <span>Archives</span>
         </a>
@@ -101,7 +101,7 @@
             
       <!-- User Management -->
       <li>
-        <a href="{{ url_for('admin.user_management') }}" class="nav-link flex items-center px-4 py-2.5 text-sm font-medium text-gray-900 rounded-lg hover:bg-gray-100 group transition-all duration-200">
+        <a href="{{ url_for('admin.user_management') }}" class="nav-link relative flex items-center px-4 py-2.5 text-sm font-medium text-gray-900 rounded-lg hover:bg-gray-100 group transition-all duration-200">
           <i class="fas fa-users-gear w-5 h-5 text-primary-500 mr-2.5"></i>
           <span>User Management</span>
         </a>
@@ -117,3 +117,26 @@
     </a>
   </div>
 </aside>
+
+<style>
+  /* Active navigation link styling with left border indicator */
+  .nav-link.active::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 4px;
+    background-color: #0059cc;
+    border-radius: 0 4px 4px 0;
+  }
+  
+  .nav-link.active {
+    background-color: #f3f4f6;
+    color: #0059cc;
+  }
+  
+  .nav-link.active i {
+    color: #0059cc;
+  }
+</style>
