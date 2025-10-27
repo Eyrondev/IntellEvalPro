@@ -54,8 +54,10 @@ class Config:
     # Session Configuration
     SESSION_COOKIE_SECURE = False  # Set to True in production with HTTPS
     SESSION_COOKIE_HTTPONLY = True
-    SESSION_COOKIE_SAMESITE = 'Lax'
+    SESSION_COOKIE_SAMESITE = 'Lax'  # Allow cookies for same-site AJAX requests
+    SESSION_COOKIE_NAME = 'intellevalpro_session'  # Custom session cookie name
     PERMANENT_SESSION_LIFETIME = 3600  # 1 hour
+    SESSION_TYPE = 'filesystem'  # Use filesystem sessions for better reliability
     
     # Upload Configuration
     UPLOAD_FOLDER = 'uploads'

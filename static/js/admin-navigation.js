@@ -3,14 +3,21 @@
  * This script loads the navigation sidebar and header into any page
  */
 document.addEventListener('DOMContentLoaded', function() {
-  // Load navigation components
-  // Determine if we're in admin folder or root folder
-  const isInAdminFolder = window.location.pathname.includes('/admin/');
-  const navPath = isInAdminFolder ? '/admin/navigation' : '/admin/navigation';
-  const headerPath = isInAdminFolder ? '/admin/header' : '/admin/header';
+  console.log('🚀 Admin navigation initializing...');
   
-  loadComponent('admin-sidebar', navPath);
-  loadComponent('admin-header', headerPath);
+  // Load navigation components
+  loadComponent('admin-sidebar', '/admin/navigation');
+  loadComponent('admin-header', '/admin/header');
+  
+  // Listen for component loaded events
+  document.addEventListener('componentLoaded', function(e) {
+    console.log('📢 Component loaded event:', e.detail.id);
+    
+    if (e.detail.id === 'admin-sidebar') {
+      // Navigation loaded, set active page
+      setTimeout(() => setActivePage(), 50);
+    }
+  });
   
   // Initialize mobile menu toggle
   setTimeout(function() {
@@ -31,7 +38,7 @@ document.addEventListener('DOMContentLoaded', function() {
       }
     });
     
-    // Set active page in navigation
+    // Set active page in navigation (backup in case event didn't fire)
     setActivePage();
     
     // Hide loader
@@ -42,7 +49,7 @@ document.addEventListener('DOMContentLoaded', function() {
         loader.style.display = 'none';
       }, 300);
     }
-  }, 100);
+  }, 300); // Increased delay to ensure components are loaded
 });
 
 /**
@@ -52,25 +59,50 @@ document.addEventListener('DOMContentLoaded', function() {
  */
 function loadComponent(containerId, componentUrl) {
   const container = document.getElementById(containerId);
-  if (!container) return;
+  if (!container) {
+    console.error(`❌ Container not found: ${containerId}`);
+    return;
+  }
   
-  fetch(componentUrl)
+  console.log(`📦 Loading component: ${componentUrl} into ${containerId}`);
+  
+  fetch(componentUrl, {
+    method: 'GET',
+    credentials: 'same-origin', // Important for AWS to include session cookies
+    headers: {
+      'Accept': 'text/html',
+      'X-Requested-With': 'XMLHttpRequest'
+    }
+  })
     .then(response => {
+      console.log(`📥 Response status for ${componentUrl}:`, response.status);
       if (!response.ok) {
         throw new Error(`HTTP error! Status: ${response.status}`);
       }
       return response.text();
     })
     .then(html => {
+      console.log(`✅ Component loaded successfully: ${containerId}`);
       container.innerHTML = html;
       
       // Dispatch event when component is loaded
       const event = new CustomEvent('componentLoaded', { detail: { id: containerId } });
       document.dispatchEvent(event);
+      
+      // If this is the navigation component, set active page immediately
+      if (containerId === 'admin-sidebar') {
+        setTimeout(() => setActivePage(), 100);
+      }
     })
     .catch(error => {
-      console.error('Error loading component:', error);
-      container.innerHTML = `<p class="text-red-500 p-4">Failed to load component: ${error.message}</p>`;
+      console.error(`❌ Error loading component ${componentUrl}:`, error);
+      container.innerHTML = `
+        <div class="p-4 bg-red-50 border border-red-200 rounded-lg">
+          <p class="text-red-600 text-sm">Failed to load component</p>
+          <p class="text-red-500 text-xs mt-1">${error.message}</p>
+          <button onclick="location.reload()" class="mt-2 text-xs text-red-700 underline">Reload Page</button>
+        </div>
+      `;
     });
 }
 
@@ -184,10 +216,11 @@ function initializeAdminMobileMenu() {
 function setActivePage() {
   // Get current page path
   const currentPath = window.location.pathname;
-  console.log('Current path:', currentPath);
+  console.log('🔍 Setting active page for path:', currentPath);
   
-  // Page mapping for breadcrumb updates
+  // Page mapping for breadcrumb updates (exact path matching)
   const pageMap = {
+    '/admin/dashboard': 'Dashboard',
     '/admin/admin-dashboard': 'Dashboard',
     '/admin/user-management': 'User Management',
     '/admin/faculty-list': 'Faculty Management', 
@@ -201,50 +234,52 @@ function setActivePage() {
     '/admin/archives': 'Archives'
   };
   
-  // Find and update breadcrumb
+  // Update breadcrumb
   const currentPageElement = document.getElementById('current-page');
   if (currentPageElement) {
-    // Check for exact path match first
-    if (pageMap[currentPath]) {
-      currentPageElement.textContent = pageMap[currentPath];
-      console.log('Updated breadcrumb to:', pageMap[currentPath]);
-    } else {
-      // Fallback: Check for partial path matches
-      for (const [path, title] of Object.entries(pageMap)) {
-        if (currentPath.includes(path.split('/').pop())) {
-          currentPageElement.textContent = title;
-          console.log('Updated breadcrumb (partial match) to:', title);
-          break;
-        }
-      }
-    }
+    const pageTitle = pageMap[currentPath] || 'Dashboard';
+    currentPageElement.textContent = pageTitle;
+    console.log('📝 Updated breadcrumb to:', pageTitle);
     
     // Apply active styling to breadcrumb
     currentPageElement.classList.remove('text-gray-500');
     currentPageElement.classList.add('text-primary-600', 'font-semibold');
+  } else {
+    console.warn('⚠️ Breadcrumb element #current-page not found');
   }
   
   // Set active class in navigation links
   let activeSet = false;
-  document.querySelectorAll('.nav-link').forEach(link => {
+  const navLinks = document.querySelectorAll('.nav-link');
+  console.log(`🔗 Found ${navLinks.length} navigation links`);
+  
+  navLinks.forEach(link => {
     const href = link.getAttribute('href');
     
     // Remove active classes first
     link.classList.remove('active', 'bg-gray-100', 'text-primary-700');
     
     if (href) {
+      // Normalize paths for comparison
+      const normalizedHref = href.replace(/\/$/, ''); // Remove trailing slash
+      const normalizedPath = currentPath.replace(/\/$/, '');
+      
       // Check for exact match first
-      if (href === currentPath) {
+      if (normalizedHref === normalizedPath) {
         link.classList.add('active', 'bg-gray-100', 'text-primary-700');
         activeSet = true;
-        console.log('Set active link (exact):', href);
+        console.log('✅ Set active link (exact match):', href);
       }
       // Then check for partial match (for nested routes)
-      else if (!activeSet && currentPath.startsWith(href) && href.length > 1) {
+      else if (!activeSet && normalizedPath.startsWith(normalizedHref) && normalizedHref.length > 6) {
         link.classList.add('active', 'bg-gray-100', 'text-primary-700');
         activeSet = true;
-        console.log('Set active link (partial):', href);
+        console.log('✅ Set active link (partial match):', href);
       }
     }
   });
+  
+  if (!activeSet) {
+    console.warn('⚠️ No navigation link was set as active for path:', currentPath);
+  }
 }

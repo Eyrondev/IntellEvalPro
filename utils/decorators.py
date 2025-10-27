@@ -184,8 +184,54 @@ def admin_required(f):
     """
     Decorator to require admin role
     Shortcut for @role_required('admin')
+    Handles both regular requests and AJAX/component requests
     """
-    return role_required('admin')(f)
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        # Check if user is logged in
+        if 'user_id' not in session:
+            # Check if this is an AJAX/API request
+            if request.is_json or request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+                return jsonify({'success': False, 'message': 'Authentication required'}), 401
+            else:
+                flash('Please log in to access this page.', 'warning')
+                return redirect(url_for('auth.login'))
+        
+        # Check for session timeout (1 hour of inactivity)
+        last_activity = session.get('last_activity')
+        if last_activity:
+            try:
+                last_activity_time = datetime.fromisoformat(last_activity)
+                current_time = datetime.now()
+                time_elapsed = current_time - last_activity_time
+                
+                # If more than 1 hour (3600 seconds) has passed, force logout
+                if time_elapsed.total_seconds() > 3600:
+                    session.clear()
+                    
+                    # Handle AJAX vs regular request
+                    if request.is_json or request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+                        return jsonify({'success': False, 'message': 'Session expired', 'session_expired': True}), 401
+                    else:
+                        flash('Your session has expired. Please log in again.', 'warning')
+                        return redirect(url_for('auth.login'))
+            except (ValueError, TypeError):
+                session['last_activity'] = datetime.now().isoformat()
+        
+        # Update last activity time
+        session['last_activity'] = datetime.now().isoformat()
+        
+        # Check admin role
+        if session.get('role') != 'admin':
+            # Handle AJAX vs regular request
+            if request.is_json or request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+                return jsonify({'success': False, 'message': 'Admin access required'}), 403
+            else:
+                flash('You do not have permission to access this page.', 'danger')
+                return redirect(url_for('auth.login'))
+        
+        return f(*args, **kwargs)
+    return decorated_function
 
 
 def student_required(f):

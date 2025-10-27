@@ -140,3 +140,16 @@
     color: #0059cc;
   }
 </style>
+
+<script>
+  console.log('✅ Admin navigation component loaded successfully');
+  console.log('📍 Current URL:', window.location.pathname);
+  
+  // Trigger page update after navigation is loaded
+  setTimeout(() => {
+    if (typeof setActivePage === 'function') {
+      setActivePage();
+      console.log('🔄 Called setActivePage from navigation');
+    }
+  }, 100);
+</script>
