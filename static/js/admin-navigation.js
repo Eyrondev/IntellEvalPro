@@ -9,13 +9,18 @@ document.addEventListener('DOMContentLoaded', function() {
   loadComponent('admin-sidebar', '/admin/navigation');
   loadComponent('admin-header', '/admin/header');
   
+  // Track loaded components
+  let loadedComponents = new Set();
+  
   // Listen for component loaded events
   document.addEventListener('componentLoaded', function(e) {
     console.log('📢 Component loaded event:', e.detail.id);
+    loadedComponents.add(e.detail.id);
     
-    if (e.detail.id === 'admin-sidebar') {
-      // Navigation loaded, set active page
-      setTimeout(() => setActivePage(), 50);
+    // Set active page when both components are loaded
+    if (loadedComponents.has('admin-sidebar') && loadedComponents.has('admin-header')) {
+      console.log('🎯 Both components loaded, setting active page');
+      setTimeout(() => setActivePage(), 100);
     }
   });
   
@@ -38,8 +43,11 @@ document.addEventListener('DOMContentLoaded', function() {
       }
     });
     
-    // Set active page in navigation (backup in case event didn't fire)
-    setActivePage();
+    // Backup: Set active page if components didn't load properly
+    if (!loadedComponents.has('admin-sidebar') || !loadedComponents.has('admin-header')) {
+      console.log('⚠️ Components may not have loaded, trying backup setActivePage');
+      setActivePage();
+    }
     
     // Hide loader
     const loader = document.getElementById('loader-overlay');
@@ -49,7 +57,7 @@ document.addEventListener('DOMContentLoaded', function() {
         loader.style.display = 'none';
       }, 300);
     }
-  }, 300); // Increased delay to ensure components are loaded
+  }, 500); // Further increased delay for AWS
 });
 
 /**
@@ -234,19 +242,34 @@ function setActivePage() {
     '/admin/archives': 'Archives'
   };
   
-  // Update breadcrumb
-  const currentPageElement = document.getElementById('current-page');
-  if (currentPageElement) {
-    const pageTitle = pageMap[currentPath] || 'Dashboard';
-    currentPageElement.textContent = pageTitle;
-    console.log('📝 Updated breadcrumb to:', pageTitle);
-    
-    // Apply active styling to breadcrumb
-    currentPageElement.classList.remove('text-gray-500');
-    currentPageElement.classList.add('text-primary-600', 'font-semibold');
-  } else {
-    console.warn('⚠️ Breadcrumb element #current-page not found');
+  // Update breadcrumb - wait for element to exist
+  let attempts = 0;
+  const maxAttempts = 10;
+  
+  function updateBreadcrumb() {
+    const currentPageElement = document.getElementById('current-page');
+    if (currentPageElement) {
+      const pageTitle = pageMap[currentPath] || 'Dashboard';
+      currentPageElement.textContent = pageTitle;
+      console.log('📝 Updated breadcrumb to:', pageTitle);
+      
+      // Apply active styling to breadcrumb
+      currentPageElement.classList.remove('text-gray-500');
+      currentPageElement.classList.add('text-primary-600', 'font-semibold');
+      return true;
+    } else {
+      attempts++;
+      if (attempts < maxAttempts) {
+        console.log(`⏳ Breadcrumb element not found, retrying... (${attempts}/${maxAttempts})`);
+        setTimeout(updateBreadcrumb, 100);
+      } else {
+        console.warn('⚠️ Breadcrumb element #current-page not found after', maxAttempts, 'attempts');
+      }
+      return false;
+    }
   }
+  
+  updateBreadcrumb();
   
   // Set active class in navigation links
   let activeSet = false;

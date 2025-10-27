@@ -44,12 +44,4 @@
   // Store user role for navigation protection
   sessionStorage.setItem('user_role', 'admin');
   console.log('✅ Admin header component loaded successfully');
-  
-  // Trigger page update after header is loaded
-  setTimeout(() => {
-    if (typeof setActivePage === 'function') {
-      setActivePage();
-      console.log('🔄 Called setActivePage from header');
-    }
-  }, 100);
 </script>
