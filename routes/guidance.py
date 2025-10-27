@@ -1024,36 +1024,29 @@ def save_timer_settings():
     try:
         cursor = conn.cursor()
         
-        # Try to create table if it doesn't exist
-        try:
-            cursor.execute("""
-                CREATE TABLE IF NOT EXISTS timer_settings (
-                    setting_id INT PRIMARY KEY DEFAULT 1,
-                    enabled BOOLEAN DEFAULT TRUE,
-                    time_limit INT DEFAULT 30,
-                    warning_1 INT DEFAULT 5,
-                    warning_2 INT DEFAULT 1,
-                    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-                    updated_by INT,
-                    FOREIGN KEY (updated_by) REFERENCES users(user_id)
-                )
-            """)
-            conn.commit()
-        except:
-            pass  # Table might already exist
+        # Check if settings row exists
+        cursor.execute("SELECT COUNT(*) as count FROM timer_settings WHERE setting_id = 1")
+        result = cursor.fetchone()
+        row_exists = result[0] > 0 if result else False
         
-        # Insert or update settings
-        cursor.execute("""
-            INSERT INTO timer_settings (setting_id, enabled, time_limit, warning_1, warning_2, updated_by)
-            VALUES (1, %s, %s, %s, %s, %s)
-            ON DUPLICATE KEY UPDATE
-                enabled = VALUES(enabled),
-                time_limit = VALUES(time_limit),
-                warning_1 = VALUES(warning_1),
-                warning_2 = VALUES(warning_2),
-                updated_by = VALUES(updated_by),
-                updated_at = CURRENT_TIMESTAMP
-        """, (enabled, time_limit, warning_1, warning_2, session.get('user_id')))
+        if row_exists:
+            # UPDATE existing row
+            cursor.execute("""
+                UPDATE timer_settings 
+                SET enabled = %s, 
+                    time_limit = %s, 
+                    warning_1 = %s, 
+                    warning_2 = %s,
+                    updated_by = %s,
+                    updated_at = CURRENT_TIMESTAMP
+                WHERE setting_id = 1
+            """, (enabled, time_limit, warning_1, warning_2, session.get('user_id')))
+        else:
+            # INSERT new row (first time only)
+            cursor.execute("""
+                INSERT INTO timer_settings (setting_id, enabled, time_limit, warning_1, warning_2, updated_by)
+                VALUES (1, %s, %s, %s, %s, %s)
+            """, (enabled, time_limit, warning_1, warning_2, session.get('user_id')))
         
         conn.commit()
         

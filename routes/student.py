@@ -159,20 +159,22 @@ def student_dashboard():
         
         print(f"DEBUG: Found {len(pending_evaluations)} pending evaluations")
         
-        # Get recent completed evaluations (limit to 3 for dashboard)
+        # Get all completed evaluations for current period
         cursor.execute("""
             SELECT e.evaluation_id, e.completion_time,
                    CONCAT(f.first_name, ' ', f.last_name) as faculty_name,
-                   s.subject_code as course_code, s.title as course_title
+                   s.subject_code as course_code, s.title as course_title,
+                   p.name as department
             FROM evaluations e
             JOIN class_sections cs ON e.section_id = cs.section_id
             JOIN faculty f ON cs.faculty_id = f.faculty_id
             JOIN subjects s ON cs.subject_id = s.subject_id
+            JOIN programs p ON f.program_id = p.program_id
             WHERE e.student_id = %s
             AND e.status = 'Completed'
+            AND e.period_id = %s
             ORDER BY e.completion_time DESC
-            LIMIT 3
-        """, (student_id,))
+        """, (student_id, period['id'] if period else None))
         recent_evaluations = cursor.fetchall()
         
         print(f"DEBUG: Found {len(recent_evaluations)} recent evaluations")

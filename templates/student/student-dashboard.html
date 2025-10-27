@@ -492,8 +492,8 @@
         <div class="bg-white rounded-lg shadow dashboard-card">
           <div class="p-4 sm:p-5 border-b border-gray-200">
             <div class="flex items-center justify-between">
-              <h3 class="text-base sm:text-lg font-medium text-gray-900">Recently Completed</h3>
-              <a href="#" class="text-xs sm:text-sm font-medium text-primary-600 hover:text-primary-700">
+              <h3 class="text-base sm:text-lg font-medium text-gray-900">Completed Evaluations</h3>
+              <a href="{{ url_for('student.my_evaluations') }}" class="text-xs sm:text-sm font-medium text-primary-600 hover:text-primary-700">
                 View All
               </a>
             </div>
@@ -535,7 +535,7 @@
                             {{ evaluation.faculty_name }}
                           </div>
                           <div class="text-sm text-gray-500">
-                            Computer Science Department
+                            {{ evaluation.department if evaluation.department else 'N/A' }}
                           </div>
                         </div>
                       </div>
@@ -583,7 +583,7 @@
                   </div>
                   <div class="flex-1 min-w-0">
                     <p class="text-sm font-medium text-gray-900 truncate">{{ evaluation.faculty_name }}</p>
-                    <p class="text-xs text-gray-500">Computer Science Department</p>
+                    <p class="text-xs text-gray-500">{{ evaluation.department if evaluation.department else 'N/A' }}</p>
                   </div>
                   <span class="px-2 py-1 text-xs font-semibold rounded-full bg-green-100 text-green-800 whitespace-nowrap">
                     <i class="fas fa-check mr-1"></i>Done
@@ -605,6 +605,12 @@
                 </div>
               </div>
               {% endfor %}
+              <div class="p-4 text-center bg-gray-50">
+                <a href="{{ url_for('student.my_evaluations') }}" class="text-sm font-medium text-primary-600 hover:text-primary-700 inline-flex items-center">
+                  View All Completed Evaluations
+                  <i class="fas fa-chevron-right ml-1 text-xs"></i>
+                </a>
+              </div>
             {% else %}
               <div class="p-8 text-center">
                 <i class="fas fa-clipboard-list text-4xl text-gray-400 mb-4"></i>

@@ -769,6 +769,13 @@
                                         title="Edit">
                                     <i class="fas fa-edit"></i>
                                 </button>
+                                ${period.computed_status !== 'Completed' && period.computed_status !== 'Closed' ? `
+                                <button onclick="sendEmailNotifications(${period.period_id}, '${period.title}')" 
+                                        class="text-green-600 hover:text-green-800 transition-colors p-2 hover:bg-green-50 rounded min-w-[44px] min-h-[44px] md:min-w-0 md:min-h-0"
+                                        title="Send Email Notifications">
+                                    <i class="fas fa-envelope"></i>
+                                </button>
+                                ` : ''}
                                 <button onclick="archivePeriod(${period.period_id}, '${period.title}')" 
                                         class="text-amber-600 hover:text-amber-800 transition-colors p-2 hover:bg-amber-50 rounded min-w-[44px] min-h-[44px] md:min-w-0 md:min-h-0"
                                         title="Archive">
@@ -822,12 +829,18 @@
                         
                         <div class="flex gap-2 pt-3 border-t border-gray-200">
                             <button onclick="editPeriod(${period.period_id})" 
-                                    class="flex-1 inline-flex items-center justify-center px-4 py-2 border border-blue-300 rounded-md text-sm font-medium text-blue-700 bg-blue-50 hover:bg-blue-100 min-h-[44px]">
-                                <i class="fas fa-edit mr-2"></i>Edit
+                                    class="flex-1 inline-flex items-center justify-center px-3 py-2 border border-blue-300 rounded-md text-sm font-medium text-blue-700 bg-blue-50 hover:bg-blue-100 min-h-[44px]">
+                                <i class="fas fa-edit mr-1"></i>Edit
                             </button>
+                            ${period.computed_status !== 'Completed' && period.computed_status !== 'Closed' ? `
+                            <button onclick="sendEmailNotifications(${period.period_id}, '${period.title}')" 
+                                    class="flex-1 inline-flex items-center justify-center px-3 py-2 border border-green-300 rounded-md text-sm font-medium text-green-700 bg-green-50 hover:bg-green-100 min-h-[44px]">
+                                <i class="fas fa-envelope mr-1"></i>Email
+                            </button>
+                            ` : ''}
                             <button onclick="archivePeriod(${period.period_id}, '${period.title}')" 
-                                    class="flex-1 inline-flex items-center justify-center px-4 py-2 border border-amber-300 rounded-md text-sm font-medium text-amber-700 bg-amber-50 hover:bg-amber-100 min-h-[44px]">
-                                <i class="fas fa-archive mr-2"></i>Archive
+                                    class="flex-1 inline-flex items-center justify-center px-3 py-2 border border-amber-300 rounded-md text-sm font-medium text-amber-700 bg-amber-50 hover:bg-amber-100 min-h-[44px]">
+                                <i class="fas fa-archive mr-1"></i>Archive
                             </button>
                         </div>
                     </div>
@@ -1175,6 +1188,62 @@
             });
         }
 
+        // Send email notifications for an evaluation period
+        function sendEmailNotifications(periodId, title) {
+            Swal.fire({
+                title: 'Send Email Notifications?',
+                html: `Send email notifications to all users about "<strong>${title}</strong>"?<br><br>
+                       <span class="text-blue-600">This will notify all students, faculty, and staff about this evaluation period.</span>`,
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonColor: '#22c55e',
+                cancelButtonColor: '#6b7280',
+                confirmButtonText: '<i class="fas fa-envelope mr-2"></i>Send Emails',
+                cancelButtonText: 'Cancel',
+                showLoaderOnConfirm: true,
+                preConfirm: () => {
+                    return $.ajax({
+                        url: `/api/send-evaluation-notifications/${periodId}`,
+                        method: 'POST',
+                        dataType: 'json'
+                    }).then(response => {
+                        if (!response.success) {
+                            throw new Error(response.error || 'Failed to send emails');
+                        }
+                        return response;
+                    }).catch(error => {
+                        Swal.showValidationMessage(`Request failed: ${error.message || error}`);
+                    });
+                },
+                allowOutsideClick: () => !Swal.isLoading()
+            }).then((result) => {
+                if (result.isConfirmed && result.value) {
+                    const response = result.value;
+                    
+                    // Show progress notification
+                    Swal.fire({
+                        title: 'Sending Emails...',
+                        html: `<div class="text-left">
+                                <p class="mb-2">📧 Email notifications are being sent to <strong>${response.total_recipients}</strong> users.</p>
+                                <p class="text-sm text-gray-600">This process is running in the background. You can continue working.</p>
+                                <div class="mt-4 p-3 bg-blue-50 rounded-md">
+                                    <p class="text-sm text-blue-800">
+                                        <i class="fas fa-info-circle mr-1"></i>
+                                        Check the console for real-time progress, or refresh the page in a few moments.
+                                    </p>
+                                </div>
+                            </div>`,
+                        icon: 'success',
+                        confirmButtonColor: '#22c55e',
+                        confirmButtonText: 'Got it!'
+                    });
+                    
+                    console.log(`📧 Email Job ID: ${response.job_id}`);
+                    console.log(`📊 Sending to ${response.total_recipients} recipients`);
+                }
+            });
+        }
+
         // Archive period
         function archivePeriod(periodId, title) {
             Swal.fire({
@@ -1491,8 +1560,11 @@
         function toggleTimerFields() {
             const enabled = $('#timerEnabled').is(':checked');
             const settings = $('#timerSettings');
-            const toggleBg = $('#timerEnabled').siblings('.block');
-            const toggleDot = $('#timerEnabled').siblings('.dot');
+            
+            // Find the toggle elements correctly - they are siblings in the parent container
+            const toggleContainer = $('#timerEnabled').parent();
+            const toggleBg = toggleContainer.find('.block');
+            const toggleDot = toggleContainer.find('.dot');
             
             if (enabled) {
                 // Enable settings

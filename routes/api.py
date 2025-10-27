@@ -4414,81 +4414,42 @@ def update_period_status_auto():
         
         conn.commit()
         
-        # Send email notifications for newly activated periods
+        # Automatic email notifications removed - use manual "Send Email Notifications" button
         if periods_to_activate:
-            try:
-                from utils.email_utils import send_evaluation_start_notification
-                from datetime import datetime
-                
-                for period in periods_to_activate:
-                    # First, sync evaluations for this period (create if not exist)
-                    try:
-                        cursor.execute("""
-                            INSERT INTO evaluations (period_id, section_id, student_id, status, created_at)
-                            SELECT DISTINCT
-                                %s as period_id,
-                                cs.section_id,
-                                ss.student_id,
-                                'Pending' as status,
-                                NOW() as created_at
-                            FROM section_students ss
-                            INNER JOIN class_sections cs ON (
-                                ss.section_id = cs.section_id 
-                                OR ss.section_id = cs.section_ref_id
-                            )
-                            WHERE ss.status = 'Active'
-                            AND cs.faculty_id IS NOT NULL
-                            AND NOT EXISTS (
-                                SELECT 1 FROM evaluations ev 
-                                WHERE ev.period_id = %s 
-                                AND ev.section_id = cs.section_id 
-                                AND ev.student_id = ss.student_id
-                            )
-                        """, (period['period_id'], period['period_id']))
-                        
-                        evaluations_created = cursor.rowcount
-                        conn.commit()
-                        print(f"Synced evaluations for period {period['period_id']}: {evaluations_created} evaluation(s) created")
-                    except Exception as sync_error:
-                        print(f"Error syncing evaluations for period {period['period_id']}: {sync_error}")
-                    
-                    # Get all students assigned to this evaluation period
+            print(f"✅ {len(periods_to_activate)} period(s) automatically activated.")
+            print(f"📧 Use the 'Send Email Notifications' button to notify users.")
+            
+            # Still sync evaluations for newly activated periods
+            for period in periods_to_activate:
+                try:
                     cursor.execute("""
-                        SELECT DISTINCT u.email, u.first_name, u.last_name
-                        FROM users u
-                        INNER JOIN std_info si ON u.user_id = si.user_id
-                        INNER JOIN evaluations e ON si.id = e.student_id
-                        WHERE e.period_id = %s 
-                        AND u.role = 'student' 
-                        AND u.is_active = 1 
-                        AND u.email IS NOT NULL
-                        AND u.email != ''
-                    """, (period['period_id'],))
+                        INSERT INTO evaluations (period_id, section_id, student_id, status, created_at)
+                        SELECT DISTINCT
+                            %s as period_id,
+                            cs.section_id,
+                            ss.student_id,
+                            'Pending' as status,
+                            NOW() as created_at
+                        FROM section_students ss
+                        INNER JOIN class_sections cs ON (
+                            ss.section_id = cs.section_id 
+                            OR ss.section_id = cs.section_ref_id
+                        )
+                        WHERE ss.status = 'Active'
+                        AND cs.faculty_id IS NOT NULL
+                        AND NOT EXISTS (
+                            SELECT 1 FROM evaluations ev 
+                            WHERE ev.period_id = %s 
+                            AND ev.section_id = cs.section_id 
+                            AND ev.student_id = ss.student_id
+                        )
+                    """, (period['period_id'], period['period_id']))
                     
-                    students = cursor.fetchall()
-                    
-                    # Send notification to each student
-                    notifications_sent = 0
-                    for student in students:
-                        try:
-                            # Format dates as YYYY-MM-DD strings for the email function
-                            start_date_str = period['start_date'].strftime('%Y-%m-%d') if hasattr(period['start_date'], 'strftime') else str(period['start_date'])
-                            end_date_str = period['end_date'].strftime('%Y-%m-%d') if hasattr(period['end_date'], 'strftime') else str(period['end_date'])
-                            
-                            send_evaluation_start_notification(
-                                student_email=student['email'],
-                                student_name=f"{student['first_name']} {student['last_name']}",
-                                period_title=period['title'],
-                                start_date=start_date_str,
-                                end_date=end_date_str
-                            )
-                            notifications_sent += 1
-                        except Exception as email_error:
-                            print(f"Error sending notification to {student['email']}: {email_error}")
-                    
-                    print(f"Period '{period['title']}' activated - Notifications sent: {notifications_sent} out of {len(students)} students")
-            except Exception as notify_error:
-                print(f"Error sending activation notifications: {notify_error}")
+                    evaluations_created = cursor.rowcount
+                    conn.commit()
+                    print(f"Synced evaluations for period {period['period_id']}: {evaluations_created} evaluation(s) created")
+                except Exception as sync_error:
+                    print(f"Error syncing evaluations for period {period['period_id']}: {sync_error}")
         
         cursor.close()
     except Exception as e:
@@ -4708,78 +4669,9 @@ def create_evaluation_period_admin():
             print(f"Error syncing evaluations: {sync_error}")
             evaluations_created = 0
         
-        # Send email notifications if period is Active
-        print(f"🔍 DEBUG: Evaluation period status = {status}")
-        if status == 'Active':
-            print("✅ Status is Active - attempting to send emails...")
-            try:
-                from utils.email_utils import send_evaluation_start_notification
-                from threading import Thread
-                
-                # Get all users with valid email addresses (students, faculty, guidance, admin)
-                cursor.execute("""
-                    SELECT user_id, email, first_name, last_name, role
-                    FROM users
-                    WHERE email IS NOT NULL 
-                    AND email != ''
-                    AND email LIKE '%@%'
-                    AND role IN ('student', 'faculty', 'guidance', 'admin')
-                    AND is_active = 1
-                """)
-                
-                all_users = cursor.fetchall()
-                print(f"📊 Found {len(all_users)} users with valid emails:")
-                for user in all_users:
-                    print(f"   - {user['email']} ({user['role']}) - {user['first_name']} {user['last_name']}")
-                
-                # Get the current app context for background thread
-                app = current_app._get_current_object()
-                
-                # Function to send emails in background with app context
-                def send_notification_emails():
-                    with app.app_context():
-                        email_count = 0
-                        failed_count = 0
-                        for user in all_users:
-                            try:
-                                user_name = f"{user['first_name']} {user['last_name']}"
-                                print(f"📧 Sending email to {user['email']}...")
-                                result = send_evaluation_start_notification(
-                                    user['email'],
-                                    user_name,
-                                    data['title'],
-                                    start_date.strftime('%Y-%m-%d'),
-                                    end_date.strftime('%Y-%m-%d')
-                                )
-                                if result:
-                                    email_count += 1
-                                    print(f"   ✅ Success: {user['email']}")
-                                else:
-                                    failed_count += 1
-                                    print(f"   ❌ Failed: {user['email']}")
-                            except Exception as email_error:
-                                failed_count += 1
-                                print(f"   ❌ Exception sending to {user['email']}: {str(email_error)}")
-                                import traceback
-                                traceback.print_exc()
-                        
-                        print(f"\n📧 Email Summary: {email_count} sent, {failed_count} failed")
-                
-                # Start email sending in background thread
-                if all_users:
-                    thread = Thread(target=send_notification_emails)
-                    thread.daemon = True
-                    thread.start()
-                    print(f"� Started background email thread for {len(all_users)} recipients")
-                else:
-                    print("⚠️  No users found with valid emails")
-            
-            except Exception as notify_error:
-                print(f"❌ Email notification error: {str(notify_error)}")
-                import traceback
-                traceback.print_exc()
-        else:
-            print(f"⏭️  Skipping emails - status is '{status}' (not Active)")
+        # Email notifications removed - use manual "Send Email Notifications" button instead
+        print(f"✅ Evaluation period created with status: {status}")
+        print(f"📧 Automatic email notifications disabled. Use 'Send Email Notifications' button.")
         
         cursor.close()
         
@@ -5515,105 +5407,9 @@ def create_evaluation_period_guidance():
             print(f"Error syncing evaluations: {sync_error}")
             evaluations_created = 0
         
-        # Send email notifications if period is Active
-        print(f"🔍 DEBUG: Evaluation period status = {status}")
-        email_job_id = None
-        if status == 'Active':
-            print("✅ Status is Active - attempting to send emails...")
-            try:
-                from utils.email_utils import send_evaluation_start_notification
-                from threading import Thread
-                import uuid
-                import time
-                
-                # Get all users with valid email addresses (students, faculty, guidance, admin)
-                cursor.execute("""
-                    SELECT user_id, email, first_name, last_name, role
-                    FROM users
-                    WHERE email IS NOT NULL 
-                    AND email != ''
-                    AND email LIKE '%@%'
-                    AND role IN ('student', 'faculty', 'guidance', 'admin')
-                    AND is_active = 1
-                """)
-                
-                all_users = cursor.fetchall()
-                print(f"📊 Found {len(all_users)} users with valid emails:")
-                
-                # Generate unique job ID for tracking
-                email_job_id = str(uuid.uuid4())
-                
-                # Store job status in app config (or use Redis/database in production)
-                if not hasattr(current_app, 'email_jobs'):
-                    current_app.email_jobs = {}
-                
-                current_app.email_jobs[email_job_id] = {
-                    'status': 'processing',
-                    'total': len(all_users),
-                    'sent': 0,
-                    'failed': 0,
-                    'started_at': time.time()
-                }
-                
-                # Get the current app context for background thread
-                app = current_app._get_current_object()
-                
-                # Function to send emails in background with app context (OPTIMIZED)
-                def send_notification_emails():
-                    with app.app_context():
-                        import concurrent.futures
-                        from threading import Lock
-                        
-                        stats_lock = Lock()
-                        
-                        def send_to_user(user):
-                            try:
-                                user_name = f"{user['first_name']} {user['last_name']}"
-                                result = send_evaluation_start_notification(
-                                    user['email'],
-                                    user_name,
-                                    data['title'],
-                                    start_date.strftime('%Y-%m-%d'),
-                                    end_date.strftime('%Y-%m-%d')
-                                )
-                                with stats_lock:
-                                    if result:
-                                        app.email_jobs[email_job_id]['sent'] += 1
-                                        print(f"   ✅ Success: {user['email']}")
-                                    else:
-                                        app.email_jobs[email_job_id]['failed'] += 1
-                                        print(f"   ❌ Failed: {user['email']}")
-                                return result
-                            except Exception as email_error:
-                                with stats_lock:
-                                    app.email_jobs[email_job_id]['failed'] += 1
-                                print(f"   ❌ Exception: {user['email']}: {str(email_error)}")
-                                return False
-                        
-                        # Use ThreadPoolExecutor for parallel email sending (5 concurrent)
-                        with concurrent.futures.ThreadPoolExecutor(max_workers=5) as executor:
-                            list(executor.map(send_to_user, all_users))
-                        
-                        # Mark job as complete
-                        app.email_jobs[email_job_id]['status'] = 'completed'
-                        app.email_jobs[email_job_id]['completed_at'] = time.time()
-                        print(f"\n📧 Email Summary: {app.email_jobs[email_job_id]['sent']} sent, {app.email_jobs[email_job_id]['failed']} failed")
-                
-                # Start email sending in background thread
-                if all_users:
-                    thread = Thread(target=send_notification_emails)
-                    thread.daemon = True
-                    thread.start()
-                    print(f"🚀 Started optimized email thread for {len(all_users)} recipients (Job ID: {email_job_id})")
-                else:
-                    print("⚠️  No users found with valid emails")
-            
-            except Exception as notify_error:
-                print(f"❌ Email notification error: {str(notify_error)}")
-                import traceback
-                traceback.print_exc()
-        else:
-            print(f"⏭️  Skipping emails - status is '{status}' (not Active)")
+        # Email notifications removed - use manual "Send Email Notifications" button instead
+        print(f"✅ Evaluation period created with status: {status}")
+        print(f"📧 Automatic email notifications disabled. Use 'Send Email Notifications' button.")
         
         cursor.close()
         
@@ -5624,9 +5420,6 @@ def create_evaluation_period_guidance():
             'status': status,
             'evaluations_created': evaluations_created
         }
-        
-        # Note: Email notifications are sent in background thread
-        # No job tracking in simplified version
         
         return jsonify(response_data)
         
@@ -5664,6 +5457,150 @@ def get_email_job_status(job_id):
         'failed': job_info['failed'],
         'progress_percentage': round((job_info['sent'] + job_info['failed']) / job_info['total'] * 100) if job_info['total'] > 0 else 0
     })
+
+
+@api_bp.route('/send-evaluation-notifications/<int:period_id>', methods=['POST'])
+@login_required
+def send_evaluation_notifications(period_id):
+    """Manually send email notifications for an evaluation period"""
+    if session.get('role') not in ['admin', 'guidance']:
+        return jsonify({'success': False, 'error': 'Unauthorized'}), 403
+    
+    conn = get_db_connection()
+    if not conn:
+        return jsonify({'success': False, 'error': 'Database connection failed'}), 500
+    
+    try:
+        cursor = conn.cursor(dictionary=True)
+        
+        # Get the evaluation period details
+        cursor.execute("""
+            SELECT ep.*, ay.year_code, at.term_name
+            FROM evaluation_periods ep
+            JOIN academic_terms at ON ep.acad_term_id = at.acad_term_id
+            JOIN academic_years ay ON at.acad_year_id = ay.acad_year_id
+            WHERE ep.period_id = %s
+        """, (period_id,))
+        
+        period = cursor.fetchone()
+        
+        if not period:
+            cursor.close()
+            conn.close()
+            return jsonify({'success': False, 'error': 'Evaluation period not found'}), 404
+        
+        # Get all users with valid email addresses
+        cursor.execute("""
+            SELECT user_id, email, first_name, last_name, role
+            FROM users
+            WHERE email IS NOT NULL 
+            AND email != ''
+            AND email LIKE '%@%'
+            AND role IN ('student', 'faculty', 'guidance', 'admin')
+            AND is_active = 1
+        """)
+        
+        all_users = cursor.fetchall()
+        cursor.close()
+        
+        if not all_users:
+            conn.close()
+            return jsonify({
+                'success': False,
+                'error': 'No users with valid email addresses found'
+            }), 400
+        
+        # Import email utility
+        from utils.email_utils import send_evaluation_start_notification
+        from threading import Thread
+        import uuid
+        import time
+        
+        # Generate unique job ID for tracking
+        email_job_id = str(uuid.uuid4())
+        
+        # Initialize email jobs tracking if not exists
+        if not hasattr(current_app, 'email_jobs'):
+            current_app.email_jobs = {}
+        
+        current_app.email_jobs[email_job_id] = {
+            'status': 'processing',
+            'total': len(all_users),
+            'sent': 0,
+            'failed': 0,
+            'started_at': time.time()
+        }
+        
+        # Get the current app context for background thread
+        app = current_app._get_current_object()
+        
+        # Function to send emails in background with app context
+        def send_notification_emails():
+            import concurrent.futures
+            from threading import Lock
+            
+            stats_lock = Lock()
+            
+            def send_to_user(user):
+                # Each thread needs its own app context
+                with app.app_context():
+                    try:
+                        user_name = f"{user['first_name']} {user['last_name']}"
+                        result = send_evaluation_start_notification(
+                            user['email'],
+                            user_name,
+                            period['title'],
+                            period['start_date'].strftime('%Y-%m-%d'),
+                            period['end_date'].strftime('%Y-%m-%d')
+                        )
+                        with stats_lock:
+                            if result:
+                                app.email_jobs[email_job_id]['sent'] += 1
+                                print(f"   ✅ Email sent: {user['email']}")
+                            else:
+                                app.email_jobs[email_job_id]['failed'] += 1
+                                print(f"   ❌ Email failed: {user['email']}")
+                        return result
+                    except Exception as email_error:
+                        with stats_lock:
+                            app.email_jobs[email_job_id]['failed'] += 1
+                        print(f"   ❌ Exception: {user['email']}: {str(email_error)}")
+                        return False
+            
+            # Use ThreadPoolExecutor for parallel email sending (5 concurrent)
+            with concurrent.futures.ThreadPoolExecutor(max_workers=5) as executor:
+                list(executor.map(send_to_user, all_users))
+            
+            # Mark job as complete
+            with app.app_context():
+                app.email_jobs[email_job_id]['status'] = 'completed'
+                app.email_jobs[email_job_id]['completed_at'] = time.time()
+                print(f"\n📧 Email Summary: {app.email_jobs[email_job_id]['sent']} sent, {app.email_jobs[email_job_id]['failed']} failed")
+        
+        # Start email sending in background thread
+        thread = Thread(target=send_notification_emails)
+        thread.daemon = True
+        thread.start()
+        
+        print(f"🚀 Started email notification job for period '{period['title']}' (Job ID: {email_job_id})")
+        print(f"📊 Sending to {len(all_users)} users")
+        
+        conn.close()
+        
+        return jsonify({
+            'success': True,
+            'message': f'Email notifications are being sent to {len(all_users)} users',
+            'job_id': email_job_id,
+            'total_recipients': len(all_users)
+        })
+        
+    except Exception as e:
+        print(f"Error sending evaluation notifications: {e}")
+        import traceback
+        traceback.print_exc()
+        if conn:
+            conn.close()
+        return jsonify({'success': False, 'error': str(e)}), 500
 
 
 @api_bp.route('/guidance/evaluation-periods/<int:period_id>', methods=['PUT'])
@@ -13646,67 +13583,17 @@ def create_evaluation_period():
         conn.commit()
         period_id = cursor.lastrowid
         
-        # Send email notifications to all users (students, faculty, guidance, admin)
-        try:
-            from utils.email_utils import send_evaluation_start_notification
-            from threading import Thread
-            from flask import current_app
-            
-            # Get all users with valid email addresses
-            cursor.execute("""
-                SELECT user_id, email, first_name, last_name, role
-                FROM users
-                WHERE email IS NOT NULL 
-                AND email != ''
-                AND email LIKE '%@%'
-                AND role IN ('student', 'faculty', 'guidance', 'admin')
-            """)
-            all_users = cursor.fetchall()
-            
-            # Get the current app context for background thread
-            app = current_app._get_current_object()
-            
-            # Function to send emails in background with app context
-            def send_notification_emails():
-                with app.app_context():
-                    email_count = 0
-                    for user in all_users:
-                        try:
-                            user_name = f"{user['first_name']} {user['last_name']}"
-                            send_evaluation_start_notification(
-                                user['email'],
-                                user_name,
-                                title,
-                                start_date,
-                                end_date
-                            )
-                            email_count += 1
-                        except Exception as email_error:
-                            print(f"Failed to send email to {user['email']}: {str(email_error)}")
-                    
-                    print(f"✅ Sent {email_count} evaluation period notification emails")
-            
-            # Start email sending in background thread
-            if all_users:
-                thread = Thread(target=send_notification_emails)
-                thread.daemon = True
-                thread.start()
-                print(f"📧 Started sending {len(all_users)} email notifications for evaluation period: {title}")
-        
-        except Exception as email_exc:
-            # Don't fail the period creation if email sending fails
-            print(f"Warning: Email notifications failed: {str(email_exc)}")
-            import traceback
-            traceback.print_exc()
+        # Email notifications removed - use manual "Send Email Notifications" button instead
+        print(f"✅ Evaluation period created with ID: {period_id}")
+        print(f"📧 Automatic email notifications disabled. Use 'Send Email Notifications' button.")
         
         cursor.close()
         conn.close()
         
         return jsonify({
             'success': True,
-            'message': 'Evaluation period created successfully. Email notifications are being sent to all users.',
-            'period_id': period_id,
-            'emails_queued': len(all_users) if 'all_users' in locals() else 0
+            'message': 'Evaluation period created successfully',
+            'period_id': period_id
         })
         
     except Exception as e:
