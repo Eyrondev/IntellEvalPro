@@ -421,6 +421,7 @@ def ai_support_chat():
         
         data = request.get_json()
         user_message = data.get('message', '').strip()
+        user_role = data.get('role', 'student')  # Get role from request, default to 'student'
         
         if not user_message:
             return jsonify({
@@ -435,8 +436,8 @@ def ai_support_chat():
                 'reply': "I'm the IntellEvalPro AI Assistant and I can only help with questions about this evaluation system. Please ask me about system features, navigation, evaluations, or troubleshooting. 😊"
             })
         
-        # Get AI response
-        success, response = get_ai_response(user_message)
+        # Get AI response with role-specific context
+        success, response = get_ai_response(user_message, role=user_role)
         
         if success:
             return jsonify({

@@ -88,58 +88,101 @@
       <main id="main-content" class="flex-1 overflow-auto p-4 md:p-6 bg-gray-50">
         <!-- Page header -->
         <div class="mb-6">
-          <h1 class="text-2xl font-bold text-gray-800">Help & Support</h1>
-          <p class="text-gray-500 mt-1">Find answers to common questions and get assistance with IntellEvalPro guidance features</p>
+          <h1 class="text-2xl md:text-3xl font-bold text-gray-800">Help & Support</h1>
+          <p class="text-sm md:text-base text-gray-500 mt-1">Comprehensive guidance for managing evaluations, analytics, and system administration</p>
+        </div>
+
+        <!-- Quick Actions Banner -->
+        <div class="bg-gradient-to-r from-orange-500 to-orange-600 rounded-xl shadow-lg p-6 mb-8 text-white">
+          <div class="flex flex-col md:flex-row items-start md:items-center justify-between">
+            <div class="mb-4 md:mb-0">
+              <h2 class="text-xl md:text-2xl font-bold mb-2 flex items-center">
+                <i class="fas fa-robot mr-3"></i>
+                AI-Powered Assistance
+              </h2>
+              <p class="text-orange-100 text-sm md:text-base">Get instant help with evaluation management, analytics, and system administration</p>
+            </div>
+            <button onclick="document.getElementById('chat-toggle-btn').click()" class="bg-white text-orange-600 px-6 py-3 rounded-lg font-semibold hover:bg-orange-50 transition-colors flex items-center shadow-lg">
+              <i class="fas fa-comments mr-2"></i>
+              Chat with AI
+            </button>
+          </div>
         </div>
 
         <!-- Quick Help Cards -->
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6 mb-8">
           <!-- System Management -->
-          <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6 hover:shadow-md transition-shadow cursor-pointer" onclick="scrollToSection('system-management')">
-            <div class="flex items-center mb-4">
-              <div class="p-3 rounded-lg bg-blue-100">
-                <i class="fas fa-cogs text-blue-600 text-xl"></i>
+          <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-5 hover:shadow-md hover:border-orange-300 transition-all cursor-pointer group" onclick="scrollToSection('system-management')">
+            <div class="flex items-start mb-3">
+              <div class="p-2.5 rounded-lg bg-blue-100 group-hover:bg-blue-200 transition-colors">
+                <i class="fas fa-cogs text-blue-600 text-lg"></i>
               </div>
-              <h3 class="text-lg font-semibold text-gray-900 ml-3">System Management</h3>
             </div>
-            <p class="text-gray-600">Learn how to manage evaluation periods, students, and faculty data</p>
+            <h3 class="text-base font-semibold text-gray-900 mb-2">System Management</h3>
+            <p class="text-sm text-gray-600">Manage periods, students, faculty, and questionnaires</p>
           </div>
 
           <!-- Evaluation Analytics -->
-          <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6 hover:shadow-md transition-shadow cursor-pointer" onclick="scrollToSection('analytics-help')">
-            <div class="flex items-center mb-4">
-              <div class="p-3 rounded-lg bg-green-100">
-                <i class="fas fa-chart-line text-green-600 text-xl"></i>
+          <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-5 hover:shadow-md hover:border-orange-300 transition-all cursor-pointer group" onclick="scrollToSection('analytics-help')">
+            <div class="flex items-start mb-3">
+              <div class="p-2.5 rounded-lg bg-green-100 group-hover:bg-green-200 transition-colors">
+                <i class="fas fa-chart-line text-green-600 text-lg"></i>
               </div>
-              <h3 class="text-lg font-semibold text-gray-900 ml-3">Analytics & Reports</h3>
             </div>
-            <p class="text-gray-600">Understand evaluation analytics, reports, and performance metrics</p>
+            <h3 class="text-base font-semibold text-gray-900 mb-2">Analytics & Reports</h3>
+            <p class="text-sm text-gray-600">Generate insights, reports, and performance metrics</p>
+          </div>
+
+          <!-- AI Analytics -->
+          <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-5 hover:shadow-md hover:border-orange-300 transition-all cursor-pointer group" onclick="scrollToSection('ai-analytics')">
+            <div class="flex items-start mb-3">
+              <div class="p-2.5 rounded-lg bg-purple-100 group-hover:bg-purple-200 transition-colors">
+                <i class="fas fa-brain text-purple-600 text-lg"></i>
+              </div>
+            </div>
+            <h3 class="text-base font-semibold text-gray-900 mb-2">AI Analytics</h3>
+            <p class="text-sm text-gray-600">Leverage AI for evaluation insights and trends</p>
           </div>
 
           <!-- Technical Support -->
-          <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6 hover:shadow-md transition-shadow cursor-pointer" onclick="scrollToSection('contact-support')">
-            <div class="flex items-center mb-4">
-              <div class="p-3 rounded-lg bg-purple-100">
-                <i class="fas fa-headset text-purple-600 text-xl"></i>
+          <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-5 hover:shadow-md hover:border-orange-300 transition-all cursor-pointer group" onclick="scrollToSection('technical-support')">
+            <div class="flex items-start mb-3">
+              <div class="p-2.5 rounded-lg bg-orange-100 group-hover:bg-orange-200 transition-colors">
+                <i class="fas fa-headset text-orange-600 text-lg"></i>
               </div>
-              <h3 class="text-lg font-semibold text-gray-900 ml-3">Technical Support</h3>
             </div>
-            <p class="text-gray-600">Get technical assistance and contact our support team</p>
+            <h3 class="text-base font-semibold text-gray-900 mb-2">Technical Support</h3>
+            <p class="text-sm text-gray-600">Troubleshoot issues and get expert assistance</p>
           </div>
         </div>
 
         <!-- FAQ Section -->
-        <div class="bg-white rounded-lg shadow-sm border border-gray-200 mb-6">
-          <div class="p-6 border-b border-gray-200">
-            <h2 class="text-xl font-semibold text-gray-900">Frequently Asked Questions</h2>
+        <div class="bg-white rounded-xl shadow-sm border border-gray-200 mb-6">
+          <div class="p-4 md:p-6 border-b border-gray-200">
+            <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+              <div>
+                <h2 class="text-lg md:text-xl font-semibold text-gray-900">Frequently Asked Questions</h2>
+                <p class="text-sm text-gray-600 mt-1">Browse common questions or use our AI assistant for instant answers</p>
+              </div>
+              <div class="flex items-center gap-2 text-sm">
+                <span class="bg-orange-100 text-orange-700 px-3 py-1.5 rounded-full font-medium">
+                  <i class="fas fa-question-circle mr-1"></i>
+                  <span id="total-faqs">15</span> FAQs
+                </span>
+              </div>
+            </div>
           </div>
-          <div class="p-6">
+          <div class="p-4 md:p-6">
             <!-- Search FAQ -->
             <div class="mb-6">
               <div class="relative">
-                <input type="text" id="faq-search" placeholder="Search FAQ..." class="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-primary-500 focus:border-primary-500">
+                <input type="text" id="faq-search" placeholder="Search for guidance topics (e.g., 'create period', 'generate report', 'analytics')..." class="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 text-sm md:text-base">
                 <i class="fas fa-search absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
               </div>
+              <p class="text-xs text-gray-500 mt-2">
+                <i class="fas fa-lightbulb text-yellow-500 mr-1"></i>
+                Tip: Our AI Assistant provides personalized, context-aware answers instantly!
+              </p>
             </div>
 
             <!-- System Management FAQs -->
@@ -150,32 +193,68 @@
               </h3>
               <div class="space-y-4">
                 <div class="faq-item border border-gray-200 rounded-lg">
-                  <button class="faq-question w-full text-left px-4 py-3 font-medium text-gray-900 hover:bg-gray-50 focus:outline-none flex items-center justify-between">
-                    How do I create a new evaluation period?
-                    <i class="fas fa-chevron-down transform transition-transform"></i>
+                  <button class="faq-question w-full text-left px-4 py-3 font-medium text-gray-900 hover:bg-gray-50 focus:outline-none flex items-center justify-between transition-colors">
+                    <span class="flex items-center">
+                      <i class="fas fa-calendar-plus text-orange-600 mr-3 text-sm"></i>
+                      How do I create a new evaluation period?
+                    </span>
+                    <i class="fas fa-chevron-down transform transition-transform text-gray-400"></i>
                   </button>
-                  <div class="faq-answer hidden px-4 pb-3 text-gray-600">
-                    To create a new evaluation period, go to Evaluation Management > Evaluation Periods. Click "Create New Period" and fill in the required details including period name, start/end dates, and description. Make sure to set the appropriate faculty and courses for the evaluation.
+                  <div class="faq-answer hidden px-4 pb-4 pt-2 text-gray-600">
+                    <p class="leading-relaxed mb-3">To create a new evaluation period:</p>
+                    <ol class="list-decimal list-inside space-y-2 ml-2">
+                      <li>Navigate to <strong>Evaluation Management</strong> → <strong>Evaluation Periods</strong></li>
+                      <li>Click <strong>"Create New Period"</strong> button</li>
+                      <li>Fill in required details:
+                        <ul class="list-disc list-inside ml-6 mt-1 space-y-1">
+                          <li>Period name (e.g., "Mid-term 2024", "Finals 2024")</li>
+                          <li>Start and end dates</li>
+                          <li>Academic year and semester</li>
+                          <li>Description and instructions for students</li>
+                        </ul>
+                      </li>
+                      <li>Assign questionnaire template</li>
+                      <li>Select faculty and courses to evaluate</li>
+                      <li>Click <strong>"Create Period"</strong> to save</li>
+                    </ol>
+                    <div class="mt-3 p-3 bg-blue-50 border border-blue-200 rounded-lg">
+                      <p class="text-sm text-blue-800">
+                        <i class="fas fa-info-circle mr-1"></i>
+                        <strong>Note:</strong> Students will receive email notifications automatically when the period becomes active.
+                      </p>
+                    </div>
                   </div>
                 </div>
 
                 <div class="faq-item border border-gray-200 rounded-lg">
-                  <button class="faq-question w-full text-left px-4 py-3 font-medium text-gray-900 hover:bg-gray-50 focus:outline-none flex items-center justify-between">
-                    How can I monitor student evaluation progress?
-                    <i class="fas fa-chevron-down transform transition-transform"></i>
+                  <button class="faq-question w-full text-left px-4 py-3 font-medium text-gray-900 hover:bg-gray-50 focus:outline-none flex items-center justify-between transition-colors">
+                    <span class="flex items-center">
+                      <i class="fas fa-clipboard-list text-orange-600 mr-3 text-sm"></i>
+                      How do I create and manage questionnaires?
+                    </span>
+                    <i class="fas fa-chevron-down transform transition-transform text-gray-400"></i>
                   </button>
-                  <div class="faq-answer hidden px-4 pb-3 text-gray-600">
-                    Use the Student Management section to view real-time progress of student evaluations. You can see completion rates, pending evaluations, and enable retake options for students who need to resubmit their evaluations.
-                  </div>
-                </div>
-
-                <div class="faq-item border border-gray-200 rounded-lg">
-                  <button class="faq-question w-full text-left px-4 py-3 font-medium text-gray-900 hover:bg-gray-50 focus:outline-none flex items-center justify-between">
-                    What's the difference between questionnaire types?
-                    <i class="fas fa-chevron-down transform transition-transform"></i>
-                  </button>
-                  <div class="faq-answer hidden px-4 pb-3 text-gray-600">
-                    The questionnaire builder offers different question types: Multiple Choice (single selection), Checkboxes (multiple selections), Rating Scales (numeric ratings), Likert Scales (agreement levels), and Text fields (open responses). Choose based on the type of feedback you want to collect.
+                  <div class="faq-answer hidden px-4 pb-4 pt-2 text-gray-600">
+                    <p class="leading-relaxed mb-3">The questionnaire builder offers flexible question types:</p>
+                    <ul class="space-y-2">
+                      <li class="flex items-start">
+                        <i class="fas fa-check-circle text-green-500 mr-2 mt-0.5"></i>
+                        <span><strong>Rating Scales</strong> - Numerical ratings (1-5) for performance criteria</span>
+                      </li>
+                      <li class="flex items-start">
+                        <i class="fas fa-check-circle text-green-500 mr-2 mt-0.5"></i>
+                        <span><strong>Likert Scales</strong> - Agreement levels (Strongly Disagree to Strongly Agree)</span>
+                      </li>
+                      <li class="flex items-start">
+                        <i class="fas fa-check-circle text-green-500 mr-2 mt-0.5"></i>
+                        <span><strong>Multiple Choice</strong> - Single selection from options</span>
+                      </li>
+                      <li class="flex items-start">
+                        <i class="fas fa-check-circle text-green-500 mr-2 mt-0.5"></i>
+                        <span><strong>Text Fields</strong> - Open-ended feedback and comments</span>
+                      </li>
+                    </ul>
+                    <p class="mt-3 leading-relaxed">Go to <strong>Questionnaire Management</strong> to create, edit, or duplicate templates.</p>
                   </div>
                 </div>
               </div>
@@ -215,6 +294,65 @@
                   </button>
                   <div class="faq-answer hidden px-4 pb-3 text-gray-600">
                     Most reports include export options in multiple formats (PDF, Excel, CSV). Look for the export button in the top-right corner of report pages. You can also schedule automated report generation for regular periods.
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- AI Analytics FAQs -->
+            <div id="ai-analytics" class="mb-8">
+              <h3 class="text-lg font-semibold text-gray-900 mb-4 flex items-center">
+                <i class="fas fa-brain text-orange-600 mr-2"></i>
+                AI Analytics & Insights
+              </h3>
+              <div class="space-y-4">
+                <div class="faq-item border border-gray-200 rounded-lg">
+                  <button class="faq-question w-full text-left px-4 py-3 font-medium text-gray-900 hover:bg-gray-50 focus:outline-none flex items-center justify-between transition-colors">
+                    <span class="flex items-center">
+                      <i class="fas fa-robot text-orange-600 mr-3 text-sm"></i>
+                      What is the AI Analytics Dashboard?
+                    </span>
+                    <i class="fas fa-chevron-down transform transition-transform text-gray-400"></i>
+                  </button>
+                  <div class="faq-answer hidden px-4 pb-4 pt-2 text-gray-600">
+                    <p class="leading-relaxed mb-3">The AI Analytics Dashboard uses Google Gemini AI to provide intelligent insights from evaluation data:</p>
+                    <ul class="space-y-2">
+                      <li class="flex items-start">
+                        <i class="fas fa-check-circle text-green-500 mr-2 mt-0.5"></i>
+                        <span><strong>Sentiment Analysis</strong> - Analyze student comments and feedback tone</span>
+                      </li>
+                      <li class="flex items-start">
+                        <i class="fas fa-check-circle text-green-500 mr-2 mt-0.5"></i>
+                        <span><strong>Trend Detection</strong> - Identify patterns in faculty performance</span>
+                      </li>
+                      <li class="flex items-start">
+                        <i class="fas fa-check-circle text-green-500 mr-2 mt-0.5"></i>
+                        <span><strong>Recommendations</strong> - Data-driven suggestions for improvement</span>
+                      </li>
+                      <li class="flex items-start">
+                        <i class="fas fa-check-circle text-green-500 mr-2 mt-0.5"></i>
+                        <span><strong>Predictive Insights</strong> - Forecast evaluation completion rates</span>
+                      </li>
+                    </ul>
+                    <div class="mt-3 p-3 bg-purple-50 border border-purple-200 rounded-lg">
+                      <p class="text-sm text-purple-800">
+                        <i class="fas fa-sparkles mr-1"></i>
+                        Access AI Analytics from the main dashboard or Analytics section.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="faq-item border border-gray-200 rounded-lg">
+                  <button class="faq-question w-full text-left px-4 py-3 font-medium text-gray-900 hover:bg-gray-50 focus:outline-none flex items-center justify-between transition-colors">
+                    <span class="flex items-center">
+                      <i class="fas fa-comments text-orange-600 mr-3 text-sm"></i>
+                      How does sentiment analysis work?
+                    </span>
+                    <i class="fas fa-chevron-down transform transition-transform text-gray-400"></i>
+                  </button>
+                  <div class="faq-answer hidden px-4 pb-4 pt-2 text-gray-600">
+                    <p class="leading-relaxed">AI sentiment analysis examines student comments to determine emotional tone (positive, neutral, negative). It identifies key themes, concerns, and praises mentioned frequently, helping you understand overall satisfaction levels and specific areas needing attention.</p>
                   </div>
                 </div>
               </div>
@@ -260,222 +398,133 @@
             </div>
           </div>
         </div>
-
-        <!-- Contact Support Section -->
-        <div id="contact-support" class="bg-white rounded-lg shadow-sm border border-gray-200 mb-6">
-          <div class="p-6 border-b border-gray-200">
-            <h2 class="text-xl font-semibold text-gray-900">Contact Support</h2>
-            <p class="text-gray-600 mt-1">Can't find what you're looking for? Get in touch with our support team</p>
-          </div>
-          <div class="p-6">
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <!-- Contact Information -->
-              <div>
-                <h3 class="text-lg font-semibold text-gray-900 mb-4">Get in Touch</h3>
-                <div class="space-y-4">
-                  <div class="flex items-center">
-                    <div class="p-2 rounded-lg bg-blue-100 mr-3">
-                      <i class="fas fa-envelope text-blue-600"></i>
-                    </div>
-                    <div>
-                      <p class="font-medium text-gray-900">Email Support</p>
-                      <p class="text-gray-600">support@intellevalpro.edu</p>
-                    </div>
-                  </div>
-                  <div class="flex items-center">
-                    <div class="p-2 rounded-lg bg-green-100 mr-3">
-                      <i class="fas fa-phone text-green-600"></i>
-                    </div>
-                    <div>
-                      <p class="font-medium text-gray-900">Phone Support</p>
-                      <p class="text-gray-600">+63 (2) 123-4567</p>
-                    </div>
-                  </div>
-                  <div class="flex items-center">
-                    <div class="p-2 rounded-lg bg-purple-100 mr-3">
-                      <i class="fas fa-clock text-purple-600"></i>
-                    </div>
-                    <div>
-                      <p class="font-medium text-gray-900">Support Hours</p>
-                      <p class="text-gray-600">Mon-Fri: 8:00 AM - 5:00 PM</p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              <!-- Support Request Form -->
-              <div>
-                <h3 class="text-lg font-semibold text-gray-900 mb-4">Send Support Request</h3>
-                <form class="space-y-4">
-                  <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">Subject</label>
-                    <input type="text" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-primary-500 focus:border-primary-500" placeholder="Brief description of your issue">
-                  </div>
-                  <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">Priority</label>
-                    <select class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-primary-500 focus:border-primary-500">
-                      <option value="low">Low - General question</option>
-                      <option value="medium">Medium - Issue affecting work</option>
-                      <option value="high">High - System down or urgent</option>
-                    </select>
-                  </div>
-                  <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">Description</label>
-                    <textarea rows="4" class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-primary-500 focus:border-primary-500" placeholder="Please describe your issue in detail..."></textarea>
-                  </div>
-                  <button type="submit" class="w-full px-4 py-2 bg-primary-600 text-white font-medium rounded-lg hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2">
-                    Send Support Request
-                  </button>
-                </form>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Quick Links -->
-        <div class="bg-white rounded-lg shadow-sm border border-gray-200">
-          <div class="p-6 border-b border-gray-200">
-            <h2 class="text-xl font-semibold text-gray-900">Quick Links</h2>
-          </div>
-          <div class="p-6">
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-              <a href="{{ url_for('guidance.questionnaire_management') }}" class="flex items-center p-3 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors">
-                <i class="fas fa-clipboard-list text-primary-600 mr-3"></i>
-                <span class="text-gray-900">Manage Questionnaires</span>
-              </a>
-              <a href="{{ url_for('guidance.evaluation_periods') }}" class="flex items-center p-3 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors">
-                <i class="fas fa-calendar-alt text-primary-600 mr-3"></i>
-                <span class="text-gray-900">Evaluation Periods</span>
-              </a>
-              <a href="{{ url_for('analytics.faculty_performance') }}" class="flex items-center p-3 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors">
-                <i class="fas fa-chart-line text-primary-600 mr-3"></i>
-                <span class="text-gray-900">Faculty Performance</span>
-              </a>
-              <a href="{{ url_for('guidance.guidance_dashboard') }}" class="flex items-center p-3 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors">
-                <i class="fas fa-gauge-high text-primary-600 mr-3"></i>
-                <span class="text-gray-900">Dashboard</span>
-              </a>
-            </div>
-          </div>
-        </div>
       </main>
     </div>
   </div>
 
   <!-- AI Chatbot Widget -->
-  <div id="ai-chatbot-container" class="fixed bottom-6 right-6 z-50">
+  <div id="ai-chatbot-container" class="fixed bottom-4 md:bottom-6 right-4 md:right-6 z-50">
     <!-- Chat Button -->
-    <button id="chat-toggle-btn" class="bg-gradient-to-r from-primary-600 to-primary-700 text-white rounded-full p-4 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-110 flex items-center justify-center">
-      <i class="fas fa-robot text-2xl"></i>
-      <span class="ml-2 font-medium hidden md:inline">AI Assistant</span>
+    <button id="chat-toggle-btn" class="bg-gradient-to-r from-orange-500 to-orange-600 text-white rounded-full p-3 md:p-4 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 flex items-center justify-center group">
+      <i class="fas fa-robot text-xl md:text-2xl"></i>
+      <span class="ml-2 font-medium hidden md:inline text-sm lg:text-base">Guidance AI</span>
+      <span class="absolute -top-1 -right-1 w-3 h-3 bg-green-400 rounded-full border-2 border-white animate-pulse"></span>
     </button>
 
     <!-- Chat Window -->
-    <div id="chat-window" class="hidden absolute bottom-20 right-0 w-96 max-w-[calc(100vw-3rem)] bg-white rounded-2xl shadow-2xl border border-gray-200 overflow-hidden flex flex-col" style="height: 500px; max-height: calc(100vh - 8rem);">
+    <div id="chat-window" class="hidden fixed bottom-16 md:bottom-20 right-4 md:right-6 w-[calc(100vw-2rem)] md:w-96 bg-white rounded-2xl shadow-2xl border border-gray-200 overflow-hidden flex flex-col" style="height: calc(100vh - 8rem); max-height: 600px;">
       <!-- Chat Header -->
-      <div class="bg-gradient-to-r from-primary-600 to-primary-700 text-white p-4 flex items-center justify-between">
+      <div class="bg-gradient-to-r from-orange-500 to-orange-600 text-white p-4 flex items-center justify-between">
         <div class="flex items-center">
-          <div class="w-10 h-10 bg-white rounded-full flex items-center justify-center mr-3">
-            <i class="fas fa-robot text-primary-600 text-xl"></i>
+          <div class="w-10 h-10 bg-white rounded-full flex items-center justify-center mr-3 animate-pulse">
+            <i class="fas fa-robot text-orange-600 text-xl"></i>
           </div>
           <div>
-            <h3 class="font-semibold text-lg">IntellEval Assistant</h3>
-            <p class="text-xs text-primary-100">Powered by Gemini AI</p>
+            <h3 class="font-semibold text-base md:text-lg">Guidance AI Assistant</h3>
+            <p class="text-xs text-orange-100 flex items-center">
+              <span class="w-2 h-2 bg-green-400 rounded-full mr-1.5 animate-pulse"></span>
+              Online • Powered by Gemini AI
+            </p>
           </div>
         </div>
         <button id="chat-close-btn" class="text-white hover:bg-white hover:bg-opacity-20 rounded-full p-2 transition-colors">
-          <i class="fas fa-times"></i>
+          <i class="fas fa-times text-lg"></i>
         </button>
       </div>
 
       <!-- Chat Messages -->
       <div id="chat-messages" class="flex-1 overflow-y-auto p-4 space-y-4 bg-gray-50">
         <!-- Welcome Message -->
-        <div class="flex items-start">
-          <div class="w-8 h-8 bg-primary-100 rounded-full flex items-center justify-center mr-2 flex-shrink-0">
-            <i class="fas fa-robot text-primary-600 text-sm"></i>
+        <div class="flex items-start animate-fadeIn">
+          <div class="w-8 h-8 bg-gradient-to-br from-orange-500 to-orange-600 rounded-full flex items-center justify-center mr-2 flex-shrink-0 shadow-sm">
+            <i class="fas fa-robot text-white text-sm"></i>
           </div>
-          <div class="bg-white rounded-lg rounded-tl-none p-3 shadow-sm max-w-[80%]">
-            <p class="text-sm text-gray-800">Hi! 👋 I'm your IntellEvalPro AI Assistant for Guidance Counselors. I can help you with system management, evaluation analytics, report generation, and troubleshooting. How can I assist you today?</p>
+          <div class="bg-white rounded-lg rounded-tl-none p-3 shadow-sm max-w-[85%] border border-gray-100">
+            <p class="text-sm text-gray-800 leading-relaxed">
+              👋 <strong>Hello, Guidance Counselor!</strong> I'm your AI Assistant.
+            </p>
+            <p class="text-sm text-gray-700 mt-2 leading-relaxed">
+              I can help you with:
+            </p>
+            <ul class="text-sm text-gray-700 mt-2 space-y-1 ml-2">
+              <li>• <strong>Evaluation Management</strong> - Creating periods, managing questionnaires</li>
+              <li>• <strong>Analytics & Reports</strong> - Generating insights, faculty performance</li>
+              <li>• <strong>Student Management</strong> - Monitoring progress, enabling retakes</li>
+              <li>• <strong>AI Features</strong> - Understanding AI analytics and sentiment analysis</li>
+            </ul>
+            <p class="text-sm text-gray-600 mt-3 italic">
+              💡 Try asking: "How do I create an evaluation period?" or "What's in the AI Analytics dashboard?"
+            </p>
           </div>
+        </div>
+
+        <!-- Quick Action Buttons -->
+        <div class="flex flex-wrap gap-2 px-2">
+          <button class="quick-question-btn text-xs bg-orange-50 hover:bg-orange-100 text-orange-700 px-3 py-2 rounded-full border border-orange-200 transition-colors">
+            How do I create evaluation periods?
+          </button>
+          <button class="quick-question-btn text-xs bg-orange-50 hover:bg-orange-100 text-orange-700 px-3 py-2 rounded-full border border-orange-200 transition-colors">
+            Generate faculty reports
+          </button>
+          <button class="quick-question-btn text-xs bg-orange-50 hover:bg-orange-100 text-orange-700 px-3 py-2 rounded-full border border-orange-200 transition-colors">
+            What's AI Analytics?
+          </button>
         </div>
       </div>
 
       <!-- Chat Input -->
-      <div class="border-t border-gray-200 p-4 bg-white">
+      <div class="border-t border-gray-200 p-3 md:p-4 bg-white">
         <form id="chat-form" class="flex items-center space-x-2">
           <input 
             type="text" 
             id="chat-input" 
-            placeholder="Ask me anything about IntellEvalPro..." 
-            class="flex-1 px-4 py-2 border border-gray-300 rounded-full focus:ring-2 focus:ring-primary-500 focus:border-primary-500 text-sm"
+            placeholder="Ask about evaluation management..." 
+            class="flex-1 px-3 md:px-4 py-2 md:py-2.5 border border-gray-300 rounded-full focus:ring-2 focus:ring-orange-500 focus:border-orange-500 text-sm"
             autocomplete="off"
           />
           <button 
             type="submit" 
             id="chat-send-btn"
-            class="bg-primary-600 text-white rounded-full p-2 hover:bg-primary-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed w-10 h-10 flex items-center justify-center"
+            class="bg-orange-600 text-white rounded-full p-2 md:p-2.5 hover:bg-orange-700 active:scale-95 transition-all disabled:opacity-50 disabled:cursor-not-allowed w-9 h-9 md:w-10 md:h-10 flex items-center justify-center shadow-md"
           >
-            <i class="fas fa-paper-plane"></i>
+            <i class="fas fa-paper-plane text-sm"></i>
           </button>
         </form>
-        <p class="text-xs text-gray-500 mt-2 text-center">AI responses are based on system documentation</p>
+        <p class="text-xs text-gray-500 mt-2 text-center flex items-center justify-center">
+          <i class="fas fa-shield-alt text-gray-400 mr-1"></i>
+          AI responses based on IntellEvalPro guidance documentation
+        </p>
       </div>
     </div>
   </div>
 
   <script>
-    document.addEventListener('DOMContentLoaded', function() {
-      // FAQ functionality
-      const faqQuestions = document.querySelectorAll('.faq-question');
-      faqQuestions.forEach(question => {
-        question.addEventListener('click', function() {
-          const answer = this.nextElementSibling;
-          const icon = this.querySelector('i.fa-chevron-down');
-          
-          if (answer.classList.contains('hidden')) {
-            answer.classList.remove('hidden');
-            icon.classList.add('rotate-180');
-          } else {
-            answer.classList.add('hidden');
-            icon.classList.remove('rotate-180');
-          }
-        });
+    // Initialize FAQ functionality after page load
+    $(document).ready(function() {
+      // FAQ accordion functionality - matches student help page
+      $('.faq-question').click(function() {
+        const answer = $(this).next('.faq-answer');
+        const icon = $(this).find('i.fa-chevron-down');
+        
+        // Toggle current FAQ with smooth slide animation
+        answer.slideToggle(300);
+        icon.toggleClass('rotate-180');
       });
 
       // FAQ search functionality
-      const searchInput = document.getElementById('faq-search');
-      searchInput.addEventListener('input', function() {
-        const searchTerm = this.value.toLowerCase();
-        const faqItems = document.querySelectorAll('.faq-item');
+      $('#faq-search').on('input', function() {
+        const searchTerm = $(this).val().toLowerCase();
         
-        faqItems.forEach(item => {
-          const question = item.querySelector('.faq-question').textContent.toLowerCase();
-          const answer = item.querySelector('.faq-answer').textContent.toLowerCase();
+        $('.faq-item').each(function() {
+          const questionText = $(this).find('.faq-question').text().toLowerCase();
+          const answerText = $(this).find('.faq-answer').text().toLowerCase();
           
-          if (question.includes(searchTerm) || answer.includes(searchTerm)) {
-            item.style.display = '';
+          if (questionText.includes(searchTerm) || answerText.includes(searchTerm)) {
+            $(this).show();
           } else {
-            item.style.display = 'none';
+            $(this).hide();
           }
         });
-      });
-
-      // Support form submission
-      const supportForm = document.querySelector('#contact-support form');
-      supportForm.addEventListener('submit', function(e) {
-        e.preventDefault();
-        
-        if (typeof Swal !== 'undefined') {
-          Swal.fire({
-            icon: 'success',
-            title: 'Support Request Sent',
-            text: 'Your support request has been submitted. We\'ll get back to you within 24 hours.',
-            confirmButtonColor: '#0059cc'
-          });
-        }
-        
-        this.reset();
       });
     });
 
@@ -513,6 +562,20 @@
       // Close chat window
       chatCloseBtn.click(function() {
         chatWindow.addClass('hidden');
+      });
+
+      // Close chat when clicking outside
+      $(document).click(function(e) {
+        if (!$(e.target).closest('#chat-window, #chat-toggle-btn').length) {
+          chatWindow.addClass('hidden');
+        }
+      });
+
+      // Quick question buttons
+      $('.quick-question-btn').click(function() {
+        const question = $(this).text().trim();
+        chatInput.val(question);
+        chatForm.submit();
       });
 
       // Handle chat form submission
@@ -563,13 +626,12 @@
       });
 
       function addUserMessage(message) {
+        const timestamp = new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
         const messageHtml = `
-          <div class="flex items-start justify-end">
-            <div class="bg-primary-600 text-white rounded-lg rounded-tr-none p-3 shadow-sm max-w-[80%]">
-              <p class="text-sm">${escapeHtml(message)}</p>
-            </div>
-            <div class="w-8 h-8 bg-primary-600 rounded-full flex items-center justify-center ml-2 flex-shrink-0">
-              <i class="fas fa-user text-white text-sm"></i>
+          <div class="flex items-start justify-end animate-fadeIn">
+            <div class="bg-gradient-to-r from-orange-500 to-orange-600 text-white rounded-lg rounded-tr-none p-3 shadow-md max-w-[85%]">
+              <p class="text-sm leading-relaxed">${escapeHtml(message)}</p>
+              <p class="text-xs text-orange-100 mt-2 text-right">${timestamp}</p>
             </div>
           </div>
         `;
@@ -578,13 +640,15 @@
       }
 
       function addAiMessage(message) {
+        const timestamp = new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
         const messageHtml = `
-          <div class="flex items-start">
-            <div class="w-8 h-8 bg-primary-100 rounded-full flex items-center justify-center mr-2 flex-shrink-0">
-              <i class="fas fa-robot text-primary-600 text-sm"></i>
+          <div class="flex items-start animate-fadeIn">
+            <div class="w-8 h-8 bg-gradient-to-br from-orange-500 to-orange-600 rounded-full flex items-center justify-center mr-2 flex-shrink-0 shadow-sm">
+              <i class="fas fa-robot text-white text-sm"></i>
             </div>
-            <div class="bg-white rounded-lg rounded-tl-none p-3 shadow-sm max-w-[80%]">
-              <p class="text-sm text-gray-800">${formatAiMessage(message)}</p>
+            <div class="bg-white rounded-lg rounded-tl-none p-3 shadow-sm max-w-[85%] border border-gray-100">
+              <div class="text-sm text-gray-800 leading-relaxed">${formatAiMessage(message)}</div>
+              <p class="text-xs text-gray-400 mt-2">${timestamp}</p>
             </div>
           </div>
         `;
@@ -594,15 +658,15 @@
 
       function showTypingIndicator() {
         const typingHtml = `
-          <div class="flex items-start typing-indicator">
-            <div class="w-8 h-8 bg-primary-100 rounded-full flex items-center justify-center mr-2 flex-shrink-0">
-              <i class="fas fa-robot text-primary-600 text-sm"></i>
+          <div class="flex items-start typing-indicator animate-fadeIn">
+            <div class="w-8 h-8 bg-gradient-to-br from-orange-500 to-orange-600 rounded-full flex items-center justify-center mr-2 flex-shrink-0 shadow-sm">
+              <i class="fas fa-robot text-white text-sm"></i>
             </div>
-            <div class="bg-white rounded-lg rounded-tl-none p-3 shadow-sm">
-              <div class="flex space-x-1">
-                <div class="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style="animation-delay: 0s"></div>
-                <div class="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style="animation-delay: 0.2s"></div>
-                <div class="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style="animation-delay: 0.4s"></div>
+            <div class="bg-white rounded-lg rounded-tl-none p-3 shadow-sm border border-gray-100">
+              <div class="flex items-center space-x-2">
+                <div class="w-2 h-2 bg-orange-400 rounded-full animate-bounce" style="animation-delay: 0s"></div>
+                <div class="w-2 h-2 bg-orange-400 rounded-full animate-bounce" style="animation-delay: 0.15s"></div>
+                <div class="w-2 h-2 bg-orange-400 rounded-full animate-bounce" style="animation-delay: 0.3s"></div>
               </div>
             </div>
           </div>
@@ -631,12 +695,25 @@
       }
 
       function formatAiMessage(message) {
+        // Don't escape HTML - the message comes from trusted AI source
+        
         // Convert **bold** to <strong>
-        message = message.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
-        // Convert line breaks
-        message = message.replace(/\n/g, '<br>');
+        message = message.replace(/\*\*(.+?)\*\*/gs, '<strong>$1</strong>');
+        
+        // Convert numbered lists (1. 2. 3. etc)
+        message = message.replace(/^\d+\.\s+(.+)$/gm, '<li class="ml-4">$1</li>');
+        
         // Convert bullet points
-        message = message.replace(/^- (.+)$/gm, '• $1');
+        message = message.replace(/^[\-\*•]\s+(.+)$/gm, '<li class="ml-4">$1</li>');
+        
+        // Wrap consecutive list items in <ul>
+        message = message.replace(/(<li class="ml-4">.*?<\/li>\s*)+/gs, function(match) {
+          return '<ul class="list-disc list-inside space-y-1 my-2">' + match + '</ul>';
+        });
+        
+        // Convert line breaks to <br>
+        message = message.replace(/\n/g, '<br>');
+        
         return message;
       }
     });
@@ -659,16 +736,31 @@
       }
     }
 
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(10px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .animate-fadeIn {
+      animation: fadeIn 0.3s ease-out;
+    }
+
     #chat-toggle-btn {
       animation: pulse 2s infinite;
     }
 
     @keyframes pulse {
       0%, 100% {
-        box-shadow: 0 10px 15px -3px rgba(0, 89, 204, 0.3);
+        box-shadow: 0 10px 15px -3px rgba(249, 115, 22, 0.3);
       }
       50% {
-        box-shadow: 0 10px 25px -3px rgba(0, 89, 204, 0.5);
+        box-shadow: 0 10px 25px -3px rgba(249, 115, 22, 0.5);
       }
     }
 
@@ -683,12 +775,22 @@
     }
 
     #chat-messages::-webkit-scrollbar-thumb {
-      background: #cbd5e0;
+      background: #f97316;
       border-radius: 10px;
     }
 
     #chat-messages::-webkit-scrollbar-thumb:hover {
-      background: #a0aec0;
+      background: #ea580c;
+    }
+
+    /* FAQ animations */
+    .faq-answer {
+      display: none;
+    }
+
+    .rotate-180 {
+      transform: rotate(180deg);
+      transition: transform 0.3s ease;
     }
   </style>
 

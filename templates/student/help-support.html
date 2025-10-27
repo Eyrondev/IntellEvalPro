@@ -65,61 +65,104 @@
       <div id="header-container"></div>
       
       <!-- Page Content -->
-      <main class="p-6">
+      <main class="p-4 md:p-6">
         <!-- Page Title -->
         <div class="mb-6">
-          <h1 class="text-2xl font-bold text-gray-900 mb-2">Help & Support</h1>
-          <p class="text-gray-600">Find answers to common questions and get assistance with IntellEvalPro</p>
+          <h1 class="text-2xl md:text-3xl font-bold text-gray-900 mb-2">Help & Support</h1>
+          <p class="text-sm md:text-base text-gray-600">Find answers to common questions and get instant assistance with our AI-powered chatbot</p>
+        </div>
+
+        <!-- Quick Actions Banner -->
+        <div class="bg-gradient-to-r from-primary-600 to-primary-700 rounded-xl shadow-lg p-6 mb-8 text-white">
+          <div class="flex flex-col md:flex-row items-start md:items-center justify-between">
+            <div class="mb-4 md:mb-0">
+              <h2 class="text-xl md:text-2xl font-bold mb-2 flex items-center">
+                <i class="fas fa-headset mr-3"></i>
+                Need Quick Help?
+              </h2>
+              <p class="text-primary-100 text-sm md:text-base">Chat with our AI Assistant for instant answers to your evaluation questions</p>
+            </div>
+            <button onclick="document.getElementById('chat-toggle-btn').click()" class="bg-white text-primary-600 px-6 py-3 rounded-lg font-semibold hover:bg-primary-50 transition-colors flex items-center shadow-lg">
+              <i class="fas fa-robot mr-2"></i>
+              Start Chat
+            </button>
+          </div>
         </div>
 
         <!-- Quick Help Cards -->
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6 mb-8">
           <!-- Getting Started -->
-          <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6 hover:shadow-md transition-shadow cursor-pointer" onclick="scrollToSection('getting-started')">
-            <div class="flex items-center mb-4">
-              <div class="p-3 rounded-lg bg-blue-100">
-                <i class="fas fa-rocket text-blue-600 text-xl"></i>
+          <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-5 hover:shadow-md hover:border-primary-300 transition-all cursor-pointer group" onclick="scrollToSection('getting-started')">
+            <div class="flex items-start mb-3">
+              <div class="p-2.5 rounded-lg bg-blue-100 group-hover:bg-blue-200 transition-colors">
+                <i class="fas fa-rocket text-blue-600 text-lg"></i>
               </div>
-              <h3 class="text-lg font-semibold text-gray-900 ml-3">Getting Started</h3>
             </div>
-            <p class="text-gray-600">Learn the basics of using IntellEvalPro for student evaluations</p>
+            <h3 class="text-base font-semibold text-gray-900 mb-2">Getting Started</h3>
+            <p class="text-sm text-gray-600">Learn how to navigate and use the evaluation system</p>
           </div>
 
           <!-- Evaluation Help -->
-          <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6 hover:shadow-md transition-shadow cursor-pointer" onclick="scrollToSection('evaluation-help')">
-            <div class="flex items-center mb-4">
-              <div class="p-3 rounded-lg bg-green-100">
-                <i class="fas fa-clipboard-check text-green-600 text-xl"></i>
+          <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-5 hover:shadow-md hover:border-primary-300 transition-all cursor-pointer group" onclick="scrollToSection('evaluation-help')">
+            <div class="flex items-start mb-3">
+              <div class="p-2.5 rounded-lg bg-green-100 group-hover:bg-green-200 transition-colors">
+                <i class="fas fa-clipboard-check text-green-600 text-lg"></i>
               </div>
-              <h3 class="text-lg font-semibold text-gray-900 ml-3">Evaluation Help</h3>
             </div>
-            <p class="text-gray-600">Find help with completing and submitting evaluations</p>
+            <h3 class="text-base font-semibold text-gray-900 mb-2">Completing Evaluations</h3>
+            <p class="text-sm text-gray-600">Step-by-step guide to rating your faculty</p>
           </div>
 
           <!-- Dashboard & Progress -->
-          <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6 hover:shadow-md transition-shadow cursor-pointer" onclick="scrollToSection('dashboard-progress')">
-            <div class="flex items-center mb-4">
-              <div class="p-3 rounded-lg bg-purple-100">
-                <i class="fas fa-chart-line text-purple-600 text-xl"></i>
+          <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-5 hover:shadow-md hover:border-primary-300 transition-all cursor-pointer group" onclick="scrollToSection('dashboard-progress')">
+            <div class="flex items-start mb-3">
+              <div class="p-2.5 rounded-lg bg-purple-100 group-hover:bg-purple-200 transition-colors">
+                <i class="fas fa-chart-line text-purple-600 text-lg"></i>
               </div>
-              <h3 class="text-lg font-semibold text-gray-900 ml-3">Dashboard & Progress</h3>
             </div>
-            <p class="text-gray-600">Learn about tracking your evaluation progress</p>
+            <h3 class="text-base font-semibold text-gray-900 mb-2">Track Your Progress</h3>
+            <p class="text-sm text-gray-600">Monitor your evaluation completion status</p>
+          </div>
+
+          <!-- Technical Support -->
+          <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-5 hover:shadow-md hover:border-primary-300 transition-all cursor-pointer group" onclick="scrollToSection('technical-issues')">
+            <div class="flex items-start mb-3">
+              <div class="p-2.5 rounded-lg bg-orange-100 group-hover:bg-orange-200 transition-colors">
+                <i class="fas fa-tools text-orange-600 text-lg"></i>
+              </div>
+            </div>
+            <h3 class="text-base font-semibold text-gray-900 mb-2">Technical Issues</h3>
+            <p class="text-sm text-gray-600">Troubleshoot common technical problems</p>
           </div>
         </div>
 
         <!-- FAQ Section -->
         <div class="bg-white rounded-xl shadow-sm border border-gray-200 mb-6">
-          <div class="p-6 border-b border-gray-200">
-            <h2 class="text-xl font-semibold text-gray-900">Frequently Asked Questions</h2>
+          <div class="p-4 md:p-6 border-b border-gray-200">
+            <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+              <div>
+                <h2 class="text-lg md:text-xl font-semibold text-gray-900">Frequently Asked Questions</h2>
+                <p class="text-sm text-gray-600 mt-1">Browse common questions or search for specific topics</p>
+              </div>
+              <div class="flex items-center gap-2 text-sm">
+                <span class="bg-primary-100 text-primary-700 px-3 py-1.5 rounded-full font-medium">
+                  <i class="fas fa-question-circle mr-1"></i>
+                  <span id="total-faqs">24</span> FAQs
+                </span>
+              </div>
+            </div>
           </div>
-          <div class="p-6">
+          <div class="p-4 md:p-6">
             <!-- Search FAQ -->
             <div class="mb-6">
               <div class="relative">
-                <input type="text" id="faq-search" placeholder="Search FAQ..." class="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-primary-500 focus:border-primary-500">
+                <input type="text" id="faq-search" placeholder="Search for answers (e.g., 'how to submit evaluation', 'rating scale', 'anonymous')..." class="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 text-sm md:text-base">
                 <i class="fas fa-search absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
               </div>
+              <p class="text-xs text-gray-500 mt-2">
+                <i class="fas fa-lightbulb text-yellow-500 mr-1"></i>
+                Tip: Try our AI Assistant for instant, personalized answers!
+              </p>
             </div>
 
             <!-- Getting Started FAQs -->
@@ -130,22 +173,64 @@
               </h3>
               <div class="space-y-4">
                 <div class="faq-item border border-gray-200 rounded-lg">
-                  <button class="faq-question w-full text-left px-4 py-3 font-medium text-gray-900 hover:bg-gray-50 focus:outline-none flex items-center justify-between">
-                    How do I log in to IntellEvalPro?
-                    <i class="fas fa-chevron-down transform transition-transform"></i>
+                  <button class="faq-question w-full text-left px-4 py-3 font-medium text-gray-900 hover:bg-gray-50 focus:outline-none flex items-center justify-between transition-colors">
+                    <span class="flex items-center">
+                      <i class="fas fa-sign-in-alt text-primary-600 mr-3 text-sm"></i>
+                      How do I log in to IntellEvalPro?
+                    </span>
+                    <i class="fas fa-chevron-down transform transition-transform text-gray-400"></i>
                   </button>
-                  <div class="faq-answer hidden px-4 pb-3 text-gray-600">
-                    To log in to IntellEvalPro, use your student credentials provided by your institution. Enter your username and password on the login page. If you're having trouble logging in or forgot your password, use the "Forgot Password" link or contact your academic office for assistance.
+                  <div class="faq-answer hidden px-4 pb-4 pt-2 text-gray-600">
+                    <p class="leading-relaxed">To log in:</p>
+                    <ol class="list-decimal list-inside mt-2 space-y-1 ml-2">
+                      <li>Go to the IntellEvalPro login page</li>
+                      <li>Enter your <strong>Student ID</strong> (e.g., 2022-0215) as username</li>
+                      <li>Enter your password (default: your birthday in MMDDYYYY format)</li>
+                      <li>Click "Login" button</li>
+                    </ol>
+                    <div class="mt-3 p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
+                      <p class="text-sm text-yellow-800">
+                        <i class="fas fa-exclamation-triangle mr-1"></i>
+                        <strong>Forgot password?</strong> Click "Forgot Password" link or contact your guidance counselor for assistance.
+                      </p>
+                    </div>
                   </div>
                 </div>
 
                 <div class="faq-item border border-gray-200 rounded-lg">
-                  <button class="faq-question w-full text-left px-4 py-3 font-medium text-gray-900 hover:bg-gray-50 focus:outline-none flex items-center justify-between">
-                    What is the evaluation system for?
-                    <i class="fas fa-chevron-down transform transition-transform"></i>
+                  <button class="faq-question w-full text-left px-4 py-3 font-medium text-gray-900 hover:bg-gray-50 focus:outline-none flex items-center justify-between transition-colors">
+                    <span class="flex items-center">
+                      <i class="fas fa-info-circle text-primary-600 mr-3 text-sm"></i>
+                      What is the evaluation system for?
+                    </span>
+                    <i class="fas fa-chevron-down transform transition-transform text-gray-400"></i>
                   </button>
-                  <div class="faq-answer hidden px-4 pb-3 text-gray-600">
-                    The IntellEvalPro system allows students to provide anonymous feedback on their faculty and courses. Your evaluations help improve the quality of education and assist faculty in enhancing their teaching methods. All responses are confidential and contribute to improving the learning experience.
+                  <div class="faq-answer hidden px-4 pb-4 pt-2 text-gray-600">
+                    <p class="leading-relaxed mb-3">IntellEvalPro allows you to provide <strong>anonymous feedback</strong> on your faculty's teaching performance. Your evaluations help:</p>
+                    <ul class="space-y-2">
+                      <li class="flex items-start">
+                        <i class="fas fa-check-circle text-green-500 mr-2 mt-0.5"></i>
+                        <span>Improve teaching quality and educational experience</span>
+                      </li>
+                      <li class="flex items-start">
+                        <i class="fas fa-check-circle text-green-500 mr-2 mt-0.5"></i>
+                        <span>Faculty members enhance their teaching methods</span>
+                      </li>
+                      <li class="flex items-start">
+                        <i class="fas fa-check-circle text-green-500 mr-2 mt-0.5"></i>
+                        <span>Administration make data-driven decisions</span>
+                      </li>
+                      <li class="flex items-start">
+                        <i class="fas fa-check-circle text-green-500 mr-2 mt-0.5"></i>
+                        <span>Maintain academic excellence standards</span>
+                      </li>
+                    </ul>
+                    <div class="mt-3 p-3 bg-blue-50 border border-blue-200 rounded-lg">
+                      <p class="text-sm text-blue-800">
+                        <i class="fas fa-shield-alt mr-1"></i>
+                        Your responses are <strong>100% anonymous and confidential</strong>. Faculty cannot see who submitted specific ratings.
+                      </p>
+                    </div>
                   </div>
                 </div>
 
@@ -380,63 +465,97 @@
   <div id="sidebar-overlay" class="fixed inset-0 z-30 bg-black bg-opacity-50 hidden lg:hidden"></div>
 
   <!-- AI Chatbot Widget -->
-  <div id="ai-chatbot-container" class="fixed bottom-6 right-6 z-50">
+  <div id="ai-chatbot-container" class="fixed bottom-4 md:bottom-6 right-4 md:right-6 z-50">
     <!-- Chat Button -->
-    <button id="chat-toggle-btn" class="bg-gradient-to-r from-primary-600 to-primary-700 text-white rounded-full p-4 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-110 flex items-center justify-center">
-      <i class="fas fa-robot text-2xl"></i>
-      <span class="ml-2 font-medium hidden md:inline">AI Assistant</span>
+    <button id="chat-toggle-btn" class="bg-gradient-to-r from-primary-600 to-primary-700 text-white rounded-full p-3 md:p-4 shadow-lg hover:shadow-xl transition-all duration-300 hover:scale-105 flex items-center justify-center group">
+      <i class="fas fa-robot text-xl md:text-2xl"></i>
+      <span class="ml-2 font-medium hidden md:inline text-sm lg:text-base">Ask AI Assistant</span>
+      <span class="absolute -top-1 -right-1 w-3 h-3 bg-green-400 rounded-full border-2 border-white animate-pulse"></span>
     </button>
 
     <!-- Chat Window -->
-    <div id="chat-window" class="hidden absolute bottom-20 right-0 w-96 max-w-[calc(100vw-3rem)] bg-white rounded-2xl shadow-2xl border border-gray-200 overflow-hidden flex flex-col" style="height: 500px; max-height: calc(100vh - 8rem);">
+    <div id="chat-window" class="hidden fixed bottom-16 md:bottom-20 right-4 md:right-6 w-[calc(100vw-2rem)] md:w-96 bg-white rounded-2xl shadow-2xl border border-gray-200 overflow-hidden flex flex-col" style="height: calc(100vh - 8rem); max-height: 600px;">
       <!-- Chat Header -->
       <div class="bg-gradient-to-r from-primary-600 to-primary-700 text-white p-4 flex items-center justify-between">
         <div class="flex items-center">
-          <div class="w-10 h-10 bg-white rounded-full flex items-center justify-center mr-3">
+          <div class="w-10 h-10 bg-white rounded-full flex items-center justify-center mr-3 animate-pulse">
             <i class="fas fa-robot text-primary-600 text-xl"></i>
           </div>
           <div>
-            <h3 class="font-semibold text-lg">IntellEval Assistant</h3>
-            <p class="text-xs text-primary-100">Powered by Gemini AI</p>
+            <h3 class="font-semibold text-base md:text-lg">IntellEval AI Assistant</h3>
+            <p class="text-xs text-primary-100 flex items-center">
+              <span class="w-2 h-2 bg-green-400 rounded-full mr-1.5 animate-pulse"></span>
+              Online • Powered by Gemini AI
+            </p>
           </div>
         </div>
         <button id="chat-close-btn" class="text-white hover:bg-white hover:bg-opacity-20 rounded-full p-2 transition-colors">
-          <i class="fas fa-times"></i>
+          <i class="fas fa-times text-lg"></i>
         </button>
       </div>
 
       <!-- Chat Messages -->
       <div id="chat-messages" class="flex-1 overflow-y-auto p-4 space-y-4 bg-gray-50">
         <!-- Welcome Message -->
-        <div class="flex items-start">
-          <div class="w-8 h-8 bg-primary-100 rounded-full flex items-center justify-center mr-2 flex-shrink-0">
-            <i class="fas fa-robot text-primary-600 text-sm"></i>
+        <div class="flex items-start animate-fadeIn">
+          <div class="w-8 h-8 bg-gradient-to-br from-primary-500 to-primary-600 rounded-full flex items-center justify-center mr-2 flex-shrink-0 shadow-sm">
+            <i class="fas fa-robot text-white text-sm"></i>
           </div>
-          <div class="bg-white rounded-lg rounded-tl-none p-3 shadow-sm max-w-[80%]">
-            <p class="text-sm text-gray-800">Hi! 👋 I'm your IntellEvalPro AI Assistant. I can help you with questions about the evaluation system, navigation, features, and troubleshooting. How can I assist you today?</p>
+          <div class="bg-white rounded-lg rounded-tl-none p-3 shadow-sm max-w-[85%] border border-gray-100">
+            <p class="text-sm text-gray-800 leading-relaxed">
+              👋 <strong>Hello!</strong> I'm your IntellEvalPro AI Assistant.
+            </p>
+            <p class="text-sm text-gray-700 mt-2 leading-relaxed">
+              I can help you with:
+            </p>
+            <ul class="text-sm text-gray-700 mt-2 space-y-1 ml-2">
+              <li>• <strong>Evaluation questions</strong> - How to rate faculty, submit evaluations</li>
+              <li>• <strong>Navigation help</strong> - Finding features and pages</li>
+              <li>• <strong>Technical issues</strong> - Login problems, system errors</li>
+              <li>• <strong>Account help</strong> - Password reset, profile updates</li>
+            </ul>
+            <p class="text-sm text-gray-600 mt-3 italic">
+              💡 Try asking: "How do I submit an evaluation?" or "What does the rating scale mean?"
+            </p>
           </div>
+        </div>
+
+        <!-- Quick Action Buttons -->
+        <div class="flex flex-wrap gap-2 px-2">
+          <button class="quick-question-btn text-xs bg-primary-50 hover:bg-primary-100 text-primary-700 px-3 py-2 rounded-full border border-primary-200 transition-colors">
+            How do I complete evaluations?
+          </button>
+          <button class="quick-question-btn text-xs bg-primary-50 hover:bg-primary-100 text-primary-700 px-3 py-2 rounded-full border border-primary-200 transition-colors">
+            What's the rating scale?
+          </button>
+          <button class="quick-question-btn text-xs bg-primary-50 hover:bg-primary-100 text-primary-700 px-3 py-2 rounded-full border border-primary-200 transition-colors">
+            Are evaluations anonymous?
+          </button>
         </div>
       </div>
 
       <!-- Chat Input -->
-      <div class="border-t border-gray-200 p-4 bg-white">
+      <div class="border-t border-gray-200 p-3 md:p-4 bg-white">
         <form id="chat-form" class="flex items-center space-x-2">
           <input 
             type="text" 
             id="chat-input" 
-            placeholder="Ask me anything about IntellEvalPro..." 
-            class="flex-1 px-4 py-2 border border-gray-300 rounded-full focus:ring-2 focus:ring-primary-500 focus:border-primary-500 text-sm"
+            placeholder="Type your question here..." 
+            class="flex-1 px-3 md:px-4 py-2 md:py-2.5 border border-gray-300 rounded-full focus:ring-2 focus:ring-primary-500 focus:border-primary-500 text-sm"
             autocomplete="off"
           />
           <button 
             type="submit" 
             id="chat-send-btn"
-            class="bg-primary-600 text-white rounded-full p-2 hover:bg-primary-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed w-10 h-10 flex items-center justify-center"
+            class="bg-primary-600 text-white rounded-full p-2 md:p-2.5 hover:bg-primary-700 active:scale-95 transition-all disabled:opacity-50 disabled:cursor-not-allowed w-9 h-9 md:w-10 md:h-10 flex items-center justify-center shadow-md"
           >
-            <i class="fas fa-paper-plane"></i>
+            <i class="fas fa-paper-plane text-sm"></i>
           </button>
         </form>
-        <p class="text-xs text-gray-500 mt-2 text-center">AI responses are based on system documentation</p>
+        <p class="text-xs text-gray-500 mt-2 text-center flex items-center justify-center">
+          <i class="fas fa-shield-alt text-gray-400 mr-1"></i>
+          AI responses are based on IntellEvalPro documentation
+        </p>
       </div>
     </div>
   </div>
@@ -511,12 +630,21 @@
         chatWindow.toggleClass('hidden');
         if (!chatWindow.hasClass('hidden')) {
           chatInput.focus();
+          // Add entrance animation
+          chatWindow.addClass('animate-slideUp');
         }
       });
 
       // Close chat window
       chatCloseBtn.click(function() {
         chatWindow.addClass('hidden');
+      });
+
+      // Quick question buttons
+      $(document).on('click', '.quick-question-btn', function() {
+        const question = $(this).text();
+        chatInput.val(question);
+        chatForm.submit();
       });
 
       // Handle chat form submission
@@ -530,6 +658,9 @@
         addUserMessage(message);
         chatInput.val('');
         
+        // Remove quick action buttons after first message
+        $('.quick-question-btn').parent().fadeOut();
+        
         // Disable input while processing
         chatInput.prop('disabled', true);
         chatSendBtn.prop('disabled', true);
@@ -542,18 +673,22 @@
           url: '/api/ai-support-chat',
           method: 'POST',
           contentType: 'application/json',
-          data: JSON.stringify({ message: message }),
+          data: JSON.stringify({ 
+            message: message,
+            context: 'student_help_support',
+            role: 'student'
+          }),
           success: function(response) {
             removeTypingIndicator();
             if (response.success) {
               addAiMessage(response.reply);
             } else {
-              addAiMessage('Sorry, I encountered an error. Please try again or check the FAQs above.');
+              addAiMessage('I apologize, but I encountered an error. Please try rephrasing your question or check the FAQ sections above.');
             }
           },
           error: function() {
             removeTypingIndicator();
-            addAiMessage('Sorry, I\'m having trouble connecting right now. Please try again in a moment.');
+            addAiMessage('I\'m having trouble connecting. While I get back online, try browsing the FAQ sections above or use the search feature.');
           },
           complete: function() {
             chatInput.prop('disabled', false);
@@ -564,13 +699,15 @@
       });
 
       function addUserMessage(message) {
+        const timestamp = new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
         const messageHtml = `
-          <div class="flex items-start justify-end">
-            <div class="bg-primary-600 text-white rounded-lg rounded-tr-none p-3 shadow-sm max-w-[80%]">
-              <p class="text-sm">${escapeHtml(message)}</p>
+          <div class="flex items-start justify-end animate-fadeIn">
+            <div class="bg-gradient-to-r from-primary-600 to-primary-700 text-white rounded-lg rounded-tr-none p-3 shadow-sm max-w-[85%]">
+              <p class="text-sm leading-relaxed">${escapeHtml(message)}</p>
+              <p class="text-xs text-primary-100 mt-1 text-right">${timestamp}</p>
             </div>
-            <div class="w-8 h-8 bg-primary-600 rounded-full flex items-center justify-center ml-2 flex-shrink-0">
-              <i class="fas fa-user text-white text-sm"></i>
+            <div class="w-8 h-8 bg-primary-600 rounded-full flex items-center justify-center ml-2 flex-shrink-0 shadow-sm">
+              <i class="fas fa-user text-white text-xs"></i>
             </div>
           </div>
         `;
@@ -579,13 +716,15 @@
       }
 
       function addAiMessage(message) {
+        const timestamp = new Date().toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
         const messageHtml = `
-          <div class="flex items-start">
-            <div class="w-8 h-8 bg-primary-100 rounded-full flex items-center justify-center mr-2 flex-shrink-0">
-              <i class="fas fa-robot text-primary-600 text-sm"></i>
+          <div class="flex items-start animate-fadeIn">
+            <div class="w-8 h-8 bg-gradient-to-br from-primary-500 to-primary-600 rounded-full flex items-center justify-center mr-2 flex-shrink-0 shadow-sm">
+              <i class="fas fa-robot text-white text-xs"></i>
             </div>
-            <div class="bg-white rounded-lg rounded-tl-none p-3 shadow-sm max-w-[80%]">
-              <p class="text-sm text-gray-800">${formatAiMessage(message)}</p>
+            <div class="bg-white rounded-lg rounded-tl-none p-3 shadow-sm max-w-[85%] border border-gray-100">
+              <div class="text-sm text-gray-800 leading-relaxed">${formatAiMessage(message)}</div>
+              <p class="text-xs text-gray-500 mt-1">${timestamp}</p>
             </div>
           </div>
         `;
@@ -595,15 +734,15 @@
 
       function showTypingIndicator() {
         const typingHtml = `
-          <div class="flex items-start typing-indicator">
-            <div class="w-8 h-8 bg-primary-100 rounded-full flex items-center justify-center mr-2 flex-shrink-0">
-              <i class="fas fa-robot text-primary-600 text-sm"></i>
+          <div class="flex items-start typing-indicator animate-fadeIn">
+            <div class="w-8 h-8 bg-gradient-to-br from-primary-500 to-primary-600 rounded-full flex items-center justify-center mr-2 flex-shrink-0 shadow-sm">
+              <i class="fas fa-robot text-white text-xs"></i>
             </div>
-            <div class="bg-white rounded-lg rounded-tl-none p-3 shadow-sm">
+            <div class="bg-white rounded-lg rounded-tl-none p-3 shadow-sm border border-gray-100">
               <div class="flex space-x-1">
-                <div class="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style="animation-delay: 0s"></div>
-                <div class="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style="animation-delay: 0.2s"></div>
-                <div class="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style="animation-delay: 0.4s"></div>
+                <div class="w-2 h-2 bg-primary-400 rounded-full animate-bounce" style="animation-delay: 0s"></div>
+                <div class="w-2 h-2 bg-primary-400 rounded-full animate-bounce" style="animation-delay: 0.2s"></div>
+                <div class="w-2 h-2 bg-primary-400 rounded-full animate-bounce" style="animation-delay: 0.4s"></div>
               </div>
             </div>
           </div>
@@ -613,11 +752,15 @@
       }
 
       function removeTypingIndicator() {
-        $('.typing-indicator').remove();
+        $('.typing-indicator').fadeOut(200, function() {
+          $(this).remove();
+        });
       }
 
       function scrollChatToBottom() {
-        chatMessages.scrollTop(chatMessages[0].scrollHeight);
+        chatMessages.animate({
+          scrollTop: chatMessages[0].scrollHeight
+        }, 300);
       }
 
       function escapeHtml(text) {
@@ -633,13 +776,29 @@
 
       function formatAiMessage(message) {
         // Convert **bold** to <strong>
-        message = message.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
+        message = message.replace(/\*\*(.+?)\*\*/g, '<strong class="font-semibold text-gray-900">$1</strong>');
+        // Convert *italic* to <em>
+        message = message.replace(/\*(.+?)\*/g, '<em class="italic">$1</em>');
         // Convert line breaks
+        message = message.replace(/\n\n/g, '</p><p class="mt-2">');
         message = message.replace(/\n/g, '<br>');
         // Convert bullet points
-        message = message.replace(/^- (.+)$/gm, '• $1');
+        message = message.replace(/^• (.+)$/gm, '<li class="ml-4">• $1</li>');
+        // Wrap in paragraph if needed
+        if (!message.startsWith('<')) {
+          message = '<p>' + message + '</p>';
+        }
         return message;
       }
+
+      // Close chat when clicking outside
+      $(document).click(function(e) {
+        if (!$(e.target).closest('#ai-chatbot-container').length) {
+          if (!chatWindow.hasClass('hidden')) {
+            chatWindow.addClass('hidden');
+          }
+        }
+      });
     });
   </script>
 
@@ -648,15 +807,11 @@
       transform: rotate(180deg);
     }
 
-    /* Chatbot animations */
-    #chat-window {
-      animation: slideUp 0.3s ease-out;
-    }
-
-    @keyframes slideUp {
+    /* Animation keyframes */
+    @keyframes fadeIn {
       from {
         opacity: 0;
-        transform: translateY(20px);
+        transform: translateY(10px);
       }
       to {
         opacity: 1;
@@ -664,6 +819,26 @@
       }
     }
 
+    @keyframes slideUp {
+      from {
+        opacity: 0;
+        transform: translateY(20px) scale(0.95);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+      }
+    }
+
+    .animate-fadeIn {
+      animation: fadeIn 0.3s ease-out;
+    }
+
+    .animate-slideUp {
+      animation: slideUp 0.3s ease-out;
+    }
+
+    /* Chatbot button pulse animation */
     #chat-toggle-btn {
       animation: pulse 2s infinite;
     }
@@ -683,7 +858,7 @@
     }
 
     #chat-messages::-webkit-scrollbar-track {
-      background: #f1f1f1;
+      background: #f1f5f9;
       border-radius: 10px;
     }
 
@@ -694,6 +869,36 @@
 
     #chat-messages::-webkit-scrollbar-thumb:hover {
       background: #a0aec0;
+    }
+
+    /* FAQ hover effects */
+    .faq-item {
+      transition: all 0.2s ease;
+    }
+
+    .faq-item:hover {
+      border-color: #0059cc;
+      box-shadow: 0 2px 4px rgba(0, 89, 204, 0.1);
+    }
+
+    /* Quick action button hover effects */
+    .quick-question-btn {
+      transition: all 0.2s ease;
+    }
+
+    .quick-question-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 6px rgba(0, 89, 204, 0.2);
+    }
+
+    /* Mobile responsive adjustments */
+    @media (max-width: 768px) {
+      #chat-window {
+        bottom: 4.5rem !important;
+        right: 1rem !important;
+        width: calc(100vw - 2rem) !important;
+        max-height: calc(100vh - 10rem) !important;
+      }
     }
   </style>
 </body>
